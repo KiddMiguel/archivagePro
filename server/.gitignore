@@ -1,0 +1,56 @@
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Dossiers de l'environnement de développement
+node_modules/
+.env
+
+# Dossiers de compilation/build
+dist/
+build/
+*.log
+
+# Dépendances
+bower_components/
+
+# IDE - fichiers de configuration spécifiques
+.idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/
+*.swp
+*.swo
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.unity
+*.vs/
+*.vscode/
+*.nupkg
+*.nuget/
+
+# Fichiers de package
+*.jar
+*.war
+*.ear
+*.db
+
+# Fichiers de log
+*.log
+*.sql
+*.sqlite
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Autres fichiers et dossiers
+.DS_Store
+ehthumbs.db
+Thumbs.db
+*.stackdump
