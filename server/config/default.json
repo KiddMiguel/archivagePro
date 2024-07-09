@@ -1,0 +1,7 @@
+{
+    "mysqlHost": "localhost",
+    "mysqlUser": "root",
+    "mysqlPassword": "",
+    "mysqlDatabase": "archivapro"
+  }
+  

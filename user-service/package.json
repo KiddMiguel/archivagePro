@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< HEAD:user-service/package.json
     "start": "nodemon src/index.js"
+=======
+    "start": "nodemon index.js"
+>>>>>>> 7a131c15d635a0f2685e530d130e5cfb03cefdd2:server/package.json
   },
   "keywords": [],
   "author": "",
@@ -13,13 +17,22 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
+<<<<<<< HEAD:user-service/package.json
+=======
+    "config": "^3.3.12",
+>>>>>>> 7a131c15d635a0f2685e530d130e5cfb03cefdd2:server/package.json
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-validator": "^7.1.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD:user-service/package.json
     "morgan": "^1.10.0",
+=======
+    "mongoose": "^8.4.0",
+    "mysql": "^2.18.1",
+>>>>>>> 7a131c15d635a0f2685e530d130e5cfb03cefdd2:server/package.json
     "nodemon": "^3.1.4"
   }
 }
