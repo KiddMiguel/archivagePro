@@ -1,21 +1,18 @@
-// Pour authentifier les utilisateurs et protéger les routes qui nécessitent une connexion. 
-// Cela inclut la vérification des jetons d'accès, tels que JWT.
+// src/middlewares/authMiddleware.js
 const jwt = require('jsonwebtoken');
 
 exports.verifyToken = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
+  const token = req.header('Authorization').replace('Bearer ', '');
 
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
+  if (!token) {
+    return res.status(401).json({ msg: 'No token, authorization denied' });
+  }
 
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded.user;
+    next();
+  } catch (err) {
+    res.status(401).json({ msg: 'Token is not valid' });
+  }
 };

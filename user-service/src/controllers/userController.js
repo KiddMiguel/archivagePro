@@ -1,168 +1,180 @@
-const User = require('../models/userModel');
-const { promisify } = require('util');
-const { validationResult } = require('express-validator');
+// src/controllers/userController.js
+const userRepository = require('../repositories/userRepository');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Fonction pour générer un token JWT
-const generateJwtToken = (userId, type) => {
-    return jwt.sign({ userId, type }, process.env.JWT_SECRET, {
-        expiresIn: '1h',
-    });
-};
-
-// Contrôleur de test
-exports.test = (req, res) => {
-    res.status(200).send('User Service is working!');
-};
-
-// Inscription
 exports.register = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+  const { firstName, lastName, email, password, address } = req.body;
+
+  try {
+    let user = await userRepository.findUserByEmail(email);
+    if (user) {
+      return res.status(400).json({ msg: 'User already exists' });
     }
 
-    const { name, email, password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    try {
-        let user = await User.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+    const newUser = {
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      address
+    };
 
-        user = new User({
-            name,
-            email,
-            password: await bcrypt.hash(password, 10),
-        });
+    user = await userRepository.createUser(newUser);
 
-        await user.save();
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
 
-        const token = generateJwtToken(user._id, 'user');
-
-        res.status(201).json({
-            message: 'User registered successfully',
-            token,
-            user: { id: user._id, name: user.name, email: user.email },
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
-    }
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 };
 
-// Connexion
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        const token = generateJwtToken(user._id, 'user');
-
-        res.status(200).json({
-            message: 'User logged in successfully',
-            token,
-            user: { id: user._id, name: user.name, email: user.email },
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    let user = await userRepository.findUserByEmail(email);
+    if (!user) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token });
+      }
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 };
 
-// Récupération des informations utilisateur
 exports.getUserInfo = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.status(200).json({ user });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    const user = await userRepository.findUserById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 };
 
-// Mise à jour du profil
 exports.updateProfile = async (req, res) => {
-    const { name, email } = req.body;
+  const { firstName, lastName, address } = req.body;
 
-    try {
-        let user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        user.name = name || user.name;
-        user.email = email || user.email;
-
-        await user.save();
-
-        res.status(200).json({
-            message: 'User profile updated successfully',
-            user: { id: user._id, name: user.name, email: user.email },
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    let user = await userRepository.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
+
+    const updateData = {
+      firstName: firstName || user.firstName,
+      lastName: lastName || user.lastName,
+      address: address || user.address,
+    };
+
+    user = await userRepository.updateUser(req.user.id, updateData);
+
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 };
 
-// Suppression de compte
 exports.deleteProfile = async (req, res) => {
-    try {
-        await User.findByIdAndDelete(req.user.userId);
-
-        res.status(200).json({ message: 'User account deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    const user = await userRepository.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
+
+    await userRepository.deleteUser(req.user.id);
+
+    res.json({ msg: 'User removed' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
 };
 
-// Déconnexion
-exports.logout = (req, res) => {
-    res.status(200).json({ message: 'User logged out successfully' });
-};
-
-// Modifier le mot de passe
-exports.changePassword = async (req, res) => {
-    const { oldPassword, newPassword } = req.body;
-
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
-
-        user.password = await bcrypt.hash(newPassword, 10);
-        await user.save();
-
-        res.status(200).json({ message: 'Password changed successfully' });
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Server error', error });
-    }
-};
-
-// Récupération de tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
-    try {
-        const users = await User.find().select('-password');
-        res.status(200).json({ users });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    const users = await userRepository.getAllUsers();
+    res.json(users);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await userRepository.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
     }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: 'Invalid current password' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    await user.save();
+
+    res.json({ msg: 'Password updated' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+exports.logout = (req, res) => {
+  // Logique de déconnexion si nécessaire
+  res.json({ msg: 'Logout successful' });
+};
+
+exports.test = (req, res) => {
+  res.json({ msg: 'Test route is working' });
 };

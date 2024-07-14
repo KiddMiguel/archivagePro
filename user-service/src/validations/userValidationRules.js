@@ -1,4 +1,5 @@
-const { check } = require('express-validator');
+// src/validations/userValidationRules.js
+const { check, validationResult } = require('express-validator');
 const rateLimit = require('express-rate-limit');
 
 // Limite de taux pour la connexion
@@ -17,15 +18,30 @@ exports.registerLimiter = rateLimit({
 
 // Règles de validation pour l'inscription
 exports.registerValidationRules = [
-    check('name', 'Name is required').not().isEmpty(),
+    check('firstName', 'First name is required').not().isEmpty(),
+    check('lastName', 'Last name is required').not().isEmpty(),
     check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
+    check('password')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+        .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
+    check('address.street', 'Street is required').not().isEmpty(),
+    check('address.city', 'City is required').not().isEmpty(),
+    check('address.postalCode', 'Postal code is required').not().isEmpty(),
+    check('address.country', 'Country is required').not().isEmpty(),
 ];
 
 // Règles de validation pour la mise à jour du profil
 exports.updateProfileValidationRules = [
-    check('name', 'Name is required').optional().not().isEmpty(),
+    check('firstName', 'First name is required').optional().not().isEmpty(),
+    check('lastName', 'Last name is required').optional().not().isEmpty(),
     check('email', 'Please include a valid email').optional().isEmail(),
+    check('address.street', 'Street is required').optional().not().isEmpty(),
+    check('address.city', 'City is required').optional().not().isEmpty(),
+    check('address.postalCode', 'Postal code is required').optional().not().isEmpty(),
+    check('address.country', 'Country is required').optional().not().isEmpty(),
 ];
 
 // Règles de validation pour la connexion
@@ -34,10 +50,15 @@ exports.loginValidationRules = [
     check('password', 'Password is required').exists(),
 ];
 
-// Modication du mot de passe
+// Règles de validation pour la modification du mot de passe
 exports.changePasswordValidationRules = [
-    check('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    check('newPassword', 'Please enter a new password with 6 or more characters').isLength({ min: 6 }),
+    check('oldPassword', 'Current password is required').exists(),
+    check('newPassword')
+        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
+        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
+        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
+        .matches(/\d/).withMessage('Password must contain at least one number')
+        .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
 ];
 
 // Middleware pour valider les règles de validation
@@ -54,5 +75,3 @@ exports.validate = (req, res, next) => {
         errors: extractedErrors,
     });
 };
-
-

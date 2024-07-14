@@ -17,4 +17,3 @@ module.exports = {
         maxAge: process.env.CORS_MAX_AGE || 3600
     }
 };
-

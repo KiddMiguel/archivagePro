@@ -5,6 +5,7 @@ import Home from './pages/landing-page/home';
 import Login from './pages/landing-page/login';
 import Signup from './pages/landing-page/signup';
 import CheckoutForm from './pages/landing-page/checkoutForm';
+import Dashboard from './pages/dashboard-page/Dashboard';
 import APIRest from './pages/ApiRest';
 import './assets/styles/App.css';
 
@@ -17,7 +18,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/api" element={<APIRest />} />
-          <Route path="/checkout" element={<CheckoutForm />} />
+          <Route path="/checkout/:id" element={<CheckoutForm />} />
+          <Route path='Dashboard/:id' element={<Dashboard />} />
         </Routes>
       </Router>
     </div>
