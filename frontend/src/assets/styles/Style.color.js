@@ -1,6 +1,6 @@
 // Couleurs utilisées dans l'application
 export const colors = {
-  primary: "#003366",
+  primary: "#1976d2",
   secondary: "#0073e6",
   success: "#28a745",
   warning: "#ffc107",

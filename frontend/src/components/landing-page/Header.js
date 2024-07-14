@@ -4,7 +4,6 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
@@ -13,14 +12,10 @@ import Grid from '@mui/material/Grid';
 import Menu from '@mui/material/Menu';
 
 const Header = () => {
-  const [language, setLanguage] = React.useState('French');
   const [anchorEl, setAnchorEl] = React.useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleChange = (event) => {
-    setLanguage(event.target.value);
-  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,7 +26,8 @@ const Header = () => {
   };
 
   return (
-    <AppBar  position="static" color="transparent" elevation={0}>
+    <AppBar position="static" color="transparent"  sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
+      
       <Toolbar>
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item xs={isMobile ? 8 : 'auto'}>
@@ -60,9 +56,10 @@ const Header = () => {
               </>
             ) : (
               <>
-                <Button variant="contained" color="primary" sx={{ textTransform: 'none' }}>
+                <Button component="a" href="/login" variant="contained" color="primary" sx={{ textTransform: 'none' }}>
                   Accéder à mon ArchiDrive
                 </Button>
+               
               </>
             )}
           </Grid>

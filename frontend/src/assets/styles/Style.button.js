@@ -1,5 +1,4 @@
 import { colors } from './Style.color';
-import { typography } from './Style.typography';
 // Styles des boutons utilisés dans l'application
 
 export const buttonStyles = {

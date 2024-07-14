@@ -1,105 +1,156 @@
 import React from "react";
 import Header from "../../components/landing-page/Header";
+import Footer from "../../components/landing-page/Footer";
 import { Container, Grid, Typography, Button, Box, Card, CardContent, CardActions } from "@mui/material";
+import { Cloud, People, Security, CheckCircle, AddCircle, Euro, Schedule } from '@mui/icons-material'; // Import des icônes Material-UI
+import image1 from "../../assets/images/image1.jpg";
+
+const cardStyles = {
+  maxWidth: 345,
+  margin: '0 auto',
+  backgroundColor: '#f5f5f5',
+  borderRadius: '8px',
+  padding: '20px',
+};
 
 const Home = () => {
   return (
-    <div>
-      <Container>
-        <Header />
-        <Grid container spacing={4} alignItems="center" style={{ marginTop: '50px' }}>
-          <Grid item xs={12} md={6} align="left">
-            <Typography variant="h1" component="h1" gutterBottom style={{ fontSize: "5rem" }}>
+    <div className="main-container">
+      <Header />
+      <Container sx={{ flex: 1 }}>
+        <Grid container spacing={5} alignItems="center" style={{ marginTop: '15px' }}>
+          <Grid item xs={12} md={6} align="left" sx={{ paddingBottom: "10rem" }}>
+            <Typography variant="h1" component="h1" gutterBottom style={{ fontSize: 'calc(2.8rem + 1vw)' }}>
               Bienvenue sur ArchiDrive
             </Typography>
             <Typography variant="body1" component="p" gutterBottom color="GrayText">
               ArchiDrive est la solution idéale pour le stockage sécurisé et l'organisation de tous vos fichiers d'architecture. Simplifiez la gestion de vos projets avec notre plateforme intuitive et performante.
             </Typography>
-            <Button variant="contained" color="primary" sx={{ marginTop: '20px', textTransform : "none"}} size="large" >
+            <Button component="a" href="/login" variant="contained" color="primary" sx={{ marginTop: '20px', textTransform: 'none' }} size="large">
               Découvrir ArchiDrive
             </Button>
           </Grid>
-          <Grid item xs={12} md={6}>
-            <div style={{ textAlign: 'center' }}>
-              <iframe
-                width="100%"
-                height="315"
-                src="https://www.youtube.com/embed/your_video_id" // Replace with your video URL
-                title="Wasabi Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
+          <Grid item xs={12} md={6} style={{ textAlign: 'center' }}>
+            <a href="https://www.loom.com/share/27c6a1b00e714ca0aff322b704d8359d?sid=1b16768a-b34c-4d14-b1b9-9d4b52a82245" target="_blank" rel="noopener noreferrer">
+              <img src={image1} alt="Watch the video" style={{ width: '100%', maxWidth: '500px', border: 'none' }} />
+            </a>
           </Grid>
         </Grid>
-      </Container>
 
-      <Container>
-        <Typography variant="h2" component="h2" gutterBottom align="center" sx={{ marginTop: 4 }}>
-          En libérant vos données avec Wasabi, vous pouvez réduire les coûts de stockage jusqu'à 80%.
-        </Typography>
-        <Typography variant="body1" component="p" gutterBottom align="center" color="GrayText" sx={{ marginBottom: 4 }}>
-          Wasabi se consacre à une seule chose: le stockage cloud. En tant que seul fournisseur du marché entièrement concentré sur le stockage cloud, notre approche unique nous a permis de mettre au point une manière plus efficace de stocker, d'accéder et d'exploiter les données pour les entreprises du monde entier.
-        </Typography>
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} md={6} lg={4}>
-            <Card>
+        {/* Nouvelle section */}
+        <Grid container spacing={4} alignItems="center" style={{ marginTop: '50px' }}>
+          <Grid item xs={12} md={4} style={{ textAlign: 'center' }}>
+            <Card sx={cardStyles}>
               <CardContent>
-                <Typography variant="h5" component="h2" gutterBottom>
-                  Paiement à la consommation
+                <Cloud style={{ fontSize: '50px' }} color="primary" />
+                <Typography variant="h6" gutterBottom>
+                  Stockage en Cloud
                 </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Payez 6,99 $ par To/mois
-                </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Aucuns frais pour le trafic sortant ou les demandes d’API
-                </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Support Basic
-                </Typography>
-                <Typography variant="h4" component="p" gutterBottom sx={{ marginTop: 2 }}>
-                  $6.99
-                </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  To/mois
+                <Typography variant="body1" color="textSecondary">
+                  Conservez tous vos fichiers en toute sécurité avec notre solution de stockage cloud. Accédez-y où que vous soyez.
                 </Typography>
               </CardContent>
-              <CardActions>
-                <Button variant="contained" color="primary" sx={{ textTransform: "none", width: '100%' }}>
-                  Démarrer un essai gratuit
-                </Button>
-              </CardActions>
             </Card>
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
-            <Card>
+          <Grid item xs={12} md={4} style={{ textAlign: 'center' }}>
+            <Card sx={cardStyles}>
               <CardContent>
-                <Typography variant="h5" component="h2" gutterBottom>
-                  Reserve Capacity Storage (RCS)
+                <People style={{ fontSize: '50px' }} color="primary" />
+                <Typography variant="h6" gutterBottom>
+                  Support Client Dédié
                 </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Acheter par tranches de 1, 3 ou 5 ans
-                </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Aucuns frais pour le trafic sortant ou les demandes d’API
-                </Typography>
-                <Typography variant="body2" component="p" gutterBottom>
-                  Support Premium
-                </Typography>
-                <Typography variant="h6" component="p" gutterBottom sx={{ marginTop: 2 }}>
-                  Greater discounts for term & capacity
+                <Typography variant="body1" color="textSecondary">
+                  Profitez d'un support client personnalisé pour répondre à toutes vos questions et vous aider à tirer le meilleur parti de notre plateforme.
                 </Typography>
               </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4} style={{ textAlign: 'center' }}>
+            <Card sx={cardStyles}>
+              <CardContent>
+                <Security style={{ fontSize: '50px' }} color="primary" />
+                <Typography variant="h6" gutterBottom>
+                  Sécurité Avancée
+                </Typography>
+                <Typography variant="body1" color="textSecondary">
+                  Vos données sont protégées par des mesures de sécurité avancées pour garantir leur confidentialité et leur intégrité.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={4} alignItems="center" style={{ marginTop: '50px' }}>
+          <Grid item xs={12} md={8}>
+            <Typography variant="h4" component="h2" gutterBottom>
+              Pourquoi choisir ArchiDrive ?
+            </Typography>
+            <Box component="ul" style={{ paddingLeft: '20px', listStyle: 'none' }}>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Stockage illimité pour tous vos fichiers de projet.
+              </Box>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Gestion des fichiers client avec accès sécurisé.
+              </Box>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Outils de gestion de projet intégrés pour une meilleure organisation.
+              </Box>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Sécurité et confidentialité des données assurées.
+              </Box>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Accès à vos fichiers depuis n'importe quel appareil, à tout moment.
+              </Box>
+              <Box component="li" display="flex" alignItems="center" mb={2}>
+                <CheckCircle style={{ color: '#4caf50', marginRight: '10px' }} />
+                Interface intuitive et facile à utiliser.
+              </Box>
+            </Box>
+          </Grid>
+           {/* Section Offre Premium */}
+          <Grid item xs={12} md={4} style={{ textAlign: 'center' }}>
+            <Card sx={{ ...cardStyles, backgroundColor: '#1976d2', color: 'white' }}>
+              <CardContent>
+                <Typography variant="h5" component="div" color="white">
+                  Offre Premium
+                </Typography>
+                <Typography variant="h6" color="whitesmoke" gutterBottom>
+                  20€ / 20 Go
+                </Typography>
+                <Box component="ul" style={{ paddingLeft: '20px', listStyle: 'none', color: 'white' }}>
+                  <Box component="li" display="flex" alignItems="center" mb={2}>
+                    <AddCircle style={{ marginRight: '10px' }} />
+                    Espace de stockage supplémentaire
+                  </Box>
+                  <Box component="li" display="flex" alignItems="center" mb={2}>
+                    <Euro style={{ marginRight: '10px' }} />
+                    20€ pour 20 Go supplémentaires
+                  </Box>
+                  <Box component="li" display="flex" alignItems="center" mb={2}>
+                    <Schedule style={{ marginRight: '10px' }} />
+                    Aucune récurrence mensuelle
+                  </Box>
+                  <Box component="li" display="flex" alignItems="center" mb={2}>
+                    <CheckCircle style={{ marginRight: '10px' }} />
+                    Payez ce dont vous avez besoin
+                  </Box>
+                </Box>
+              </CardContent>
               <CardActions>
-                <Button variant="outlined" color="primary" sx={{ textTransform: "none", width: '100%' }}>
-                  En savoir plus sur le RCS
+                <Button component="a" href="/login" variant="contained" color="success" fullWidth sx={{ textTransform: 'none' }}>
+                  Profiter de l'offre
                 </Button>
               </CardActions>
             </Card>
           </Grid>
         </Grid>
       </Container>
+      <Footer />
     </div>
   );
 };
