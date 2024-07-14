@@ -49,7 +49,7 @@ const CheckoutForm = () => {
     <>
       <AppBar position="static" color="transparent" sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
         <Toolbar>
-          <Typography variant="h6">
+          <Typography variant="h6" component="a" href="/" sx={{textDecoration : "none"}}> 
             ArchiDrive
           </Typography>
         </Toolbar>

@@ -7,8 +7,8 @@ const Login = () => {
     <>
       <AppBar position="static" color="transparent" sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
         <Toolbar>
-          <Typography variant="h6">
-            ArchiDrive
+        <Typography variant="h6" component="a" href="/" sx={{textDecoration : "none"}}> 
+        ArchiDrive
           </Typography>
         </Toolbar>
       </AppBar>
@@ -21,13 +21,13 @@ const Login = () => {
           backgroundColor: '#f4f6f8',
         }}
       >
-        <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              width: '100%',
+              width: '50%',
               boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
               borderRadius: '10px',
               padding: '30px',
