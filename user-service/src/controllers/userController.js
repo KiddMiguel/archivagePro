@@ -2,6 +2,8 @@
 const userRepository = require('../repositories/userRepository');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const isAdmin = require('../../../billing-service/src/middlewares/adminMiddleware');
+const { publishEvent } = require('../events/publisher'); 
 
 exports.register = async (req, res) => {
   const { firstName, lastName, email, password, address } = req.body;
@@ -40,6 +42,7 @@ exports.register = async (req, res) => {
         res.json({ token });
       }
     );
+    await publishEvent('auth.registered', 'ExchangeAuth', { email :user.email , firstName : user.firstName, lastName : user.lastName });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -47,6 +50,8 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  publishEvent('auth.test', 'ExchangeAuth', { message: 'Hello World' });
+
   const { email, password } = req.body;
 
   try {
@@ -63,6 +68,7 @@ exports.login = async (req, res) => {
     const payload = {
       user: {
         id: user.id,
+        isAdmin: user.isAdmin,
       },
     };
 
@@ -75,6 +81,7 @@ exports.login = async (req, res) => {
         res.json({ token });
       }
     );
+    await publishEvent('auth.loggedin', 'ExchangeAuth', {email : user.email });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -110,7 +117,7 @@ exports.updateProfile = async (req, res) => {
     };
 
     user = await userRepository.updateUser(req.user.id, updateData);
-
+    await publishEvent('auth.updated', 'ExchangeAuth', { email: user.email, firstName, lastName, address });
     res.json(user);
   } catch (err) {
     console.error(err.message);
@@ -126,7 +133,7 @@ exports.deleteProfile = async (req, res) => {
     }
 
     await userRepository.deleteUser(req.user.id);
-
+    await publishEvent('auth.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
     res.json({ msg: 'User removed' });
   } catch (err) {
     console.error(err.message);

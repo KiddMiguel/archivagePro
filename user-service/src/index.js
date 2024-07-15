@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
+const { startConsumer } = require('./events/consumer');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const cors = require('cors');
@@ -21,4 +22,5 @@ app.use('/', userRoutes);
 const port = process.env.PORT || 4001;
 app.listen(port, () => {
   console.log(`User Service running on port ${port}`);
+  startConsumer().catch(console.error); 
 });
