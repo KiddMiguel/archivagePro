@@ -15,7 +15,7 @@ const isAdmin = require('../middlewares/adminMiddleware');
 const router = express.Router();
 
 // Route pour l'inscription
-router.post('/register', registerValidationRules, registerLimiter, validate, userController.register);
+router.post('/register', registerValidationRules, validate, userController.register);
 // Route pour la connexion
 router.post('/login', loginValidationRules, loginLimiter, validate, userController.login);
 // Route pour la récupération du profil

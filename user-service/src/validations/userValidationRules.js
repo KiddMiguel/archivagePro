@@ -27,10 +27,11 @@ exports.registerValidationRules = [
         .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
         .matches(/\d/).withMessage('Password must contain at least one number')
         .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
-    check('address.street', 'Street is required').not().isEmpty(),
-    check('address.city', 'City is required').not().isEmpty(),
-    check('address.postalCode', 'Postal code is required').not().isEmpty(),
-    check('address.country', 'Country is required').not().isEmpty(),
+    // check('address.street', 'Street is required').not().isEmpty(),
+    // check('address.city', 'City is required').not().isEmpty(),
+    // check('address.postalCode', 'Postal code is required').not().isEmpty(),
+    // check('address.country', 'Country is required').not().isEmpty(),
+    check('telephone', 'Telephone is required').not().isEmpty(),
 ];
 
 // Règles de validation pour la mise à jour du profil
@@ -42,6 +43,7 @@ exports.updateProfileValidationRules = [
     check('address.city', 'City is required').optional().not().isEmpty(),
     check('address.postalCode', 'Postal code is required').optional().not().isEmpty(),
     check('address.country', 'Country is required').optional().not().isEmpty(),
+    check('telephone', 'Telephone is required').optional().not().isEmpty(),
 ];
 
 // Règles de validation pour la connexion
@@ -61,7 +63,6 @@ exports.changePasswordValidationRules = [
         .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
 ];
 
-// Middleware pour valider les règles de validation
 exports.validate = (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
@@ -69,7 +70,7 @@ exports.validate = (req, res, next) => {
     }
 
     const extractedErrors = [];
-    errors.array().map(err => extractedErrors.push({ [err.param]: err.msg }));
+    errors.array().map(err => extractedErrors.push({ field: err.param, message: err.msg }));
 
     return res.status(400).json({
         errors: extractedErrors,

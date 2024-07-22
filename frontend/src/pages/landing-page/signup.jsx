@@ -1,48 +1,116 @@
 // src/pages/Signup.js
-import React from 'react';
-import { Container, Box, Grid, Typography, TextField, Button, Link, AppBar, Toolbar } from '@mui/material';
-
-
+import React from "react";
+import {
+  Container,
+  Box,
+  Grid,
+  Typography,
+  TextField,
+  Button,
+  Link,
+  AppBar,
+  Toolbar,
+  Alert,
+} from "@mui/material";
+import { register } from "../../services/service";
 const Signup = () => {
+
+  const [error, setError] = React.useState(false);
+  const [message , setMessage] = React.useState("");
+
+  // Register
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const user = {
+      firstName: e.target.firstName.value,
+      lastName: e.target.lastName.value,
+      telephone: e.target.telephone.value,
+      email: e.target.email.value,
+      password: e.target.password.value,
+    };
+    // Call the register function from the service
+    const response = await register(user);
+    console.log(response);
+    if (response.success) {
+      console.log("User registered successfully");
+      window.location.href = "/login";
+    } else {
+      setError(true);
+      if(response.success === false){
+        setMessage(response.msg);
+      }else{
+        setMessage(response.errors[0].message);
+      }
+    }
+  };
+
   return (
     <>
-      <AppBar position="static" color="transparent" sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
+      <AppBar
+        position="static"
+        color="transparent"
+        sx={{ paddingLeft: "10px", paddingRight: "10px" }}
+      >
         <Toolbar>
-        <Typography variant="h6" component="a" href="/" sx={{textDecoration : "none"}}> 
-        ArchiDrive
+          <Typography
+            variant="h6"
+            component="a"
+            href="/"
+            sx={{ textDecoration: "none" }}
+          >
+            ArchiDrive
           </Typography>
         </Toolbar>
       </AppBar>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          backgroundColor: '#f4f6f8',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f6f8",
         }}
       >
-        <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Container
+          maxWidth="md"
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <Box
+            component="form"
+            onSubmit={(e) => handleRegister(e)}
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              width: '60%',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-              borderRadius: '10px',
-              padding: '30px',
-              backgroundColor: '#fff'
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: "60%",
+              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+              borderRadius: "10px",
+              padding: "30px",
+              backgroundColor: "#fff",
             }}
           >
-            <Grid container justifyContent="space-between" alignItems="center" sx={{ width: '100%', marginBottom: '20px' }}>
+            <Grid
+              container
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ width: "100%", marginBottom: "20px" }}
+            >
               <Grid item>
-                <Typography variant="h5">
-                S'inscrire                </Typography>
+                <Typography variant="h5">S'inscrire </Typography>
               </Grid>
               <Grid item>
-                <Link href="/login" variant="body2" sx={{ textDecoration: 'none', color: '#1a73e8' }}>
-                Vous avez déjà un compte ?                </Link>
+                <Link
+                  href="/login"
+                  variant="body2"
+                  sx={{ textDecoration: "none", color: "#1a73e8" }}
+                >
+                  Vous avez déjà un compte ?{" "}
+                </Link>
               </Grid>
             </Grid>
             <Grid container spacing={2}>
@@ -56,7 +124,7 @@ const Signup = () => {
                   id="firstName"
                   label="Prénom"
                   autoFocus
-                  sx={{ marginBottom: '20px' }}
+                  sx={{ marginBottom: "20px" }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -68,7 +136,7 @@ const Signup = () => {
                   label="Nom"
                   name="lastName"
                   autoComplete="lname"
-                  sx={{ marginBottom: '20px' }}
+                  sx={{ marginBottom: "20px" }}
                 />
               </Grid>
             </Grid>
@@ -77,11 +145,11 @@ const Signup = () => {
               margin="normal"
               required
               fullWidth
-              id="company"
-              label="Entreprise"
-              name="company"
-              autoComplete="company"
-              sx={{ marginBottom: '20px' }}
+              id="telephone"
+              label="Téléphone"
+              name="telephone"
+              autoComplete="telephone"
+              sx={{ marginBottom: "20px" }}
             />
             <TextField
               variant="outlined"
@@ -92,7 +160,7 @@ const Signup = () => {
               label="Adresse email"
               name="email"
               autoComplete="email"
-              sx={{ marginBottom: '20px' }}
+              sx={{ marginBottom: "20px" }}
             />
             <TextField
               variant="outlined"
@@ -104,17 +172,29 @@ const Signup = () => {
               type="password"
               id="password"
               autoComplete="current-password"
-              sx={{ marginBottom: '20px' }}
+              sx={{ marginBottom: "20px" }}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
               color="primary"
-              sx={{ margin: '20px 0', padding: '10px', backgroundColor: '#1a73e8', textTransform: 'none', fontSize: '15px' }}
+              sx={{
+                margin: "20px 0",
+                padding: "10px",
+                backgroundColor: "#1a73e8",
+                textTransform: "none",
+                fontSize: "15px",
+              }}
             >
               Créer un compte
-              </Button>
+            </Button>
+            {error && (
+              <Alert severity="error" sx={{ marginBottom: "20px" }}>
+                {message}
+              </Alert>
+            )}
+           
           </Box>
         </Container>
       </Box>

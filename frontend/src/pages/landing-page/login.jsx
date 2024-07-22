@@ -1,8 +1,37 @@
 // src/pages/Login.js
 import React from 'react';
 import { Container, Box, Grid, Typography, TextField, Button, Link, FormControlLabel, Checkbox, AppBar, Toolbar } from '@mui/material';
+import {login} from '../../services/service';
+import { AuthContext } from '../../services/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const [error, setError] = React.useState(null);
+  const {login} = React.useContext(AuthContext);
+  const history = useNavigate();
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const user = {
+      email: e.target.email.value,
+      password: e.target.password.value,
+    };
+
+    const response = await login(user);
+
+    if (response.success) {
+      console.log('User logged in successfully');
+      if (response.token) {
+        login(response.user, response.token);
+        history.push('/dashboard');
+      }
+
+    }else{
+      console.log(response.msg);
+    }
+  }
+
   return (
     <>
       <AppBar position="static" color="transparent" sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
@@ -23,6 +52,8 @@ const Login = () => {
       >
         <Container maxWidth="md" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Box
+            component="form"
+            onSubmit={(e) => handleLogin(e)}
             sx={{
               display: 'flex',
               flexDirection: 'column',

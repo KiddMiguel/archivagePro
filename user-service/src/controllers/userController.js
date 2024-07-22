@@ -6,12 +6,12 @@ const isAdmin = require('../../../billing-service/src/middlewares/adminMiddlewar
 const { publishEvent } = require('../events/publisher'); 
 
 exports.register = async (req, res) => {
-  const { firstName, lastName, email, password, address } = req.body;
+  const { firstName, lastName, email, password, telephone } = req.body;
 
   try {
     let user = await userRepository.findUserByEmail(email);
     if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ success : false ,  msg: 'User already exists' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -22,8 +22,8 @@ exports.register = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      address
-    };
+      telephone
+       };
 
     user = await userRepository.createUser(newUser);
 
@@ -39,13 +39,13 @@ exports.register = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.status(200).json({ msg: "User created", success : true , token });
       }
     );
     await publishEvent('auth.registered', 'ExchangeAuth', { email :user.email , firstName : user.firstName, lastName : user.lastName });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ msg: "Server error", success : false });
   }
 };
 
@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token, success : true, user: { id: user.id, email: user.email, isAdmin: user.isAdmin } });
       }
     );
     await publishEvent('auth.loggedin', 'ExchangeAuth', {email : user.email });
@@ -102,7 +102,7 @@ exports.getUserInfo = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { firstName, lastName, address } = req.body;
+  const { firstName, lastName, address, telephone } = req.body;
 
   try {
     let user = await userRepository.findUserById(req.user.id);
@@ -114,6 +114,7 @@ exports.updateProfile = async (req, res) => {
       firstName: firstName || user.firstName,
       lastName: lastName || user.lastName,
       address: address || user.address,
+      telephone: telephone || user.telephone,
     };
 
     user = await userRepository.updateUser(req.user.id, updateData);
