@@ -13,7 +13,11 @@ import {
   Alert,
 } from "@mui/material";
 import { register } from "../../services/service";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../services/AuthContext";
 const Signup = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [error, setError] = React.useState(false);
   const [message , setMessage] = React.useState("");
@@ -32,8 +36,8 @@ const Signup = () => {
     const response = await register(user);
     console.log(response);
     if (response.success) {
-      console.log("User registered successfully");
-      window.location.href = "/login";
+      login(response.user, response.token);
+      navigate('/dashboard');
     } else {
       setError(true);
       if(response.success === false){

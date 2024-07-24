@@ -14,6 +14,7 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     const token = Cookies.get('token');
+    console.log('intercepteur', token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,7 +36,7 @@ export const register = async (user) => {
 };
 
 // Connecter un utilisateur
-export const login = async (user) => {
+export const loginService = async (user) => {
   try {
     const response = await service.post('/users/login', user);
     return response.data;
@@ -48,6 +49,7 @@ export const login = async (user) => {
 export const validateToken = async () => {
   try {
     const response = await service.get('/users/profile');
+    console.log(response.data);
     return response.data;
   } catch (error) {
     return error.response.data;

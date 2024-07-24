@@ -17,7 +17,7 @@ const router = express.Router();
 // Route pour l'inscription
 router.post('/register', registerValidationRules, validate, userController.register);
 // Route pour la connexion
-router.post('/login', loginValidationRules, loginLimiter, validate, userController.login);
+router.post('/login', loginValidationRules, validate, userController.login);
 // Route pour la récupération du profil
 router.get('/profile', verifyToken, userController.getUserInfo);
 // Route pour la mise à jour du profil

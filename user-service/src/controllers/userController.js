@@ -94,7 +94,7 @@ exports.getUserInfo = async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
-    res.json(user);
+    res.json({ success: true, user: user });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
