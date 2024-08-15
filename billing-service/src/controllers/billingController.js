@@ -22,7 +22,9 @@ exports.createInvoice = async (req, res) => {
     await invoice.save();
 
     // Générer et sauvegarder le PDF
-    await generateInvoice(invoice);
+    const pdfPath = await generateInvoice(invoice);
+
+    res.json({ invoice, pdfPath });
 
     res.json({ invoice });
   } catch (err) {
