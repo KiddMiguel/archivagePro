@@ -22,7 +22,9 @@ app.use(security);
 
 // Routes
 const userRoutes = require('./routes/userRoutes');
+const billingRoutes = require('./routes/billingRoutes');
 app.use('/users', userRoutes);
+app.use('/billings', billingRoutes);
 
 app.listen(port, () => {
   console.log(`API Gateway running on port ${port}`);

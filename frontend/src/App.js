@@ -12,7 +12,7 @@ import Reload from './pages/reload';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
-
+  
   if (loading) {
     return <Reload/>; 
   }
@@ -25,7 +25,7 @@ function App() {
           <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
           <Route path="/api" element={<APIRest />} />
-          <Route path="/checkout" element={isAuthenticated ? <CheckoutForm /> : <Navigate to="/login" />} />
+          <Route path="/checkout/" element={<CheckoutForm /> } />
           <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
         </Routes>
       </Router>

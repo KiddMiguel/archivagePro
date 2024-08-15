@@ -55,3 +55,25 @@ export const validateToken = async () => {
     return error.response.data;
   }
 };
+
+// --------------------------------------------------------- Utilisateurs
+
+export const updateUser = async (user) => {
+  try {
+    const response = await service.put('users/profile', user);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+// ---------------------------------------------------------Créer une facture
+export const createInvoice = async (invoice) => {
+  try {
+    const response = await service.post('billings/invoice', invoice);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};

@@ -37,7 +37,7 @@ const Signup = () => {
     console.log(response);
     if (response.success) {
       login(response.user, response.token);
-      navigate('/dashboard');
+      navigate('/checkout');
     } else {
       setError(true);
       if(response.success === false){

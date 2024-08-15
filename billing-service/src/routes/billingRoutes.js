@@ -5,10 +5,10 @@ const billingController = require('../controllers/billingController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const isAdmin = require('../middlewares/adminMiddleware');
 
-router.post('/invoices', authMiddleware, billingController.createInvoice);
+router.post('/invoice', authMiddleware, billingController.createInvoice);
 router.get('/invoices', authMiddleware, billingController.getInvoices);
 router.put('/invoices/:id', authMiddleware, billingController.updateInvoice);
 router.delete('/invoices/:id', authMiddleware, billingController.deleteInvoice);
 router.get('/allinvoices', authMiddleware, isAdmin, billingController.getAllInvoices);
-
+router.post('/sendinvoice', authMiddleware, billingController.sendInvoice);
 module.exports = router;

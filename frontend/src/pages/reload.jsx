@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import React from 'react';
 
-const Reload = () => {
+const Reload = ({message}) => {
     return (
         <Box 
             sx={{ 
@@ -13,6 +13,7 @@ const Reload = () => {
             }}
         >
             <CircularProgress />
+            <Box ml={2}>{message}</Box>
         </Box>
     );
 };

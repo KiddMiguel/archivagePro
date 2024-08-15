@@ -5,6 +5,7 @@ module.exports = {
     origin: '*', // Ajustez selon vos besoins
   },
   userServiceUrl: process.env.USER_SERVICE_URL || 'http://localhost:4001',
+  billingServiceUrl: process.env.BILLING_SERVICE_URL || 'http://localhost:4002',
   options: {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
       // Ajoutez des options au besoin

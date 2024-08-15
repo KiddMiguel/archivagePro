@@ -14,12 +14,17 @@
     "amqplib": "^0.10.4",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "docxtemplater": "^3.49.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "libreoffice-convert": "^1.6.0",
     "mongoose": "^8.5.1",
     "morgan": "^1.10.0",
-    "nodemon": "^3.1.4"
+    "nodemailer": "^6.9.14",
+    "nodemon": "^3.1.4",
+    "pdf-lib": "^1.17.1",
+    "pizzip": "^3.1.7"
   }
 }

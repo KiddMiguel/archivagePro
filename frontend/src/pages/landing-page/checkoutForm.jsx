@@ -1,31 +1,36 @@
 import React, { useState } from 'react';
 import {
   Container, Grid, TextField, FormControlLabel, Checkbox, Button, Typography, Box, Radio, RadioGroup,
-  FormControl, FormLabel, Card, CardContent, CardHeader, Divider, Tabs, Tab, MenuItem, Select,
+  FormControl, FormLabel, Card, CardContent, CardHeader, Divider, Tabs, Tab,
   AppBar,
-  Toolbar
+  Toolbar,
+  CircularProgress
 } from '@mui/material';
-import { CreditCard, Payment, AccountBalanceWallet, AccountBalance } from '@mui/icons-material';
+import { CreditCard, AccountBalanceWallet} from '@mui/icons-material';
+import { useAuth } from '../../services/AuthContext';
+import { createInvoice } from '../../services/serviceInvoices';
+import { updateUser } from '../../services/serviceUsers';
+import Reload from '../reload';
+import { useNavigate } from 'react-router-dom';
+
 
 const CheckoutForm = () => {
-  const [billingInfo, setBillingInfo] = useState({
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    address1: '',
-    address2: '',
-    country: '',
-    state: '',
-    zip: '',
-    paymentMethod: 'credit',
-    cardName: '',
-    cardNumber: '',
-    expiration: '',
-    cvv: ''
-  });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const [billingInfo, setBillingInfo] = useState({});
 
   const [tab, setTab] = useState(0);
+
+  const seParatedWithSpace = (str) => {
+    return str.replace(/(\d{4})/g, '$1 ');
+  };
+
+  const expireDateFormatted = (str) => {
+    return str.replace(/(\d{2})(\d{2})/, '$1/$2');
+  };
+
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -39,10 +44,34 @@ const CheckoutForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Billing Information:', billingInfo);
-    alert('Paiement traité avec succès !');
+    let newDate =billingInfo.expiration.split('');
+    let anne = newDate[2]+newDate[3];
+    let mois = newDate[0]+ newDate[1];
+    let date = mois +'-'+ anne;
+
+    billingInfo.expiration = date;
+    billingInfo.user = user._id;
+    billingInfo.amount = 20;
+    billingInfo.address = {
+      street: billingInfo.address1,
+      city: billingInfo.city,
+      postalCode: billingInfo.postalCode,
+      country: billingInfo.country
+    }
+
+
+    await createInvoice(billingInfo);
+    setLoading(true);
+    await updateUser(billingInfo);
+
+    setTimeout(() => {
+      setLoading(false);
+      navigate('/dashboard');
+    }, 10000);
+    
   };
 
   return (
@@ -87,53 +116,6 @@ const CheckoutForm = () => {
                     Adresse de facturation
                   </Typography>
                   <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        id="firstName"
-                        name="firstName"
-                        label="Prénom"
-                        fullWidth
-                        autoComplete="given-name"
-                        value={billingInfo.firstName}
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        required
-                        id="lastName"
-                        name="lastName"
-                        label="Nom"
-                        fullWidth
-                        autoComplete="family-name"
-                        value={billingInfo.lastName}
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        required
-                        id="username"
-                        name="username"
-                        label="Nom d'utilisateur"
-                        fullWidth
-                        autoComplete="username"
-                        value={billingInfo.username}
-                        onChange={handleChange}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        id="email"
-                        name="email"
-                        label="Email (Optionnel)"
-                        fullWidth
-                        autoComplete="email"
-                        value={billingInfo.email}
-                        onChange={handleChange}
-                      />
-                    </Grid>
                     <Grid item xs={12}>
                       <TextField
                         required
@@ -142,7 +124,6 @@ const CheckoutForm = () => {
                         label="Adresse"
                         fullWidth
                         autoComplete="shipping address-line1"
-                        value={billingInfo.address1}
                         onChange={handleChange}
                       />
                     </Grid>
@@ -153,7 +134,6 @@ const CheckoutForm = () => {
                         label="Adresse 2 (Optionnel)"
                         fullWidth
                         autoComplete="shipping address-line2"
-                        value={billingInfo.address2}
                         onChange={handleChange}
                       />
                     </Grid>
@@ -165,31 +145,28 @@ const CheckoutForm = () => {
                         label="Pays"
                         fullWidth
                         autoComplete="shipping country"
-                        value={billingInfo.country}
                         onChange={handleChange}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         required
-                        id="state"
-                        name="state"
+                        id="city"
+                        name="city"
                         label="Région"
                         fullWidth
                         autoComplete="shipping address-level1"
-                        value={billingInfo.state}
                         onChange={handleChange}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         required
-                        id="zip"
-                        name="zip"
+                        id="postalCode"
+                        name="postalCode"
                         label="Code postal"
                         fullWidth
                         autoComplete="shipping postal-code"
-                        value={billingInfo.zip}
                         onChange={handleChange}
                       />
                     </Grid>
@@ -217,11 +194,7 @@ const CheckoutForm = () => {
                         <Divider />
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
                           <Typography variant="body2">Sous-total</Typography>
-                          <Typography variant="body2">90.00€</Typography>
-                        </Box>
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                          <Typography variant="body2">Expédition & Manutention estimées</Typography>
-                          <Typography variant="body2">8.00€</Typography>
+                          <Typography variant="body2">20.00€</Typography>
                         </Box>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
                           <Typography variant="body2">Taxe estimée</Typography>
@@ -230,15 +203,14 @@ const CheckoutForm = () => {
                         <Divider />
                         <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
                           <Typography variant="h6">Total</Typography>
-                          <Typography variant="h6">98.00€</Typography>
+                          <Typography variant="h6">20.00€</Typography>
                         </Box>
                       </Typography>
                     </CardContent>
                   </Card>
                   <Tabs value={tab} onChange={handleTabChange} variant="fullWidth" indicatorColor="primary" textColor="primary">
-                    <Tab label={<Box display="flex" alignItems="center" sx={{ textTransform: 'none' }}><CreditCard /> Carte de crédit</Box>} />
+                    <Tab label={<Box  display="flex" alignItems="center" sx={{ textTransform: 'none' }}><CreditCard /> Carte de crédit</Box>} />
                     <Tab label={<Box display="flex" alignItems="center" sx={{ textTransform: 'none' }}><AccountBalanceWallet /> PayPal</Box>} />
-                    <Tab label={<Box display="flex" alignItems="center" sx={{ textTransform: 'none' }}><AccountBalance /> Virement bancaire</Box>} />
                   </Tabs>
                   <Box hidden={tab !== 0}>
                     <Grid container spacing={2} style={{ marginTop: '20px' }}>
@@ -250,33 +222,36 @@ const CheckoutForm = () => {
                           label="Nom du titulaire de la carte"
                           fullWidth
                           autoComplete="cc-name"
-                          value={billingInfo.cardName}
                           onChange={handleChange}
                         />
                       </Grid>
                       <Grid item xs={12}>
-                        <TextField
-                          required
-                          id="cardNumber"
-                          name="cardNumber"
-                          label="Numéro de carte"
-                          fullWidth
-                          autoComplete="cc-number"
-                          value={billingInfo.cardNumber}
-                          onChange={handleChange}
-                        />
+                      <TextField
+                        required
+                        id="cardNumber"
+                        name="cardNumber"
+                        label="Numéro de carte"
+                        fullWidth
+                        autoComplete="cc-number"
+                        onChange={handleChange}
+                        inputProps={{
+                          maxLength: 16,
+                          pattern: "[0-9]*"
+                        }}
+                      />
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        <TextField
-                          required
-                          id="expiration"
-                          name="expiration"
-                          label="Date d'expiration (MM/AA)"
-                          fullWidth
-                          autoComplete="cc-exp"
-                          value={billingInfo.expiration}
-                          onChange={handleChange}
-                        />
+                      <TextField
+                      required
+                      id="expiration"
+                      name="expiration"
+                      label="Date d'expiration (MM/AA)"
+                      fullWidth
+                      autoComplete="cc-exp"
+                      type="text" 
+                      onChange={handleChange}
+                      
+                    />
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -286,8 +261,11 @@ const CheckoutForm = () => {
                           label="CVV"
                           fullWidth
                           autoComplete="cc-csc"
-                          value={billingInfo.cvv}
                           onChange={handleChange}
+                          inputProps={{
+                            maxLength: 3,
+                            pattern: "[0-9]*"
+                          }}
                         />
                       </Grid>
                     </Grid>
@@ -295,16 +273,7 @@ const CheckoutForm = () => {
                   <Box hidden={tab !== 1}>
                     <Grid container spacing={2} style={{ marginTop: '20px' }}>
                       <Grid item xs={12}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">Sélectionnez le type de compte PayPal</FormLabel>
-                          <RadioGroup aria-label="paypalAccountType" name="paypalAccountType">
-                            <FormControlLabel value="domestic" control={<Radio />} label="National" />
-                            <FormControlLabel value="international" control={<Radio />} label="International" />
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button variant="contained" color="primary" fullWidth>
+                        <Button variant="contained" color="primary" fullWidth sx={{textTransform: 'none' }}>
                           Connexion à PayPal
                         </Button>
                       </Grid>
@@ -316,37 +285,22 @@ const CheckoutForm = () => {
                       </Grid>
                     </Grid>
                   </Box>
-                  <Box hidden={tab !== 2}>
-                    <Grid container spacing={2} style={{ marginTop: '20px' }}>
-                      <Grid item xs={12}>
-                        <FormControl fullWidth>
-                          <FormLabel component="legend">Sélectionnez votre banque</FormLabel>
-                          <Select id="bank" name="bank" value={billingInfo.bank} onChange={handleChange} displayEmpty>
-                            <MenuItem value="" disabled>
-                              --Veuillez sélectionner votre banque--
-                            </MenuItem>
-                            <MenuItem value="bank1">Banque 1</MenuItem>
-                            <MenuItem value="bank2">Banque 2</MenuItem>
-                            <MenuItem value="bank3">Banque 3</MenuItem>
-                          </Select>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Button variant="contained" color="primary" fullWidth>
-                          Procéder au paiement
-                        </Button>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography variant="body2" color="textSecondary">
-                          Note : Après avoir cliqué sur le bouton, vous serez dirigé vers une passerelle de paiement sécurisée.
-                          Après avoir terminé le processus de paiement, vous serez redirigé vers le site pour voir les détails de votre commande.
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
+                  
                   <Box mt={3}>
-                    <Button type="submit" variant="contained" color="primary" fullWidth>
-                      Confirmer le paiement
+                    <Button type="submit" variant="contained" color="primary" fullWidth sx={{textTransform: 'none' }}>
+                    {loading ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        Paiement en cours...
+                        <CircularProgress
+                          color="inherit" 
+                          thickness={5} 
+                          size={20} 
+                          sx={{ color: 'white' }} 
+                        />
+                      </div>
+                    ) : (
+                      'Confirmer le paiement de 20.00€'
+                    )}
                     </Button>
                   </Box>
                 </Grid>
