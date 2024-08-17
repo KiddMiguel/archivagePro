@@ -2,33 +2,28 @@ const fs = require('fs');
 const path = require('path');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
-const libre = require('libreoffice-convert');
+const nodemailer = require('nodemailer');
 
-// Fonction pour générer un PDF à partir du modèle Word
-const generateInvoice = async (invoice) => {
-  // Charger le modèle Word
+const generateInvoiceWord = async (invoice) => {
   const templatePath = path.join(__dirname, '../templates/invoice_template.docx');
   const content = fs.readFileSync(templatePath, 'binary');
 
-  // Préparer les données pour le template
   const data = {
-    firstName: invoice.firstName,
-    lastName: invoice.lastName,
+    firstName: invoice.userComplet.firstName,
+    lastName: invoice.userComplet.lastName,
     address: invoice.address,
     date: new Date(invoice.date).toLocaleDateString(),
     date_echeance: new Date(invoice.date_echeance).toLocaleDateString(),
     description: invoice.description,
-    amount: invoice.amount.toFixed(2)
+    amount: invoice.amount.toFixed(2),
   };
 
-  // Charger le document dans docxtemplater
   const zip = new PizZip(content);
   const doc = new Docxtemplater(zip, {
     paragraphLoop: true,
     linebreaks: true,
   });
 
-  // Remplacer les balises par les données
   doc.setData(data);
 
   try {
@@ -37,25 +32,81 @@ const generateInvoice = async (invoice) => {
     throw new Error('Erreur lors de la génération du document Word : ' + error.message);
   }
 
-  // Sauvegarder le document Word généré temporairement
-  const tempDocxPath = path.join(__dirname, '../invoices', `${invoice.id}.docx`);
   const buf = doc.getZip().generate({ type: 'nodebuffer' });
+
+  const tempDocxPath = path.join(__dirname, '../invoices', `${invoice.id}.docx`);
   fs.writeFileSync(tempDocxPath, buf);
 
-  // Convertir le document Word en PDF
-  const tempPdfPath = path.join(__dirname, '../invoices', `${invoice.id}.pdf`);
-  const docxBuf = fs.readFileSync(tempDocxPath);
-  libre.convert(docxBuf, '.pdf', undefined, (err, pdfBuf) => {
-    if (err) {
-      throw new Error(`Erreur lors de la conversion en PDF : ${err.message}`);
-    }
-    fs.writeFileSync(tempPdfPath, pdfBuf);
-  });
-
-  // Supprimer le fichier temporaire .docx
-  fs.unlinkSync(tempDocxPath);
+  const tempPdfPath = path.join(__dirname, '../invoices', `${invoice.id}.docx`);
 
   return tempPdfPath;
 };
 
-module.exports = { generateInvoice };
+const generateInvoicePDF = async (invoice) => {
+  const templateHtmlPath = path.join(__dirname, '../templates/invoice_template.html');
+
+  let htmlContent = fs.readFileSync(templateHtmlPath, 'utf8');
+
+  // Remplacer les placeholders dans le HTML par les données de l'invoice
+  htmlContent = htmlContent.replace('{firstName}', invoice.firstName)
+      .replace('{lastName}', invoice.lastName)
+      .replace('{address}', invoice.address)
+      .replace('{date}', invoice.date)
+      .replace('{date_echeance}', invoice.date_echeance)
+      .replace(/{description}/g, invoice.description)
+      .replace(/{amount}/g, invoice.amount.toFixed(2));
+
+  const pdfPath = path.join(__dirname, `${invoice.id}.pdf`);
+
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setContent(htmlContent);
+  await page.pdf({ path: pdfPath, format: 'A4' });
+  await browser.close();
+
+  return pdfPath;
+};
+
+
+const sendInvoice = async (invoice, pdfPath) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com', 
+      port: 587, 
+      secure: false,
+      auth: {
+        user: 'archivage.supp0rt@gmail.com',
+        pass: 'vyyooclwucwvzada',
+      },
+    });
+
+    const mailOptions = {
+      from: 'archivage.supp0rt@gmail.com',
+      to: invoice.userComplet.email,
+      subject: `Votre facture #${invoice.id}`,
+      html: `
+        <h1>Bonjour ${invoice.userComplet.firstName},</h1>
+        <p>Veuillez trouver ci-joint la facture <strong>#${invoice.id}</strong> pour vos archives.</p>
+        <p>Merci pour votre confiance.</p>
+        <p>Bien cordialement,</p>
+        <p><strong>L'équipe ArchiDrive</strong></p>
+      `,
+      attachments: [
+        {
+          filename: `facture_${invoice.id}.docx`,
+          path: pdfPath,
+          contentType: 'application/docx',
+        }
+      ]
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Facture #${invoice.id} envoyée à ${invoice.userComplet.email}`);
+  } catch (error) {
+    console.error(`Erreur lors de l'envoi de la facture : ${error.message}`);
+    throw new Error('L\'envoi de la facture a échoué');
+  }
+};
+
+
+module.exports = { generateInvoicePDF,generateInvoiceWord , sendInvoice };
