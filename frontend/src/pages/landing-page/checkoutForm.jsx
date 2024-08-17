@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
-  Container, Grid, TextField, FormControlLabel, Checkbox, Button, Typography, Box, Radio, RadioGroup,
-  FormControl, FormLabel, Card, CardContent, CardHeader, Divider, Tabs, Tab,
+  Container, Grid, TextField, FormControlLabel, Checkbox, Button, Typography, Box, 
+ Card, CardContent, CardHeader, Divider, Tabs, Tab,
   AppBar,
   Toolbar,
   CircularProgress
@@ -10,7 +10,6 @@ import { CreditCard, AccountBalanceWallet} from '@mui/icons-material';
 import { useAuth } from '../../services/AuthContext';
 import { createInvoice } from '../../services/serviceInvoices';
 import { updateUser } from '../../services/serviceUsers';
-import Reload from '../reload';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -22,14 +21,6 @@ const CheckoutForm = () => {
   const [billingInfo, setBillingInfo] = useState({});
 
   const [tab, setTab] = useState(0);
-
-  const seParatedWithSpace = (str) => {
-    return str.replace(/(\d{4})/g, '$1 ');
-  };
-
-  const expireDateFormatted = (str) => {
-    return str.replace(/(\d{2})(\d{2})/, '$1/$2');
-  };
 
 
   const handleTabChange = (event, newValue) => {
@@ -46,14 +37,9 @@ const CheckoutForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Billing Information:', billingInfo);
-    let newDate =billingInfo.expiration.split('');
-    let anne = newDate[2]+newDate[3];
-    let mois = newDate[0]+ newDate[1];
-    let date = mois +'-'+ anne;
 
-    billingInfo.expiration = date;
     billingInfo.user = user._id;
+    billingInfo.userComplet = user;
     billingInfo.amount = 20;
     billingInfo.address = {
       street: billingInfo.address1,
