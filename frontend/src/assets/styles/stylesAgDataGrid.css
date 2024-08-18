@@ -1,0 +1,41 @@
+.ag-theme-alpine{
+    padding: 0 !important;
+}
+.ag-root-wrapper{
+    border-radius: 0.8rem !important;
+    border: 1px solid #e0e0e0 !important;
+}
+
+.ag-icon-previous, .ag-icon-next, .ag-icon-last, .ag-icon-first{
+    color: white !important;
+    border-radius:  0.2rem !important;
+    background-color: #1976d2 !important;
+}
+
+.ag-cell{
+    padding: 0.5rem !important;
+    font-size: 0.9rem !important;
+    color: #333 !important;
+}
+
+.ag-header-cell-text{
+    font-weight: 600 !important;
+    color: #1976d2 !important;
+}
+
+/* Désactiver le focus visuel */
+.ag-cell-focus {
+    outline: none !important;
+    border: none !important;
+  }
+  
+  /* Désactiver la bordure bleue autour de la cellule */
+  .ag-cell-focus .ag-cell {
+    border: none !important;
+  }
+  
+  /* Supprimer le background bleu de la ligne sélectionnée */
+  .ag-row-focus {
+    background-color: transparent !important;
+  }
+  

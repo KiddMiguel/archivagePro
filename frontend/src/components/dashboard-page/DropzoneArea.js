@@ -21,7 +21,7 @@ const DropzoneArea = ({ onDrop, label, iconSize = 48, borderColor = '#ccc', acti
     >
       <input {...getInputProps()} />
       <CloudUploadIcon sx={{ fontSize: iconSize, color: borderColor }} />
-      <Typography variant="body1" sx={{ mt: 2, color : "#6c757d"}}>
+      <Typography variant="body1" sx={{ mt: 2, color : "#6c757d", fontSize : "0.8rem"}}>
         {label} <span style={{ color: textColor, cursor: 'pointer' }}>Parcourir</span>
       </Typography>
     </Box>
