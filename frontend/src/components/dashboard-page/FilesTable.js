@@ -98,11 +98,11 @@ const FilesTable = () => {
       headerName: "Dossier",
       field: "dossier",
       sortable: true,
-      filter: false,
+      filter: true,
       resizable: true,
       flex: 2,
       cellStyle: { textAlign: 'left' },
-      cellRendererFramework: (params) => (
+      cellRenderer: (params) => (
         <Box display="flex">
           {params.value.map((member, i) => (
             <Avatar
@@ -117,7 +117,7 @@ const FilesTable = () => {
     {
       headerName: "",
       field: "options",
-      cellRendererFramework: () => (
+      cellRenderer: () => (
         <IconButton>
           <MoreVertIcon />
         </IconButton>

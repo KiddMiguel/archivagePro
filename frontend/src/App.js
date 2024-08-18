@@ -11,10 +11,11 @@ import { useAuth } from './services/AuthContext';
 import Reload from './pages/reload';
 import Favoris from './pages/dashboard-page/Favoris';
 import PrivateLayout from './components/PrivateLayout';
+import Deconnexion from './components/dashboard-page/Deconnexion';
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
-  
+  const { isAuthenticated, loading, user } = useAuth();
+  console.log(user);
   if (loading) {
     return <Reload />;
   }
@@ -31,9 +32,12 @@ function App() {
           <Route path="/checkout/" element={<CheckoutForm />} />
 
           {/* Routes protégées avec PrivateLayout */}
-          <Route path="/" element={<PrivateLayout />}>
+          <Route path="/" element={<PrivateLayout user ={user} isAuthenticated={isAuthenticated} />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/favoris" element={<Favoris />} />
+            <Route path="/corbeille" element={<h1>Corbeille</h1>} />
+            <Route path="/parametres" element={<h1>Paramètres</h1>} />
+            <Route path="/logout" element={<Deconnexion/>} />
           </Route>
         </Routes>
       </Router>

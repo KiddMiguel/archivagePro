@@ -212,6 +212,8 @@ export default function LeftBar({ open }) {
             button
             key="Déconnexion"
             sx={{ color: '#c1121f' }}
+            component={Link}
+            to="/logout"
           >
             <ListItemIcon>
               <LogoutIcon

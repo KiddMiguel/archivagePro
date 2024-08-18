@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, success : true, user: { id: user.id, email: user.email, isAdmin: user.isAdmin } });
+        res.json({ token, success : true, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName, storageLimit : user.storageLimit, storageUsed : user.storageUsed} });
       }
     );
     await publishEvent('auth.loggedin', 'ExchangeAuth', {email : user.email });
