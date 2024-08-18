@@ -12,6 +12,7 @@ import Reload from './pages/reload';
 import Favoris from './pages/dashboard-page/Favoris';
 import PrivateLayout from './components/PrivateLayout';
 import Deconnexion from './components/dashboard-page/Deconnexion';
+import Settings from './pages/dashboard-page/Settings';
 
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -36,7 +37,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
-            <Route path="/parametres" element={<h1>Paramètres</h1>} />
+            <Route path="/parametres" element={<Settings/>} />
             <Route path="/logout" element={<Deconnexion/>} />
           </Route>
         </Routes>
