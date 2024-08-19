@@ -240,9 +240,9 @@ exports.forgotPassword = async (req, res) => {
       subject: 'Réinitialisation de votre mot de passe',
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-          <div style="text-align: center; padding: 20px 0;">
-            <img src="https://your-logo-url.com/logo.png" alt="ArchiDrive" style="max-width: 150px; margin-bottom: 20px;">
-          </div>
+          <h1 style="text-align: center; padding: 20px 0; color : #1976d2">
+            ArchiDrive
+          </h1>
           <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
             <p style="font-size: 18px;">Bonjour <strong>${user.firstName} ${user.lastName}</strong>,</p>
             <p style="font-size: 16px;">Vous avez demandé à réinitialiser votre mot de passe. Voici votre mot de passe temporaire :</p>
