@@ -24,6 +24,7 @@ exports.createInvoice = async (req, res) => {
   
     // Générer et sauvegarder le PDF
     const pdfPath = await generateInvoiceWord(invoice);
+    await sendInvoice(invoice, pdfPath);
     res.json({ message :"Facture crée", statut : true  , pdfPath });
 
   } catch (err) {
