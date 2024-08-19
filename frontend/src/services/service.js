@@ -94,3 +94,20 @@ export const createInvoice = async (invoice) => {
     return error.response.data;
   }
 };
+
+// --------------------------------------------------------- Fichiers
+
+export const uploadFile = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await service.post('/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};

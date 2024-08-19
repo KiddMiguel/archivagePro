@@ -2,9 +2,21 @@ import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Typography } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-
+import { uploadFile } from '../../services/serviceFiles';
 const DropzoneArea = ({ onDrop, label, iconSize = 48, borderColor = '#ccc', activeBgColor = '#f0f8ff', textColor = '#1976d2' }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const handleDrop = async (acceptedFiles) => {
+    const file = acceptedFiles[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await uploadFile(formData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
 
   return (
     <Box
@@ -18,6 +30,7 @@ const DropzoneArea = ({ onDrop, label, iconSize = 48, borderColor = '#ccc', acti
         transition: 'background-color 0.3s ease',
         cursor: 'pointer'
       }}
+      onDrop={handleDrop} // Add this line to call handleDrop when a file is dropped
     >
       <input {...getInputProps()} />
       <CloudUploadIcon sx={{ fontSize: iconSize, color: borderColor }} />
