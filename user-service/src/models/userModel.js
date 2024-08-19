@@ -19,6 +19,12 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  temporaryPassword: {
+    type: String,
+  },
+  temporaryPasswordExpires: {
+    type: Date,
+  },
   address: {
     street: {
       type: String,

@@ -115,7 +115,7 @@ const Login = () => {
                 />
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2" sx={{ textDecoration: 'none', color: '#1a73e8' }}>
+                <Link href="/forgotpassword" variant="body2" sx={{ textDecoration: 'none', color: '#1a73e8' }}>
                 Mot de passe oublié ?                </Link>
               </Grid>
             </Grid>

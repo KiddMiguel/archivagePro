@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Navigate, Router, Routes } from 'react-router-dom';
+import { Route, Navigate, Routes } from 'react-router-dom';
 import MarkdownPage from '../pages/api-page/MarkdownPage';
 import ApiRest from '../pages/api-page/ApiRest';
 

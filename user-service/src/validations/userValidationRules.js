@@ -63,6 +63,11 @@ exports.changePasswordValidationRules = [
         .matches(/[@$!%*?&#]/).withMessage('Le mot de passe doit contenir au moins un caractère spécial'),
 ];
 
+// Règles de validation pour la réinitialisation du mot de passe
+exports.forgotPasswordValidationRules = [
+    check('email', 'Veuillez indiquer une adresse mail valide').isEmail(),
+];
+
 exports.validate = (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {

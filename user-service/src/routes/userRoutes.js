@@ -8,7 +8,8 @@ const {
   changePasswordValidationRules,
   validate,
   loginLimiter,
-  registerLimiter
+  registerLimiter,
+  forgotPasswordValidationRules
 } = require('../validations/userValidationRules');
 const { verifyToken } = require('../middlewares/authMiddleware');
 const isAdmin = require('../middlewares/adminMiddleware');
@@ -28,6 +29,8 @@ router.delete('/profile', verifyToken, userController.deleteProfile);
 router.get('/users', verifyToken, isAdmin, userController.getAllUsers);
 // Route pour la modification d'un mot de passe
 router.put('/password', verifyToken, changePasswordValidationRules, validate, userController.changePassword);
+// Route pour la récupération d'un mot de passe oublié
+router.post('/forgot-password',forgotPasswordValidationRules,  userController.forgotPassword);
 // Route pour la déconnexion
 router.get('/logout', userController.logout);
 // Route de test

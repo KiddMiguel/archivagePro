@@ -29,6 +29,15 @@ class UserRepository {
   async getAllUsers() {
     return await User.find();
   }
+
+  async updateStorageUsed(userId, storageUsed) {
+    return await User.findByIdAndUpdate(userId, { storageUsed });
+  }
+
+  async updateUserTemporaryPassword (userId, temporaryPassword, temporaryPasswordExpires) {
+    return await User.findByIdAndUpdate(userId, { temporaryPassword, temporaryPasswordExpires });
+  }
+  
 }
 
 module.exports = new UserRepository();

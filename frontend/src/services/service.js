@@ -67,6 +67,23 @@ export const updateUser = async (user) => {
   }
 };
 
+export const deleteUser = async () => {
+  try {
+    const response = await service.delete('users/profile');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const forgotPassword = async (email) => {
+  try {
+    const response = await service.post('users/forgot-password', email);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
 
 // ---------------------------------------------------------Créer une facture
 export const createInvoice = async (invoice) => {
