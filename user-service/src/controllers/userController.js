@@ -11,7 +11,7 @@ exports.register = async (req, res) => {
   try {
     let user = await userRepository.findUserByEmail(email);
     if (user) {
-      return res.status(400).json({ success : false ,  msg: 'User already exists' });
+      return res.status(400).json({ success : false ,  msg: 'L\'utilisateur existe déjà' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -92,7 +92,7 @@ exports.getUserInfo = async (req, res) => {
   try {
     const user = await userRepository.findUserById(req.user.id).select('-password');
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
     }
     res.json({ success: true, user: user });
   } catch (err) {
@@ -107,7 +107,7 @@ exports.updateProfile = async (req, res) => {
   try {
     let user = await userRepository.findUserById(req.user.id);
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
     }
 
     const updateData = {
@@ -130,7 +130,7 @@ exports.deleteProfile = async (req, res) => {
   try {
     const user = await userRepository.findUserById(req.user.id);
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
     }
 
     await userRepository.deleteUser(req.user.id);
@@ -160,12 +160,12 @@ exports.changePassword = async (req, res) => {
   try {
     const user = await userRepository.findUserById(req.user.id);
     if (!user) {
-      return res.status(404).json({ msg: 'User not found' });
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid current password' });
+      return res.status(400).json({ msg: 'Mot de passe actuel invalide.' });
     }
 
     const salt = await bcrypt.genSalt(10);

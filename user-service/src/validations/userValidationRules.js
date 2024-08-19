@@ -6,61 +6,61 @@ const rateLimit = require('express-rate-limit');
 exports.loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // limit each IP to 5 requests per windowMs
-    message: 'Too many login attempts from this IP, please try again after 15 minutes',
+    message: 'Trop de tentatives de connexion à partir de cette IP, veuillez réessayer après 15 minutes.',
 });
 
 // Limite de taux pour l'inscription
 exports.registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5, // limit each IP to 5 requests per windowMs
-    message: 'Too many accounts created from this IP, please try again after an hour',
+    message: 'Trop de comptes ont été créés à partir de cette IP, veuillez réessayer après une heure.',
 });
 
 // Règles de validation pour l'inscription
 exports.registerValidationRules = [
-    check('firstName', 'First name is required').not().isEmpty(),
-    check('lastName', 'Last name is required').not().isEmpty(),
-    check('email', 'Please include a valid email').isEmail(),
+    check('firstName', 'Le prénom est obligatoire').not().isEmpty(),
+    check('lastName', 'Le nom est obligatoire').not().isEmpty(),
+    check('email', 'Veuillez indiquer une adresse mail valide').isEmail(),
     check('password')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
-        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-        .matches(/\d/).withMessage('Password must contain at least one number')
-        .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
+        .isLength({ min: 8 }).withMessage('Le mot de passe doit comporter au moins 8 caractères')
+        .matches(/[A-Z]/).withMessage('Le mot de passe doit contenir au moins une lettre majuscule')
+        .matches(/[a-z]/).withMessage('Le mot de passe doit contenir au moins une lettre minuscule')
+        .matches(/\d/).withMessage('Le mot de passe doit contenir au moins un chiffre')
+        .matches(/[@$!%*?&#]/).withMessage('Le mot de passe doit contenir au moins un caractère spécial'),
     // check('address.street', 'Street is required').not().isEmpty(),
     // check('address.city', 'City is required').not().isEmpty(),
     // check('address.postalCode', 'Postal code is required').not().isEmpty(),
     // check('address.country', 'Country is required').not().isEmpty(),
-    check('telephone', 'Telephone is required').not().isEmpty(),
+    check('telephone', 'Le téléphone est obligatoire').not().isEmpty(),
 ];
 
 // Règles de validation pour la mise à jour du profil
 exports.updateProfileValidationRules = [
-    check('firstName', 'First name is required').optional().not().isEmpty(),
-    check('lastName', 'Last name is required').optional().not().isEmpty(),
-    check('email', 'Please include a valid email').optional().isEmail(),
-    check('address.street', 'Street is required').optional().not().isEmpty(),
-    check('address.city', 'City is required').optional().not().isEmpty(),
-    check('address.postalCode', 'Postal code is required').optional().not().isEmpty(),
-    check('address.country', 'Country is required').optional().not().isEmpty(),
-    check('telephone', 'Telephone is required').optional().not().isEmpty(),
+    check('firstName', 'Le prénom est obligatoire').optional().not().isEmpty(),
+    check('lastName', 'Le nom est obligatoire').optional().not().isEmpty(),
+    check('email', 'Veuillez indiquer une adresse mail valide').optional().isEmail(),
+    check('address.street', 'La rue est nécessaire').optional().not().isEmpty(),
+    check('address.city', 'La ville est requise').optional().not().isEmpty(),
+    check('address.postalCode', 'Le code postal est requis').optional().not().isEmpty(),
+    check('address.country', 'Le pays est requis').optional().not().isEmpty(),
+    check('telephone', 'Le téléphone est obligatoire').optional().not().isEmpty(),
 ];
 
 // Règles de validation pour la connexion
 exports.loginValidationRules = [
-    check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password is required').exists(),
+    check('email', 'Veuillez indiquer une adresse mail valide').isEmail(),
+    check('password', 'Le mot de passe est requis').exists(),
 ];
 
 // Règles de validation pour la modification du mot de passe
 exports.changePasswordValidationRules = [
-    check('oldPassword', 'Current password is required').exists(),
+    check('oldPassword', 'Le mot de passe actuel est requis').exists(),
     check('newPassword')
-        .isLength({ min: 8 }).withMessage('Password must be at least 8 characters long')
-        .matches(/[A-Z]/).withMessage('Password must contain at least one uppercase letter')
-        .matches(/[a-z]/).withMessage('Password must contain at least one lowercase letter')
-        .matches(/\d/).withMessage('Password must contain at least one number')
-        .matches(/[@$!%*?&#]/).withMessage('Password must contain at least one special character'),
+        .isLength({ min: 8 }).withMessage('Le mot de passe doit comporter au moins 8 caractères')
+        .matches(/[A-Z]/).withMessage('Le mot de passe doit contenir au moins une lettre majuscule')
+        .matches(/[a-z]/).withMessage('Le mot de passe doit contenir au moins une lettre minuscule')
+        .matches(/\d/).withMessage('Le mot de passe doit contenir au moins un chiffre')
+        .matches(/[@$!%*?&#]/).withMessage('Le mot de passe doit contenir au moins un caractère spécial'),
 ];
 
 exports.validate = (req, res, next) => {
