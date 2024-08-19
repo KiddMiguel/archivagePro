@@ -194,7 +194,7 @@ const Signup = () => {
               Créer un compte
             </Button>
             {error && (
-              <Alert severity="error" sx={{ marginBottom: "20px" }}>
+              <Alert severity="error" sx={{ background : "white", color : "#dc3545"}}>
                 {message}
               </Alert>
             )}

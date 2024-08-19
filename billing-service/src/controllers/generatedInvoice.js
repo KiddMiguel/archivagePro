@@ -3,6 +3,7 @@ const path = require('path');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const generateInvoiceWord = async (invoice) => {
   const templatePath = path.join(__dirname, '../templates/invoice_template.docx');
@@ -72,10 +73,10 @@ const sendInvoice = async (invoice, pdfPath) => {
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.MAIL_HOST, 
-      port: process.env.MAIL_PORT, 
+      port: 465, 
       auth: {
         user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASSWORD,
+        pass: process.env.MAIL_PASS,
       },
     });
 

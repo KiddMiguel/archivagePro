@@ -57,12 +57,12 @@ exports.login = async (req, res) => {
   try {
     let user = await userRepository.findUserByEmail(email);
     if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Mot de passe incorrect', success : false});
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
+      return res.status(400).json({ msg: 'Mot de passe incorrect', success : false});
     }
 
     const payload = {
