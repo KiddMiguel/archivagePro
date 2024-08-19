@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.status(200).json({ msg: "User created", success : true , token });
+        res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName } });
       }
     );
     await publishEvent('auth.registered', 'ExchangeAuth', { email :user.email , firstName : user.firstName, lastName : user.lastName });
@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, success : true, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName, storageLimit : user.storageLimit, storageUsed : user.storageUsed} });
+        res.json({ token, success : true, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName} });
       }
     );
     await publishEvent('auth.loggedin', 'ExchangeAuth', {email : user.email });
@@ -118,8 +118,8 @@ exports.updateProfile = async (req, res) => {
     };
 
     user = await userRepository.updateUser(req.user.id, updateData);
-    await publishEvent('auth.updated', 'ExchangeAuth', { email: user.email, firstName, lastName, address });
-    res.json(user);
+    await publishEvent('auth.updated', 'ExchangeAuth', {  email: user.email, firstName, lastName, address });
+    res.json({ success: true, id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email});
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

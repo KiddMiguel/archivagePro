@@ -7,14 +7,12 @@ import {
   CircularProgress
 } from '@mui/material';
 import { CreditCard, AccountBalanceWallet} from '@mui/icons-material';
-import { useAuth } from '../../services/AuthContext';
 import { createInvoice } from '../../services/serviceInvoices';
 import { updateUser } from '../../services/serviceUsers';
 import { useNavigate } from 'react-router-dom';
 
 
-const CheckoutForm = () => {
-  const { user } = useAuth();
+const CheckoutForm = ({user}) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +36,7 @@ const CheckoutForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    billingInfo.user = user._id;
+    billingInfo.user = user.id || user._id;
     billingInfo.userComplet = user;
     billingInfo.amount = 20;
     billingInfo.address = {

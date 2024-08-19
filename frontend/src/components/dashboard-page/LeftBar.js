@@ -21,7 +21,7 @@ export default function LeftBar({ open }) {
         return 1;
       case '/corbeille':
         return 2;
-      case '/parametres':
+      case '/settings':
         return 3;
       default:
         return null;
@@ -187,7 +187,7 @@ export default function LeftBar({ open }) {
             selected={selectedIndex === 3}
             sx={listItemStyle(3)}
             component={Link}
-            to="/parametres"
+            to="/settings"
           >
             <ListItemIcon>
               <SettingsIcon

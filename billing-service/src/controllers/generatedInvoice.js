@@ -9,8 +9,8 @@ const generateInvoiceWord = async (invoice) => {
   const content = fs.readFileSync(templatePath, 'binary');
 
   const data = {
-    firstName: invoice.userComplet.firstName,
-    lastName: invoice.userComplet.lastName,
+    firstName: invoice.facture.firstName,
+    lastName: invoice.facture.lastName,
     address: invoice.address,
     date: new Date(invoice.date).toLocaleDateString(),
     date_echeance: new Date(invoice.date_echeance).toLocaleDateString(),
@@ -81,7 +81,7 @@ const sendInvoice = async (invoice, pdfPath) => {
 
     const mailOptions = {
       from: process.env.MAIL_USER,
-      to: invoice.userComplet.email,
+      to: invoice.facture.email,
       subject: `Votre facture #${invoice.id}`,
         html: `
         <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
@@ -93,7 +93,7 @@ const sendInvoice = async (invoice, pdfPath) => {
             <hr style="border: none; border-top: 1px solid #e0e0e0;">
             <div style="padding: 20px 0;">
               <p style="margin: 0;"><strong>Facture #${invoice.id}</strong></p>
-              <p style="margin: 0;">Client : <strong>${invoice.userComplet.firstName} ${invoice.userComplet.lastName}</strong> (${invoice.userComplet.email})</p>
+              <p style="margin: 0;">Client : <strong>${invoice.facture.firstName} ${invoice.facture.lastName}</strong> (${invoice.facture.email})</p>
               <p style="margin: 0;">Méthode de paiement : <strong>Carte de crédit</strong></p>
               <p style="margin: 0;">Date de paiement : <strong>${new Date(invoice.date).toLocaleDateString()}</strong></p>
             </div>
@@ -125,7 +125,7 @@ const sendInvoice = async (invoice, pdfPath) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`Facture #${invoice.id} envoyée à ${invoice.userComplet.email}`);
+    console.log(`Facture #${invoice.id} envoyée à ${invoice.facture.email}`);
   } catch (error) {
     console.error(`Erreur lors de l'envoi de la facture : ${error.message}`);
     throw new Error('L\'envoi de la facture a échoué');

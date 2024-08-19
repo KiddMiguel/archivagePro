@@ -52,7 +52,7 @@ export default function Header({ user }) {
         />
       </Box>
 
-      <Link to="/profile" style={{ textDecoration: "none", color: "inherit" }}>
+      <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography sx={{ fontSize: "14px" }} variant="h6">
             {user.firstName + " " + user.lastName}

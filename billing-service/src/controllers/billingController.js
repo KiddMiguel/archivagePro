@@ -3,7 +3,7 @@ const Invoice = require('../models/invoiceModel');
 const {  sendInvoice, generateInvoicePDF, generateInvoiceWord } = require('./generatedInvoice');
 
 exports.createInvoice = async (req, res) => {
-  const { amount, address, userComplet } = req.body;
+  const { amount, address, facture } = req.body;
 
   try {
     const invoice = {
@@ -14,7 +14,7 @@ exports.createInvoice = async (req, res) => {
       date_echeance: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours à partir de la date actuelle
       address: address.street + ', ' + address.city + ', ' + address.postalCode + ', ' + address.country,
       status: "paid",
-      userComplet: userComplet
+      facture: facture
     };
 
     const newInvoice = new Invoice(invoice);
@@ -24,8 +24,7 @@ exports.createInvoice = async (req, res) => {
   
     // Générer et sauvegarder le PDF
     const pdfPath = await generateInvoiceWord(invoice);
-    await sendInvoice(invoice, pdfPath);
-    res.json({ invoice, pdfPath });
+    res.json({ message :"Facture crée", statut : true  , pdfPath });
 
   } catch (err) {
     console.error(err.message);

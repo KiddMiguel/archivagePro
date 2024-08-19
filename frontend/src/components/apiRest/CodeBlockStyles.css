@@ -1,0 +1,39 @@
+/* Conteneur du bloc de code */
+.code-container {
+    position: relative;
+    background-color: #2d2d2d; /* Fond sombre */
+    border-radius: 8px;
+    padding: 16px;
+    overflow: auto;
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffffff; /* Texte blanc */
+    margin-bottom: 20px;
+}
+
+/* Style du code */
+.code-container pre {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Bouton de copie */
+.copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #444; /* Fond du bouton */
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.copy-button:hover {
+    background-color: #555; /* Changement de couleur au survol */
+}
+
+.copy-button:focus {
+    outline: none;
+}
