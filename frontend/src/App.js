@@ -29,10 +29,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
+          <Route path="/checkout/" element={<CheckoutForm user={user} />} />
 
           {/* Routes protégées avec PrivateLayout */}
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
-            <Route path="/checkout/" element={<CheckoutForm user={user} />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />

@@ -18,7 +18,6 @@ connectDB()
   .catch((err) => {
     console.error("Failed to connect to database:", err);
   });
-
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(cors()); 

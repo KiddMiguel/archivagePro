@@ -134,7 +134,9 @@ exports.deleteProfile = async (req, res) => {
     }
 
     await userRepository.deleteUser(req.user.id);
+
     await publishEvent('auth.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
+
     res.json({ msg: 'User removed' });
   } catch (err) {
     console.error(err.message);

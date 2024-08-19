@@ -37,7 +37,7 @@ const CheckoutForm = ({user}) => {
     e.preventDefault();
 
     billingInfo.user = user.id || user._id;
-    billingInfo.userComplet = user;
+    billingInfo.facture = user;
     billingInfo.amount = 20;
     billingInfo.address = {
       street: billingInfo.address1,

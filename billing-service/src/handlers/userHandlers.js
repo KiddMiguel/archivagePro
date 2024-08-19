@@ -8,7 +8,7 @@ async function handleUserDeleted(eventData) {
         const userId = eventData.userId;
         console.log(`Handling deletion for user with ID: ${userId}`);
 
-        // Supprimez les factures ou autres données associées à cet utilisateur
+        // récupère les factures ou autres données associées à cet utilisateur
         const invoices = await Invoice.find({ user: userId });
         
         // Chemin du dossier des factures
