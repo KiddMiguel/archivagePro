@@ -8,8 +8,11 @@ const multer = require('multer');
 // Set up multer for file uploads
 const upload = multer({ dest: 'uploads/' });
 
+// Créer un dossier
+router.post('/folder', authMiddleware, fileController.createFolder);
+
 // Télécharger un fichier
-router.post('/upload', authMiddleware, upload.single('file'), fileController.uploadFile);
+router.post('/upload', authMiddleware, upload.single('file'), fileController.uploadFileToFolder);
 
 // Récupérer un fichier par ID
 router.get('/:id', authMiddleware, fileController.getFile);

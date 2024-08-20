@@ -12,7 +12,6 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Middlewares
-app.use(bodyParser.json());
 app.use(helmet());
 app.use(morgan('combined'));
 app.use(cors(config.cors));

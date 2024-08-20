@@ -28,13 +28,6 @@ const FolderSchema = new Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    },
-    metadata: {
-        description: {
-            type: String,
-            default: ''
-        },
-        tags: [String]
     }
 });
 

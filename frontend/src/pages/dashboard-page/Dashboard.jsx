@@ -57,11 +57,12 @@ const Dashboard = () => {
   };
 
   const handleFileDrop = (acceptedFiles) => {
-    setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); // Ajouter les fichiers sélectionnés aux fichiers existants
+    setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
   const handleUploadFiles = async () => {
     for (const file of selectedFiles) {
+      console.log(`Uploading file: ${file.name}`);
       await uploadFile(file);
     }
     handleCloseFileDialog(); // Fermer le dialogue après téléchargement

@@ -1,31 +1,31 @@
 require('dotenv').config();
 const express = require('express');
-const {connectDB} = require('./config/db');
-const bodyParser = require('body-parser');
-const fileRoutes = require('./routes/fileRoutes');
 const cors = require('cors');
+const { connectDB } = require('./config/db');
+const fileRoutes = require('./routes/fileRoutes');
+const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const validateApiKey = require('./middlewares/validateApiKey');
-const { startAuthConsumer } = require('./events/authConsumer');
+const morgan = require('morgan');
 const app = express();
+
 connectDB()
   .then(() => {
-    startAuthConsumer().catch((err) => {
-      console.error("Error starting auth consumer:", err);
-    });
+    console.log('Database connected');
   })
   .catch((err) => {
-    console.error("Failed to connect to database:", err);
+    console.error('Failed to connect to database:', err);
   });
 
-app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json());
-app.use(cors()); 
+app.use(helmet());
 app.use(validateApiKey);
 app.use(morgan('combined'));
 
-// Routes principales
+
 app.use('/', fileRoutes);
 
 const port = process.env.PORT || 4003;

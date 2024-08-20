@@ -14,6 +14,7 @@ import Deconnexion from './components/dashboard-page/Deconnexion';
 import Settings from './pages/dashboard-page/Settings';
 import ApiRoutes from './routes/ApiRoutes';  // Assurez-vous que le chemin est correct
 import ForgotPassword from './pages/landing-page/forgotPassword';
+import DashTest from './pages/dashboard-page/DashTest';
 
 function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -28,6 +29,7 @@ function App() {
         <Routes>
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />
+          <Route path="/test" element={<DashTest />} />
           <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
           <Route path="/forgotpassword" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
