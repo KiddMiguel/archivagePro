@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FolderCard from '../../components/dashboard-page/FolderCard';
@@ -7,11 +7,16 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
+import { uploadFile } from '../../services/serviceFiles';
+import RenderIcon from '../../components/dashboard-page/RenderIcon';
+
 
 const Dashboard = () => {
   const [openFolderDialog, setOpenFolderDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
   const [folderName, setFolderName] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -48,11 +53,18 @@ const Dashboard = () => {
 
   const handleCloseFileDialog = () => {
     setOpenFileDialog(false);
+    setSelectedFiles([]);
   };
 
   const handleFileDrop = (acceptedFiles) => {
-    console.log('Files dropped:', acceptedFiles);
-    handleCloseFileDialog();
+    setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); // Ajouter les fichiers sélectionnés aux fichiers existants
+  };
+
+  const handleUploadFiles = async () => {
+    for (const file of selectedFiles) {
+      await uploadFile(file);
+    }
+    handleCloseFileDialog(); // Fermer le dialogue après téléchargement
   };
 
   return (
@@ -162,7 +174,7 @@ const Dashboard = () => {
 
       {/* Dialogue pour télécharger un fichier */}
       <Dialog open={openFileDialog} onClose={handleCloseFileDialog} fullScreen={fullScreen} maxWidth="md" fullWidth>
-        <DialogTitle>Télécharger un fichier</DialogTitle>
+        <DialogTitle>Télécharger des fichiers</DialogTitle>
         <DialogContent>
           <DropzoneArea
             onDrop={handleFileDrop}
@@ -172,10 +184,25 @@ const Dashboard = () => {
             activeBgColor="#e3f2fd"
             textColor="#1976d2"
           />
+          <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", overflowX: "auto", width: "100%" }}>
+          {selectedFiles.map((file, index) => (
+                <Box key={index} sx={{display : "flex"}}>
+              <Box  display="flex" alignItems="center" sx={{ fontWeight: "600" }}>
+                <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 0 }}>
+                  {<RenderIcon type={file.name.split(".").slice(-1)[0]} />}
+                </Avatar>
+                {file.name}
+              </Box>
+              </Box>
+            ))}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseFileDialog} color="primary">
             Annuler
+          </Button>
+          <Button onClick={handleUploadFiles} color="primary" variant="contained">
+            Télécharger
           </Button>
         </DialogActions>
       </Dialog>

@@ -100,14 +100,19 @@ export const createInvoice = async (invoice) => {
 export const uploadFile = async (file) => {
   try {
     const formData = new FormData();
+    console.log('file', file);
     formData.append('file', file);
+    formData.append('fileName', file.name);
+    console.log('formData', formData);
     const response = await service.post('/files/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
+    console.log(error);
     return error.response.data;
   }
 };

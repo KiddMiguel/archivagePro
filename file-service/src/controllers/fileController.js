@@ -2,7 +2,7 @@ const { GridFSBucket, ObjectId } = require('mongodb');
 const { getDB } = require('../config/db');
 const fs = require('fs');
 
-// Télécharger un fichier
+// Téléverser un fichier
 exports.uploadFile = async (req, res) => {
     if (!req.file) {
         return res.status(400).send({ message: 'No file uploaded' });
@@ -12,6 +12,25 @@ exports.uploadFile = async (req, res) => {
         const db = getDB();
         const bucket = new GridFSBucket(db);
         const uploadStream = bucket.openUploadStream(req.file.originalname);
+
+        fs.createReadStream(req.file.path).pipe(uploadStream)
+            .on('error', (error) => res.status(500).send({ message: error.message }))
+            .on('finish', () => res.status(201).send({ message: 'File uploaded successfully', fileId: uploadStream.id }));
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+// Téléverser un fichier
+exports.uploadFileToFolder = async (req, res) => {
+    if (!req.file) {
+        return res.status(400).send({ message: 'No file uploaded' });
+    }
+
+    try {
+        const db = getDB();
+        const bucket = new GridFSBucket(db);
+        const uploadStream = bucket.openUploadStream(req.file.originalname, { metadata: { folderId: req.params.folderId } });
 
         fs.createReadStream(req.file.path).pipe(uploadStream)
             .on('error', (error) => res.status(500).send({ message: error.message }))
