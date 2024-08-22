@@ -45,9 +45,10 @@ const Dashboard = ({rootFolder, user}) => {
 
 
   const handleDossiers = async () => {
-    const folders = await getUserFolders(user._id);
-    setFolders(folders.slice(1));
+    const folders = await getUserFolders(user._id || user.id);
+    setFolders(folders.length ? folders.slice(1) : []);
   };
+
   const handleUploadFiles = async () => {
     if (selectedFiles.length === 0) {
       setUploadMessage('Veuillez sélectionner un fichier');
@@ -65,7 +66,7 @@ const Dashboard = ({rootFolder, user}) => {
 
     for (const file of selectedFiles) {
       setLoadingUpload(true);
-      await uploadFile(file);
+      await uploadFile(file, rootFolder._id);
     }
     setTimeout(() => {
       setLoadingUpload(false);
@@ -168,7 +169,7 @@ const Dashboard = ({rootFolder, user}) => {
 
                     <Grid container spacing={3}>
               {folders.length > 0 ? (
-                folders.map((folder, index) => (
+                folders && folders.map((folder, index) => (
                   <Grid item xs={12} md={3} key={index}>
                     <FolderCard
                       title={folder.name}

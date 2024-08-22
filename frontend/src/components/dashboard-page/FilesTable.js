@@ -5,19 +5,23 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { Box, Avatar, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import "../../assets/styles/stylesAgDataGrid.css";
-import { getAllFiles } from '../../services/serviceFiles';
+import { getAllFiles, getFolderFiles } from '../../services/serviceFiles';
 import RenderIcon from './RenderIcon';
 
-const FilesTable = ({ rootFolder, filesUpdated  }) => {
+const FilesTable = ({ rootFolder, filesUpdated, folder }) => {
+  console.log("rootFolder", rootFolder);
+  console.log("folder", folder);
   const [rowData, setRowData] = useState([]);
 
   const handleFiles = async () => {
-    const files = await getAllFiles(rootFolder.owner);
+    const files =  rootFolder ?  await getAllFiles(rootFolder.owner) : await getFolderFiles(folder._id);
+
 
     let totalSizeInBytes = 0;
+    console.log("files", files);
 
     // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
-    files.forEach((file) => {
+   files && files.forEach((file) => {
       totalSizeInBytes += file.length; // Ajouter la taille de chaque fichier en octets
 
       // Formater la taille de chaque fichier individuellement
