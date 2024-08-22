@@ -7,8 +7,10 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile, createFolder, getUserFolders, deleteFolder } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
+import FolderFilesDialog from '../../components/dashboard-page/FolderFilesDialog';
+
 
 
 
@@ -22,6 +24,10 @@ const Dashboard = ({rootFolder, user}) => {
   const [folderMessage, setFolderMessage] = useState('');
   const [folders, setFolders] = useState([]);
   const [foldersUpdated, setFoldersUpdated] = useState(false);
+  const [openFolderFilesDialog, setOpenFolderFilesDialog] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState({});
+  const [filesUpdated, setFilesUpdated] = useState(false); 
+
 
     
   const theme = useTheme();
@@ -37,16 +43,48 @@ const Dashboard = ({rootFolder, user}) => {
     handleCloseFolderDialog();
   };
 
-  const handleDeleteFolder = async () => {
-    await deleteFolder();
-  };
 
   const handleDossiers = async () => {
     const folders = await getUserFolders(user._id);
     setFolders(folders.slice(1));
   };
+  const handleUploadFiles = async () => {
+    if (selectedFiles.length === 0) {
+      setUploadMessage('Veuillez sélectionner un fichier');
+      return;
+    }
+    if (selectedFiles.length > 10) {
+      setUploadMessage('Vous ne pouvez télécharger que 10 fichiers à la fois');
+      return;
+    }
 
+    if(selectedFiles.some(file => file.size > 10000000)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+      return;
+    }
+
+    for (const file of selectedFiles) {
+      setLoadingUpload(true);
+      await uploadFile(file);
+    }
+    setTimeout(() => {
+      setLoadingUpload(false);
+      handleCloseFileDialog(); 
+      setFilesUpdated(true);
+    }, 3000);
+  };
+
+  const handleOpenFolderFilesDialog = (folder) => {
+    setSelectedFolder(folder);
+    setOpenFolderFilesDialog(true);
+  };
   
+
+  const handleCloseFolderFilesDialog = () => {
+    setOpenFolderFilesDialog(false);
+    setSelectedFolder(null);
+  };
+
   useEffect(() => {
     handleDossiers();
   }, [foldersUpdated]);
@@ -56,7 +94,6 @@ const Dashboard = ({rootFolder, user}) => {
   }, [folders]);
 
 
-  console.log(rootFolder);
 
   const handleOpenFolderDialog = () => {
     setOpenFolderDialog(true);
@@ -86,30 +123,7 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
-  const handleUploadFiles = async () => {
-    if (selectedFiles.length === 0) {
-      setUploadMessage('Veuillez sélectionner un fichier');
-      return;
-    }
-    if (selectedFiles.length > 10) {
-      setUploadMessage('Vous ne pouvez télécharger que 10 fichiers à la fois');
-      return;
-    }
-
-    if(selectedFiles.some(file => file.size > 10000000)) {
-      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
-      return;
-    }
-
-    for (const file of selectedFiles) {
-      setLoadingUpload(true);
-      await uploadFile(file);
-    }
-    setTimeout(() => {
-      setLoadingUpload(false);
-    handleCloseFileDialog(); 
-    }, 3000);
-  };
+ 
 
   return (
     <Box>
@@ -152,25 +166,37 @@ const Dashboard = ({rootFolder, user}) => {
           }
         </Box>
 
-        <Grid container spacing={3}>
-          {(folders.length > 0) ? (
-            folders.map((folder, index) => (
-              <Grid item xs={12} md={3} key={index}>
-                <FolderCard
-                  title={folder.name}
-                  icon={<FolderIcon />}
-                  onOpen={() => console.log('Open folder')}
-                />
-                </Grid>
-            ))
-            ) : (
-              <Box sx={{width : "100%"}}>
-              <Typography variant="body1" align='center' sx={{ color: 'rgba(0, 0, 0, 0.6)', }}>
-                Aucun dossier trouvé
-              </Typography>
-              </Box>
-            )}
-        </Grid>
+                    <Grid container spacing={3}>
+              {folders.length > 0 ? (
+                folders.map((folder, index) => (
+                  <Grid item xs={12} md={3} key={index}>
+                    <FolderCard
+                      title={folder.name}
+                      icon={<FolderIcon />}
+                      onOpen={() => handleOpenFolderFilesDialog(folder)}
+                      rootFolder={folder}
+                      setFoldersUpdated={setFoldersUpdated} // Ici, vous passez correctement setFoldersUpdated
+                    />
+                  </Grid>
+                ))
+              ) : (
+                <Box sx={{ width: "100%" }}>
+                  <Typography variant="body1" align='center' sx={{ color: 'rgba(0, 0, 0, 0.6)' }}>
+                    Aucun dossier trouvé
+                  </Typography>
+                </Box>
+              )}
+            </Grid>
+
+
+              {/* Utilisation du composant FolderFilesDialog */}
+              <FolderFilesDialog 
+               open={openFolderFilesDialog}
+               onClose={handleCloseFolderFilesDialog}
+               folder={selectedFolder}
+               filesUpdated={filesUpdated}
+               setFilesUpdated={setFilesUpdated}
+              />
       </Box>
 
       <Divider
@@ -190,7 +216,7 @@ const Dashboard = ({rootFolder, user}) => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
-            <FilesTable />
+            <FilesTable  rootFolder={rootFolder} setFoldersUpdated = {setFoldersUpdated}/>
           </Grid>
           <Grid item xs={12} md={4}>
             <StorageCard
@@ -277,6 +303,8 @@ const Dashboard = ({rootFolder, user}) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+
     </Box>
   );
 };

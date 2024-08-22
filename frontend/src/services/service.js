@@ -39,8 +39,6 @@ export const loginService = async (user) => {
   try {
     // Connexion de l'utilisateur
     const response = await service.post('/users/login', user);
-    console.log(response.data);
-
     // Récupérer le dossier root
     const rootFolderResponse = await service.get('/files/root', {
       headers: {
@@ -174,6 +172,27 @@ export const getUserFolders = async (userId) => {
 export const deleteFolder = async (folderId) => {
   try {
     const response = await service.delete(`/files/folder/${folderId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+// Récupérer les fichiers d'un dossier
+export const getFolderFiles = async (folderId) => {
+  try {
+    const response = await service.get(`/files/folder/${folderId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+// Récupérer un les fichiers d'un user
+export const getAllFiles = async (user) => {
+  try {
+    const response = await service.get(`/files/user/${user}`);
     return response.data;
   } catch (error) {
     return error.response.data;

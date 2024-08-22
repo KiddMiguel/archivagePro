@@ -59,6 +59,10 @@ const FileSchema = new Schema({
             ref: 'Folder',  // Référence au dossier parent
             default: null
         },
+        parentFolderName: {
+            type: String,
+            default: null
+        },
         owner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',  // Référence à l'utilisateur propriétaire

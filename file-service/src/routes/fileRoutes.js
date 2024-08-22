@@ -17,6 +17,8 @@ router.delete('/folder/:id', authMiddleware, fileController.deleteFolder);
 // Récupérer les fichiers d'un dossier
 router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
 
+
+
 // Récupérer les dossiers d'un utilisateur
 router.get('/folder/user/:userId', authMiddleware, fileController.getUserFolders);
 
