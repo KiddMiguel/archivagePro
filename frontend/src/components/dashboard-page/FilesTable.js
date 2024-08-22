@@ -10,9 +10,12 @@ import { deleteFile, downloadFile, getAllFiles, getFolderFiles } from '../../ser
 import RenderIcon from './RenderIcon';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { CircularProgress } from '@mui/material';
 
 const FilesTable = ({ rootFolder, filesUpdated, folder }) => {
   const [rowData, setRowData] = useState([]);
+  const [loadingDonwload, setLoadingDownload] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const handleFiles = async () => {
     const files = rootFolder ? await getAllFiles(rootFolder.owner) : await getFolderFiles(folder._id);
@@ -122,21 +125,36 @@ const FilesTable = ({ rootFolder, filesUpdated, folder }) => {
       field: "options",
       cellRenderer: (params) => {
         const handleDownloadClick = async () => {
-          console.log(params.data);
+          setLoadingDownload(true);
           await downloadFile(params.data._id);
+          setLoadingDownload(false);
         };
               
         const handleDeleteClick = async () => {
+          setLoadingDelete(true);
           await deleteFile(params.data._id);
+          setLoadingDelete(false);
         };
 
         return (
           <Box display="flex" justifyContent="center" alignItems="center"  >
             <IconButton onClick={handleDownloadClick} aria-label="download">
-              <DownloadIcon sx={{ color: 'grey', fontSize : "17px" }} />
+              {
+                loadingDonwload ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute'}} />
+                ) : (
+                  <DownloadIcon sx={{ color: 'grey', fontSize : "17px" }} />
+                )
+              }
             </IconButton>
             <IconButton onClick={handleDeleteClick} aria-label="delete">
-              <DeleteIcon sx={{ color: 'grey', fontSize : "17px" }} />
+              {
+                loadingDelete ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute'}} />
+                ) : (
+                  <DeleteIcon sx={{ color: 'grey', fontSize : "17px" }} />
+                )
+              }
             </IconButton>
           </Box>
         );

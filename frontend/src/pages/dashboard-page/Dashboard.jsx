@@ -123,7 +123,8 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
- 
+
+
 
   return (
     <Box>
