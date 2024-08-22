@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -8,18 +8,19 @@ import "../../assets/styles/stylesAgDataGrid.css";
 import { getAllFiles } from '../../services/serviceFiles';
 import RenderIcon from './RenderIcon';
 
-const FilesTable = ({ rootFolder, filesUpdated }) => {
+const FilesTable = ({ rootFolder, filesUpdated  }) => {
   const [rowData, setRowData] = useState([]);
-  const gridApiRef = useRef(null);
 
   const handleFiles = async () => {
     const files = await getAllFiles(rootFolder.owner);
 
     let totalSizeInBytes = 0;
 
+    // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
     files.forEach((file) => {
-      totalSizeInBytes += file.length;
+      totalSizeInBytes += file.length; // Ajouter la taille de chaque fichier en octets
 
+      // Formater la taille de chaque fichier individuellement
       let fileSize = file.length;
       let i = 0;
       const byteUnits = ['octets', 'Ko', 'Mo', 'Go', 'To', 'Po', 'Eo', 'Zo', 'Yo'];
@@ -35,23 +36,6 @@ const FilesTable = ({ rootFolder, filesUpdated }) => {
     setRowData(files);
   };
 
-  useEffect(() => {
-    handleFiles();
-  }, [rootFolder]);
-
-  useEffect(() => {
-    if (filesUpdated && gridApiRef.current) {
-      // Met à jour les données directement dans la grille
-      handleFiles().then(() => {
-        gridApiRef.current.setRowData(rowData);
-      });
-    }
-  }, [filesUpdated]);
-
-  const onGridReady = (params) => {
-    gridApiRef.current = params.api;
-    params.api.setRowData(rowData);
-  };
 
   const columnDefs = [
     {
@@ -129,7 +113,6 @@ const FilesTable = ({ rootFolder, filesUpdated }) => {
   useEffect(() => {
     handleFiles();
   }, [rootFolder, filesUpdated]);
-
 
   return (
     <div className="ag-theme-alpine" style={{ height: '100%', width: '100%', padding: '16px' }}>
