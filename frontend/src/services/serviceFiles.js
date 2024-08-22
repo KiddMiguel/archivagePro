@@ -1,1 +1,1 @@
-export { uploadFile } from './service';
+export { uploadFile,createFolder } from './service';

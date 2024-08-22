@@ -7,10 +7,15 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const validateApiKey = require('./middlewares/validateApiKey');
 const morgan = require('morgan');
+const { startAuthConsumer } = require('./events/authConsumer');
 const app = express();
 
 connectDB()
   .then(() => {
+    startAuthConsumer().catch((err) => {
+      console.error('Error starting auth consumer:', err);
+    });
+
     console.log('Database connected');
   })
   .catch((err) => {

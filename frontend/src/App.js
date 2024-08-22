@@ -17,8 +17,8 @@ import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 
 function App() {
-  const { isAuthenticated, loading, user } = useAuth();
-  
+  const { isAuthenticated, loading, user, rootFolder } = useAuth();
+
   if (loading) {
     return <Reload />;
   }
@@ -37,7 +37,7 @@ function App() {
 
           {/* Routes protégées avec PrivateLayout */}
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder}/>} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
             <Route path="/settings" element={<Settings />} />

@@ -22,7 +22,7 @@ const Login = () => {
       const response = await loginService(user);
       if (response.success) {
         if (response.token) {
-          login(response.user, response.token);
+          login(response.user, response.token, response.rootFolder);
           navigate('/dashboard');
         }
       } else {

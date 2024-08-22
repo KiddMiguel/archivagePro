@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar } from '@mui/material';
+import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar, CircularProgress } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FolderCard from '../../components/dashboard-page/FolderCard';
@@ -9,14 +9,20 @@ import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
 import { uploadFile } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
+import { createFolder } from '../../services/serviceFiles';
 
 
-const Dashboard = () => {
+const Dashboard = ({rootFolder}) => {
   const [openFolderDialog, setOpenFolderDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
   const [folderName, setFolderName] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [folderMessage, setFolderMessage] = useState('');
 
+  console.log(rootFolder);
+  
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -43,7 +49,11 @@ const Dashboard = () => {
   };
 
   const handleCreateFolder = () => {
-    console.log(`Creating folder: ${folderName}`);
+    if (!folderName) {
+      setFolderMessage('Veuillez entrer un nom de dossier');
+      return;
+    };
+    createFolder({ name: folderName, parentFolderId: rootFolder._id });
     handleCloseFolderDialog();
   };
 
@@ -52,7 +62,9 @@ const Dashboard = () => {
   };
 
   const handleCloseFileDialog = () => {
+    setLoadingUpload(false);
     setOpenFileDialog(false);
+    setUploadMessage('');
     setSelectedFiles([]);
   };
 
@@ -61,11 +73,28 @@ const Dashboard = () => {
   };
 
   const handleUploadFiles = async () => {
+    if (selectedFiles.length === 0) {
+      setUploadMessage('Veuillez sélectionner un fichier');
+      return;
+    }
+    if (selectedFiles.length > 10) {
+      setUploadMessage('Vous ne pouvez télécharger que 10 fichiers à la fois');
+      return;
+    }
+
+    if(selectedFiles.some(file => file.size > 10000000)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+      return;
+    }
+
     for (const file of selectedFiles) {
-      console.log(`Uploading file: ${file.name}`);
+      setLoadingUpload(true);
       await uploadFile(file);
     }
-    handleCloseFileDialog(); // Fermer le dialogue après téléchargement
+    setTimeout(() => {
+      setLoadingUpload(false);
+    handleCloseFileDialog(); 
+    }, 3000);
   };
 
   return (
@@ -164,7 +193,8 @@ const Dashboard = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseFolderDialog} color="primary">
+          {folderMessage && <Typography color="error" sx={{marginRight : "auto", ml : 2}} >{folderMessage}</Typography>}
+          <Button onClick={handleCloseFolderDialog} color="primary" sx={{textTransform : "none"}}>
             Annuler
           </Button>
           <Button onClick={handleCreateFolder} color="primary" variant="contained" sx={{ textTransform: "none", borderRadius: "10px" }}>
@@ -198,12 +228,27 @@ const Dashboard = () => {
             ))}
           </Box>
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={handleCloseFileDialog} color="primary">
+        {uploadMessage && <Typography color="error" sx={{marginRight : "auto", ml : 2}} >{uploadMessage}</Typography>}
+
+          <Button onClick={handleCloseFileDialog} color="primary" sx={{textTransform : "none"}}>
             Annuler
           </Button>
-          <Button onClick={handleUploadFiles} color="primary" variant="contained">
-            Télécharger
+          <Button onClick={handleUploadFiles} color="primary" variant="contained" sx={{textTransform : "none", mr : 2}} >
+          {loadingUpload ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        Téléchargement...
+                        <CircularProgress
+                          color="inherit" 
+                          thickness={5} 
+                          size={20} 
+                          sx={{ color: 'white' }} 
+                        />
+                      </div>
+                    ) : (
+                      'Télécharger'
+                    )}
           </Button>
         </DialogActions>
       </Dialog>

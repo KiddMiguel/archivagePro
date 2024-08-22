@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
         res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName } });
       }
     );
-    await publishEvent('auth.registered', 'ExchangeAuth', { email :user.email , firstName : user.firstName, lastName : user.lastName });
+    await publishEvent('auth.file.registered', 'ExchangeAuth', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: "Server error", success : false });
@@ -72,13 +72,13 @@ exports.login = async (req, res) => {
         user.temporaryPassword = null;
         user.temporaryPasswordExpires = null;
         await user.save();
-        // Vous pouvez également forcer l'utilisateur à changer son mot de passe ici si nécessaire
       }
     }
 
     if (!isMatch) {
       return res.status(400).json({ msg: 'Mot de passe incorrect', success: false });
     }
+    
 
     const payload = {
       user: {
@@ -162,7 +162,7 @@ exports.deleteProfile = async (req, res) => {
 
     await userRepository.deleteUser(req.user.id);
 
-    await publishEvent('auth.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
+    await publishEvent('auth.billing.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
 
     res.json({ msg: 'User removed' });
   } catch (err) {

@@ -3,16 +3,16 @@ const router = express.Router();
 const fileController = require('../controllers/fileController');
 const authMiddleware = require('../middlewares/authMiddleware');
 const isAdmin = require('../middlewares/adminMiddleware');
-const multer = require('multer');
-
-// Set up multer for file uploads
-const upload = multer({ dest: 'uploads/' });
+const upload = require('../middlewares/upload');
 
 // Créer un dossier
 router.post('/folder', authMiddleware, fileController.createFolder);
 
+// récupérer un dossier parent root
+router.get('/root', authMiddleware, fileController.getRootFolder);
+
 // Télécharger un fichier
-router.post('/upload', authMiddleware, upload.single('file'), fileController.uploadFileToFolder);
+router.post('/upload', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
 
 // Récupérer un fichier par ID
 router.get('/:id', authMiddleware, fileController.getFile);

@@ -49,10 +49,6 @@ const FileSchema = new Schema({
         type: Date,
         required: true
     },
-    md5: {
-        type: String,
-        required: true
-    },
     contentType: {
         type: String,
         required: true
@@ -67,12 +63,7 @@ const FileSchema = new Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',  // Référence à l'utilisateur propriétaire
             required: true
-        },
-        description: {
-            type: String,
-            default: ''
-        },
-        tags: [String]
+        }
     }
 });
 

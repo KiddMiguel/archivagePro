@@ -39,54 +39,89 @@ exports.createFolder = async (req, res) => {
 
 // Téléverser un fichier dans un dossier
 exports.uploadFileToFolder = async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send({ message: 'No file uploaded' });
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).send({ message: 'No files uploaded' });
     }
 
-    const { folderId } = req.query || req.params;
+    let { folderId } = req.params || req.query;
+
+    if (!folderId) {
+        const rootFolder = await Folder.findOne({ name: 'root_' + req.user.id, owner: req.user.id });
+        if (!rootFolder) {
+            return res.status(404).send({ message: 'Root folder not found' });
+        }
+        folderId = rootFolder._id;
+    }
+
     const owner = req.user.id;
 
     try {
         const db = getDB();
         const bucket = new GridFSBucket(db);
 
-        const folder = await Folder.findById(folderId);
-        if (!folder) {
-            return res.status(404).send({ message: 'Folder not found' });
-        }
-
-        // Créer un flux de téléversement pour le fichier
-        const uploadStream = bucket.openUploadStream(req.file.originalname, {
-            metadata: { parentFolder: folderId, owner }
-        });
-
-        // Lire le fichier et le téléverser dans la base de données
-        fs.createReadStream(req.file.path).pipe(uploadStream)
-            .on('error', (error) => res.status(500).send({ message: error.message }))
-            .on('finish', async () => {
-                const fileId = uploadStream.id;
-                await File.create({
-                    _id: fileId,
-                    filename: req.file.originalname,
-                    length: req.file.size, // Taille du fichier
-                    chunkSize: 255 * 1024,  // 255 KB
-                    uploadDate: new Date(), // Date de téléversement
-                    md5: req.file.md5 || '',  // MD5 hash du fichier
-                    contentType: req.file.mimetype, // Type de contenu du fichier
-                    metadata: { // Métadonnées supplémentaires
-                        parentFolder: folderId,
-                        owner,
-                        description: req.body.description || '',
-                        tags: req.body.tags || []
-                    }
+        const filePromises = req.files.map((file) => {
+            return new Promise((resolve, reject) => {
+                const uploadStream = bucket.openUploadStream(file.originalname, {
+                    metadata: { parentFolder: folderId, owner }
                 });
 
-                res.status(201).send({ message: 'File uploaded successfully', fileId });
+                const readStream = fs.createReadStream(file.path);
+
+                readStream.pipe(uploadStream)
+                    .on('error', (error) => reject(error))
+                    .on('finish', async () => {
+                        const fileId = uploadStream.id;
+                        await File.create({
+                            _id: fileId,
+                            filename: file.originalname,
+                            length: file.size,
+                            chunkSize: 255 * 1024,
+                            uploadDate: new Date(),
+                            contentType: file.mimetype,
+                            metadata: {
+                                parentFolder: folderId,
+                                owner
+                            }
+                        });
+
+                        // Supprimer le fichier temporaire après l'upload
+                        fs.unlink(file.path, (error) => {
+                            if (error) {
+                                console.error(`Error deleting temp file: ${error.message}`);
+                            }
+                        });
+
+                        resolve(fileId);
+                    });
+
+                readStream.on('error', reject);
             });
+        });
+
+        const uploadedFileIds = await Promise.all(filePromises);
+
+        res.status(201).send({ message: 'Files uploaded successfully', fileIds: uploadedFileIds });
+
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
 };
+
+// récupérer le dossier parent root
+exports.getRootFolder = async (req, res) => {
+    console.log(req);
+    try {
+      const rootFolder = await Folder.findOne({ name: 'root_' + req.user.id, owner: req.user.id });
+      if (!rootFolder) {
+        return res.status(404).send({ message: 'Root folder not found' });
+      }
+      res.status(200).send(rootFolder);
+    } catch (error) {
+      res.status(500).send({ message: error.message });
+    }
+};
+
+  
 
 // Récupérer un fichier par ID
 exports.getFile = async (req, res) => {

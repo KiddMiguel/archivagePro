@@ -34,23 +34,32 @@ export const register = async (user) => {
   }
 };
 
-// Connecter un utilisateur
+// Connecter un utilisateur 
 export const loginService = async (user) => {
   try {
+    // Connexion de l'utilisateur
     const response = await service.post('/users/login', user);
-    return response.data;
+    console.log(response.data);
+
+    // Récupérer le dossier root
+    const rootFolderResponse = await service.get('/files/root', {
+      headers: {
+        Authorization: `Bearer ${response.data.token}`,
+      },
+    });
+    return { ...response.data, rootFolder: rootFolderResponse.data };
   } catch (error) {
-    return error.response.data;
+    return error.response ? error.response.data : { message: 'Erreur réseau' };
   }
 };
+
 
 // Valider le token
 export const validateToken = async () => {
   try {
     const response = await service.get('/users/profile');
-    console.log(response.data);
-    return response.data;
-  } catch (error) {
+    return response.data
+  }catch (error) {
     return error.response.data;
   }
 };
@@ -96,6 +105,31 @@ export const createInvoice = async (invoice) => {
 
 // --------------------------------------------------------- Fichiers
 
+// Créer un dossier
+export const createFolder = async (folder) => {
+  try {
+    const response = await service.post('/files/folder', folder);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+// Récupérer un dossier parent root
+export const getRootFolder = async (userId) => {
+  try {
+    const response = await service.get('/files/root', {
+      user: userId
+    });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+
+// Téléverser un fichier
 export const uploadFile = async (file) => {
   try {
     const formData = new FormData();

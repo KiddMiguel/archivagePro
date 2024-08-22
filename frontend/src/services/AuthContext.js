@@ -1,6 +1,6 @@
 import React, { useEffect, createContext, useState, useContext } from 'react';
 import Cookies from 'js-cookie';
-import { validateToken } from './service';
+import {  validateToken } from './service';
 
 const AuthContext = createContext();
 
@@ -10,13 +10,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Ajout de l'état de chargement
+  const [rootFolder, setRootFolder] = useState(null);
 
-  const login = (user, token) => {
+  const login = async (user, token,rootFolder ) => {
     setUser(user);
+    setRootFolder(rootFolder);
     setIsAuthenticated(true);
     Cookies.set('token', token, { expires: 7, secure: true, sameSite: 'strict' });
-    setLoading(false); // Désactiver le chargement après la connexion
+    setLoading(false);
   };
+  
 
   const logout = () => {
     setUser(null);
@@ -30,6 +33,7 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       validateToken(token)
         .then(response => {
+          console.log(response);
           if (response.success) {
             setUser(response.user);
             setIsAuthenticated(true);
@@ -51,7 +55,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, loading, login, logout, rootFolder }}>
       {children}
     </AuthContext.Provider>
   );

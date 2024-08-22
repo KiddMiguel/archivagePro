@@ -11,7 +11,7 @@ async function startAuthConsumer() {
     const queueName = "queueAuth";
     await channel.assertExchange(exchangeName, "topic", { durable: true });
     await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queueName, exchangeName, "auth.#");
+    await channel.bindQueue(queueName, exchangeName, "auth.billing.#");
 
     console.log("Waiting for auth messages in authQueue...");
     channel.consume(queueName, async message => {
@@ -21,7 +21,7 @@ async function startAuthConsumer() {
                 const eventData = JSON.parse(message.content.toString());
                 console.log(`Received auth event on ${routingKey}:`, eventData);
 
-                if (routingKey === 'auth.deleted') {
+                if (routingKey === 'auth.billing.deleted') {
                     await handleUserDeleted(eventData); 
                 }
 
