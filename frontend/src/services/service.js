@@ -129,12 +129,12 @@ export const getRootFolder = async (userId) => {
 
 
 // Téléverser un fichier
-export const uploadFile = async (file) => {
+export const uploadFile = async (file, folderId) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await service.post('/files/upload', formData, {
+    const response = await service.post(`/files/upload/${folderId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

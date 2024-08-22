@@ -23,7 +23,7 @@ router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
 router.get('/folder/user/:userId', authMiddleware, fileController.getUserFolders);
 
 // Télécharger un fichier
-router.post('/upload', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
+router.post('/upload/:folderId', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
 
 // Récupérer un fichier par ID
 router.get('/:id', authMiddleware, fileController.getFile);
