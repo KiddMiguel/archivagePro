@@ -1,1 +1,1 @@
-export { uploadFile,createFolder,getUserFolders, getUserFiles, deleteFolder, getFolderFiles,getAllFiles } from './service';
+export { uploadFile,createFolder,getUserFolders, getUserFiles, deleteFolder, getFolderFiles,getAllFiles, deleteFile,downloadFile } from './service';

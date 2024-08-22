@@ -147,13 +147,20 @@ exports.getFile = async (req, res) => {
     }
 };
 
-// Supprimer un fichier par ID
+// Supprimer un fichier d'un user
 exports.deleteFile = async (req, res) => {
     try {
+        const file = await File.findById(req.params.id);
+        if (!file) {
+            return res.status(404).send({ message: 'File not found' });
+        }
+
         const db = getDB();
         const bucket = new GridFSBucket(db);
-        await bucket.delete(ObjectId(req.params.id));
+
+        await bucket.delete(new  ObjectId(req.params.id));
         await File.findByIdAndDelete(req.params.id);
+
         res.status(200).send({ message: 'File deleted successfully' });
     } catch (error) {
         res.status(500).send({ message: error.message });
@@ -218,6 +225,46 @@ exports.getUserFolders = async (req, res) => {
     try {
         const folders = await Folder.find({ owner: req.params.userId });
         res.status(200).send(folders);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+
+// Téchareger un fichier
+exports.downloadFile = async (req, res) => {
+    try {
+        const db = getDB();
+        const bucket = new GridFSBucket(db);
+        const fileId = new ObjectId(req.params.id);
+
+        // Étape 1 : Recherche des métadonnées dans la collection `fs.files` de GridFS
+        const file = await bucket.find({ _id: fileId }).toArray();
+        if (!file || file.length === 0) {
+            return res.status(404).send({ message: 'File not found' });
+        }
+
+        // Étape 2 : Recherche des métadonnées supplémentaires dans votre collection `File`
+        const fileDB = await File.findOne({ _id: fileId });
+        if (!fileDB) {
+            return res.status(404).send({ message: 'File metadata not found' });
+        }
+
+        // Étape 3 : Configuration des en-têtes de réponse
+        res.set({
+            'Content-Type': fileDB.contentType ,
+            'Content-Disposition': `attachment; filename="${fileDB.filename}"`
+        });
+
+        // Étape 4 : Téléchargement du fichier via GridFSBucket
+        const downloadStream = bucket.openDownloadStream(fileId);
+
+        downloadStream.on('error', (error) => {
+            res.status(500).send({ message: error.message });
+        });
+
+        downloadStream.pipe(res).on('finish', () => res.end());
+
     } catch (error) {
         res.status(500).send({ message: error.message });
     }

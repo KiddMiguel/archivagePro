@@ -34,9 +34,16 @@ const FolderCard = ({
     setFoldersUpdated(true);
   };
 
+  const handleOpenBtn = () => {
+    onOpen();
+    handleClose();
+  };
+
   useEffect(() => {
     setFoldersUpdated(false);
   }, []);
+
+
 
   return (
     <Card
@@ -99,7 +106,7 @@ const FolderCard = ({
           aria-controls="folder-menu"
           aria-haspopup="true"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent the onOpen function from being called
+            e.stopPropagation(); 
             handleClick(e);
           }}
           sx={{ ml: "auto" }}
@@ -112,7 +119,7 @@ const FolderCard = ({
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={handleClose}>Ouvrir</MenuItem>
+          <MenuItem onClick={handleOpenBtn}>Ouvrir</MenuItem>
           <MenuItem onClick={handleDeleteFolder}>Supprimer</MenuItem>
         </Menu>
       </CardContent>
