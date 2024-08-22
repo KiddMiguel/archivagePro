@@ -45,9 +45,10 @@ const Dashboard = ({rootFolder, user}) => {
 
 
   const handleDossiers = async () => {
-    const folders = await getUserFolders(user._id);
-    setFolders(folders.slice(1));
+    const folders = await getUserFolders(user._id || user.id);
+    setFolders(folders.length ? folders.slice(1) : []);
   };
+
   const handleUploadFiles = async () => {
     if (selectedFiles.length === 0) {
       setUploadMessage('Veuillez sélectionner un fichier');

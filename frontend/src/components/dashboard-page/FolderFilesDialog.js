@@ -9,7 +9,7 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
   return (
     <Dialog open={open} onClose={onClose} fullScreen={fullScreen} maxWidth="md" fullWidth >
       <DialogTitle>Fichiers dans le dossier {folder?.name}</DialogTitle>
-      <DialogContent sx={{height : "350px"}}>
+      <DialogContent sx={{height : "500px"}}>
         {folder && (
           <FilesTable rootFolder={folder} />
         )}
