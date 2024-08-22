@@ -59,8 +59,8 @@ const Dashboard = ({rootFolder, user}) => {
       return;
     }
 
-    if(selectedFiles.some(file => file.size > 10000000)) {
-      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+    if(selectedFiles.some(file => file.size > 50000000)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
       return;
     }
 
@@ -68,11 +68,10 @@ const Dashboard = ({rootFolder, user}) => {
       setLoadingUpload(true);
       await uploadFile(file, rootFolder._id);
     }
-    setTimeout(() => {
-      setLoadingUpload(false);
-      handleCloseFileDialog(); 
-      setFilesUpdated(true);
-    }, 3000);
+    setLoadingUpload(false);
+    handleCloseFileDialog(); 
+    setFilesUpdated(true);
+
   };
 
   const handleOpenFolderFilesDialog = (folder) => {

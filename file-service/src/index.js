@@ -25,7 +25,7 @@ connectDB()
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(helmet());
 app.use(validateApiKey);
 app.use(morgan('combined'));

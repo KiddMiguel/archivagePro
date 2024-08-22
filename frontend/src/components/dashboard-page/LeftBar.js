@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Toolbar, Typography, Box } from '@mui/material';
 import { Link, useLocation } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -7,11 +7,16 @@ import GradeIcon from '@mui/icons-material/Grade';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DropzoneArea from './DropzoneArea';
+import { uploadFile } from '../../services/serviceFiles';
+import { CircularProgress } from '@mui/material';
 
 const drawerWidth = 180;
 
-export default function LeftBar({ open }) {
+export default function LeftBar({ open, rootFolder }) {
   const location = useLocation();
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [loadingUpload, setLoadingUpload] = useState(false);
+  
 
   const determineSelectedIndex = (path) => {
     switch (path) {
@@ -27,6 +32,31 @@ export default function LeftBar({ open }) {
         return null;
     }
   };
+
+
+  
+  const handleFileDrop = async (acceptedFiles) => {
+    if (acceptedFiles.length > 1) {
+      setUploadMessage('Vous ne pouvez télécharger qu\'un seul fichier à la fois');
+      return;
+    }
+  
+    const file = acceptedFiles[0];
+  
+    if (file.size > 50000000) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
+      return;
+    }
+  
+    setLoadingUpload(true);
+    await uploadFile(file, rootFolder._id);
+    setLoadingUpload(false);
+  
+    setUploadMessage('');
+  };
+
+
+
 
   const selectedIndex = determineSelectedIndex(location.pathname);
 
@@ -164,13 +194,27 @@ export default function LeftBar({ open }) {
             }}
           >
             <DropzoneArea
-              onDrop={(acceptedFiles) => console.log('Files dropped:', acceptedFiles)}
+            onDrop={handleFileDrop}
               label="Glisser des fichiers, ou"
               iconSize={48}
               borderColor="#ccc"
               activeBgColor="#f0f8ff"
               textColor="#1976d2"
             />
+          {uploadMessage && <Typography color="error" sx={{mt : 1, fontSize : "12px"}} >{uploadMessage}</Typography>}
+          {loadingUpload ? (
+            <Typography sx={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize : "12px", mt : 1, color : "#1976d2" }}>
+              Envoi en cours ...
+              <CircularProgress
+                color="inherit" 
+                thickness={5} 
+                size={20} 
+                sx={{ color: '#1976d2' }} 
+              />
+            </Typography>
+          ) : (
+            '')
+          }
           </Box>
           <Divider
             sx={{

@@ -44,8 +44,8 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       return;
     }
 
-    if(selectedFiles.some(file => file.size > 10000000)) {
-      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+    if(selectedFiles.some(file => file.size > 50000000)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
       return;
     }
 
@@ -53,11 +53,9 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       setLoadingUpload(true);
       await uploadFile(file, folder._id);
     }
-    setTimeout(() => {
       setLoadingUpload(false);
       handleCloseFileDialog(); 
       setFilesUpdated(true);
-    }, 3000);
   };
 
 

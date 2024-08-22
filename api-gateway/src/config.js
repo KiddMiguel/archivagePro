@@ -19,8 +19,11 @@ module.exports = {
   fileServiceUrl: process.env.FILE_SERVICE_URL || 'http://localhost:4003',
   options: {
     proxyReqOptDecorator: (proxyReqOpts, srcReq) => {
-      // Ajoutez des options au besoin
       return proxyReqOpts;
     },
+    proxyReqBodyDecorator: (bodyContent) => {
+      return bodyContent;
+    },
+    limit: '50mb',  // Limite de taille pour le corps de la requête
   },
 };

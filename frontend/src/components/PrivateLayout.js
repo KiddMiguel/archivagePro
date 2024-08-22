@@ -5,7 +5,7 @@ import LeftBar from './dashboard-page/LeftBar';
 import Header from './dashboard-page/Header';
 import { useMediaQuery, Typography, Box } from '@mui/material';
 
-const PrivateLayout = ({user , isAuthenticated}) => {
+const PrivateLayout = ({user , isAuthenticated, rootFolder}) => {
 
   // Utilisation de useMediaQuery pour vérifier si l'écran est de taille "medium" ou plus grand
   const isDesktop = useMediaQuery('(min-width:1024px)');
@@ -33,7 +33,7 @@ const PrivateLayout = ({user , isAuthenticated}) => {
 
   return (
     <div style={{ display: 'flex'}}>
-      <LeftBar />
+      <LeftBar rootFolder ={rootFolder}/>
       <div style={{ flexGrow: 1 }}>
         <Header user={user} />
         <div style={{ padding: '20px', background: "#f8f9fa" }}>

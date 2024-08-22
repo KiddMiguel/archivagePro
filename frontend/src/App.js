@@ -36,7 +36,7 @@ function App() {
           <Route path="/checkout/" element={<CheckoutForm user={user} />} />
 
           {/* Routes protégées avec PrivateLayout */}
-          <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
+          <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
             <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
