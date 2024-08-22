@@ -58,7 +58,8 @@ export const loginService = async (user) => {
 export const validateToken = async () => {
   try {
     const response = await service.get('/users/profile');
-    return response.data
+    const rootFolderResponse = await service.get('/files/root');
+    return { ...response.data, rootFolder: rootFolderResponse.data };
   }catch (error) {
     return error.response.data;
   }
@@ -148,3 +149,33 @@ export const uploadFile = async (file) => {
   }
 };
 
+// Récupérer les fichiers d'un utilisateur
+export const getUserFiles = async (userId) => {
+  try {
+    const response = await service.get(`/files/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+
+// Récupérer les dossiers d'un utilisateur
+export const getUserFolders = async (userId) => {
+  try {
+    const response = await service.get(`/files/folder/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+// Supprimer un dossier
+export const deleteFolder = async (folderId) => {
+  try {
+    const response = await service.delete(`/files/folder/${folderId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};

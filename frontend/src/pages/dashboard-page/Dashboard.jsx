@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar, CircularProgress } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -7,12 +7,12 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders, deleteFolder } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
-import { createFolder } from '../../services/serviceFiles';
 
 
-const Dashboard = ({rootFolder}) => {
+
+const Dashboard = ({rootFolder, user}) => {
   const [openFolderDialog, setOpenFolderDialog] = useState(false);
   const [openFileDialog, setOpenFileDialog] = useState(false);
   const [folderName, setFolderName] = useState('');
@@ -20,24 +20,43 @@ const Dashboard = ({rootFolder}) => {
   const [loadingUpload, setLoadingUpload] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');
   const [folderMessage, setFolderMessage] = useState('');
+  const [folders, setFolders] = useState([]);
+  const [foldersUpdated, setFoldersUpdated] = useState(false);
 
-  console.log(rootFolder);
-  
+    
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const folders = [
-    { title: 'Design Docs', fileCount: 10, sizeUsed: '290 MB', date: '05-08-23', bgColor: '#619B8A' },
-    { title: 'Converted Files', fileCount: 10, sizeUsed: '98 MB', date: '03-05-23', bgColor: '#D1D5DB' },
-    { title: 'Urgent Folders', fileCount: 10, sizeUsed: '201 MB', date: '02-01-23', bgColor: '#A3B18A' },
-    { title: "Client's Brief", fileCount: 10, sizeUsed: '302 MB', date: '24-02-23', bgColor: '#B56576' },
-    { title: 'Urgent Folders', fileCount: 10, sizeUsed: '201 MB', date: '02-01-23', bgColor: '#A3B18A' },
-    { title: "Client's Brief", fileCount: 10, sizeUsed: '302 MB', date: '24-02-23', bgColor: '#B56576' },
-    { title: "Client's Brief", fileCount: 10, sizeUsed: '302 MB', date: '24-02-23', bgColor: '#B56576' },
-    { title: "Client's Brief", fileCount: 10, sizeUsed: '302 MB', date: '24-02-23', bgColor: '#B56576' },
-    { title: 'Urgent Folders', fileCount: 10, sizeUsed: '201 MB', date: '02-01-23', bgColor: '#A3B18A' },
-    { title: "Client's Brief", fileCount: 10, sizeUsed: '302 MB', date: '24-02-23', bgColor: '#B56576' },
-  ];
+  const handleCreateFolder = async () => {
+    if (!folderName) {
+      setFolderMessage('Veuillez entrer un nom de dossier');
+      return;
+    };
+    await createFolder({ name: folderName, parentFolderId: rootFolder._id });
+    setFoldersUpdated(true);
+    handleCloseFolderDialog();
+  };
+
+  const handleDeleteFolder = async () => {
+    await deleteFolder();
+  };
+
+  const handleDossiers = async () => {
+    const folders = await getUserFolders(user._id);
+    setFolders(folders.slice(1));
+  };
+
+  
+  useEffect(() => {
+    handleDossiers();
+  }, [foldersUpdated]);
+
+  useEffect(() => {
+    setFoldersUpdated(false); 
+  }, [folders]);
+
+
+  console.log(rootFolder);
 
   const handleOpenFolderDialog = () => {
     setOpenFolderDialog(true);
@@ -48,18 +67,13 @@ const Dashboard = ({rootFolder}) => {
     setFolderName('');
   };
 
-  const handleCreateFolder = () => {
-    if (!folderName) {
-      setFolderMessage('Veuillez entrer un nom de dossier');
-      return;
-    };
-    createFolder({ name: folderName, parentFolderId: rootFolder._id });
-    handleCloseFolderDialog();
-  };
+
 
   const handleOpenFileDialog = () => {
     setOpenFileDialog(true);
   };
+
+
 
   const handleCloseFileDialog = () => {
     setLoadingUpload(false);
@@ -129,22 +143,33 @@ const Dashboard = ({rootFolder}) => {
           <Typography align='left' variant="h5" sx={{ fontWeight: 'bold', marginBottom: 2 }}>
             Dossiers
           </Typography>
-          <Button align='left' sx={{ fontWeight: 'regular', marginBottom: 2, fontSize: 13, textTransform: "none" }}>
-            Voir tout
-          </Button>
+          {
+            folders.length > 8 && (
+              <Button align='left' sx={{ fontWeight: 'regular', marginBottom: 2, fontSize: 13, textTransform: "none" }}>
+                Voir tout
+              </Button>
+            )
+          }
         </Box>
 
         <Grid container spacing={3}>
-          {folders.slice(0, 8).map((folder, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-              <FolderCard
-                icon={<FolderIcon />}
-                title={folder.title}
-                fileCount={folder.fileCount}
-                sizeUsed={folder.sizeUsed}
-              />
-            </Grid>
-          ))}
+          {(folders.length > 0) ? (
+            folders.map((folder, index) => (
+              <Grid item xs={12} md={3} key={index}>
+                <FolderCard
+                  title={folder.name}
+                  icon={<FolderIcon />}
+                  onOpen={() => console.log('Open folder')}
+                />
+                </Grid>
+            ))
+            ) : (
+              <Box sx={{width : "100%"}}>
+              <Typography variant="body1" align='center' sx={{ color: 'rgba(0, 0, 0, 0.6)', }}>
+                Aucun dossier trouvé
+              </Typography>
+              </Box>
+            )}
         </Grid>
       </Box>
 

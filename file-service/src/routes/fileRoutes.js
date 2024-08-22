@@ -11,6 +11,15 @@ router.post('/folder', authMiddleware, fileController.createFolder);
 // récupérer un dossier parent root
 router.get('/root', authMiddleware, fileController.getRootFolder);
 
+// Supprimer un dossier par ID
+router.delete('/folder/:id', authMiddleware, fileController.deleteFolder);
+
+// Récupérer les fichiers d'un dossier
+router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
+
+// Récupérer les dossiers d'un utilisateur
+router.get('/folder/user/:userId', authMiddleware, fileController.getUserFolders);
+
 // Télécharger un fichier
 router.post('/upload', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
 

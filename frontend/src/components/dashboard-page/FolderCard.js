@@ -15,8 +15,6 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 const FolderCard = ({
   icon,
   title,
-  fileCount,
-  sizeUsed,
   onOpen,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -85,39 +83,6 @@ return (
             >
                 {title}
             </Typography>
-
-            <Box sx={{ marginLeft: "auto", textAlign: "right" }}>
-                <Typography
-                    variant="body2"
-                    sx={{
-                        color: "#495057",
-                        fontSize: 11,
-                        fontWeight: "500",
-                        display: {
-                            xs: "none",
-                            md: "none",
-                            lg: "block",
-                        },
-                    }}
-                >
-                    {sizeUsed}
-                </Typography>
-                <Typography
-                    variant="body2"
-                    sx={{
-                        color: "#495057",
-                        fontSize: 11,
-                        fontWeight: "500",
-                        display: {
-                            xs: "none",
-                            md: "none",
-                            lg: "block",
-                        },
-                    }}
-                >
-                    {fileCount} fichiers
-                </Typography>
-            </Box>
 
             <IconButton
                 aria-controls="folder-menu"

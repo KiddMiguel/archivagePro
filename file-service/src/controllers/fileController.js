@@ -109,7 +109,6 @@ exports.uploadFileToFolder = async (req, res) => {
 
 // récupérer le dossier parent root
 exports.getRootFolder = async (req, res) => {
-    console.log(req);
     try {
       const rootFolder = await Folder.findOne({ name: 'root_' + req.user.id, owner: req.user.id });
       if (!rootFolder) {
@@ -151,6 +150,29 @@ exports.deleteFile = async (req, res) => {
     }
 };
 
+// Supprimer un dossier par ID
+exports.deleteFolder = async (req, res) => {
+    try {
+        const folder = await Folder.findById(req.params.id);
+        if (!folder) {
+            return res.status(404).send({ message: 'Folder not found' });
+        }
+
+        // Supprimer tous les fichiers du dossier
+        await File.deleteMany({ "metadata.parentFolder": req.params.id });
+
+        // Supprimer tous les sous-dossiers
+        await Folder.deleteMany({ path: { $regex: `^${folder.path}` } });
+
+        // Supprimer le dossier
+        await Folder.findByIdAndDelete(req.params.id);
+
+        res.status(200).send({ message: 'Folder deleted successfully' });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
 // Récupérer les fichiers d'un utilisateur
 exports.getUserFiles = async (req, res) => {
     try {
@@ -176,6 +198,16 @@ exports.getFolderFiles = async (req, res) => {
     try {
         const files = await File.find({ "metadata.parentFolder": req.params.folderId });
         res.status(200).send(files);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+// Récupérer les dossiers d'un utilisateur
+exports.getUserFolders = async (req, res) => {
+    try {
+        const folders = await Folder.find({ owner: req.params.userId });
+        res.status(200).send(folders);
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
