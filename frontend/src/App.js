@@ -37,7 +37,7 @@ function App() {
 
           {/* Routes protégées avec PrivateLayout */}
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
-            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder}/>} />
+            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
             <Route path="/settings" element={<Settings />} />

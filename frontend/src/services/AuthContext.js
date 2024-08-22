@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setRootFolder(null);
     setIsAuthenticated(false);
     Cookies.remove('token');
     setLoading(false); // Désactiver le chargement après la déconnexion
@@ -37,6 +38,7 @@ export const AuthProvider = ({ children }) => {
           if (response.success) {
             setUser(response.user);
             setIsAuthenticated(true);
+            setRootFolder(response.rootFolder);
           } else {
             Cookies.remove('token');
             setIsAuthenticated(false);
