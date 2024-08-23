@@ -19,9 +19,9 @@ import DashTest from './pages/dashboard-page/DashTest';
 function App() {
   const { isAuthenticated, loading, user, rootFolder } = useAuth();
 
-  if (loading) {
-    return <Reload />;
-  }
+  // if (loading) {
+  //   return <Reload />;
+  // }
 
   return (
     <div className="App">

@@ -7,9 +7,10 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile, createFolder, getUserFolders, getAllFiles } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders, getAllFiles, validateToken } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
 import FolderFilesDialog from '../../components/dashboard-page/FolderFilesDialog';
+import Reload from '../reload';
 
 
 
@@ -20,6 +21,7 @@ const Dashboard = ({rootFolder, user}) => {
   const [folderName, setFolderName] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [loadingUpload, setLoadingUpload] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [uploadMessage, setUploadMessage] = useState('');
   const [folderMessage, setFolderMessage] = useState('');
   const [folders, setFolders] = useState([]);
@@ -27,8 +29,7 @@ const Dashboard = ({rootFolder, user}) => {
   const [openFolderFilesDialog, setOpenFolderFilesDialog] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState({});
   const [filesUpdated, setFilesUpdated] = useState(false); 
-  const [sizes, setSizes] = useState({ documents: 0, medias: 0, others: 0 });
-  const [stockageChange, setStockageChange] = useState(false);
+  const [sizes, setSizes] = useState({ documents: 0, medias: 0, others: 0, limitStockage: 0, usedCurrentStockage: 0 });
 
     
   const theme = useTheme();
@@ -59,21 +60,28 @@ const Dashboard = ({rootFolder, user}) => {
       setUploadMessage('Vous ne pouvez télécharger que 10 fichiers à la fois');
       return;
     }
-
-    if(selectedFiles.some(file => file.size > 50000000)) {
+  
+    if (selectedFiles.some(file => file.size > 50 * 1024 * 1024)) {
       setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
       return;
     }
-
-    for (const file of selectedFiles) {
-      setLoadingUpload(true);
-      await uploadFile(file, rootFolder._id);
+  
+    setLoadingUpload(true);  
+  
+    try {
+      for (const file of selectedFiles) {
+        await uploadFile(file, rootFolder._id);
+      }
+      setFilesUpdated(true); // 
+    } catch (error) {
+      console.error("Error uploading files: ", error);
+      setUploadMessage('Erreur lors du téléchargement des fichiers');
+    } finally {
+      setLoadingUpload(false);
+      handleCloseFileDialog();
     }
-    setLoadingUpload(false);
-    handleCloseFileDialog(); 
-    setFilesUpdated(true);
-
   };
+  
 
   const handleOpenFolderFilesDialog = (folder) => {
     setSelectedFolder(folder);
@@ -88,8 +96,7 @@ const Dashboard = ({rootFolder, user}) => {
 
   const handlerCalculateSizeTypeFile = async () => {
     let limitStockage = user.storageLimit;
-    let usedCurrentStockage = user.storageUsed; 
-    // type document
+    let usedCurrentStockage = user.storageUsed;
     let type = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf', 'odt', 'ods', 'odp', 'odg', 'odc', 'odf', 'odb', 'odi', 'odm', 'ott', 'ots', 'otp', 'otg', 'otc', 'otf', 'oti', 'oth', 'ots', 'ott', 'otm'];
     let totalSizeInBytes = 0;
     const files = await getAllFiles(rootFolder.owner);
@@ -98,7 +105,6 @@ const Dashboard = ({rootFolder, user}) => {
         totalSizeInBytes += file.length;
       }
     }
-    // type media
     let typeMedia = ['mp3', 'mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv', 'webm', 'm4a', 'm4v', 'f4v', 'f4a', 'm4b', 'm4r', 'f4b', 'wav', 'flac', 'ogg', 'oga', 'opus', 'amr', 'aiff', 'aif', 'aifc', 'wma', 'aac', '3gp', '3gp2', '3g2', '3gpp', '3gpp2', 'ogg', 'ogv', 'oga', 'ogx', 'ogm', 'spx', 'opus', 'webm', 'flv', 'f4v', 'f4p', 'f4a', 'f4b'];
     let totalSizeInBytesMedia = 0;
     for (const file of files) {
@@ -106,8 +112,7 @@ const Dashboard = ({rootFolder, user}) => {
         totalSizeInBytesMedia += file.length;
       }
     }
-    // type other
-    let typeOther = ['js', 'php', 'ts', 'java', 'py']
+    let typeOther = ['js', 'php', 'ts', 'java', 'py'];
     let totalSizeInBytesOther = 0;
     for (const file of files) {
       if (typeOther.includes(file.filename.split('.').pop())) {
@@ -116,31 +121,23 @@ const Dashboard = ({rootFolder, user}) => {
     }
     return { totalSizeInBytes, totalSizeInBytesMedia, totalSizeInBytesOther, limitStockage, usedCurrentStockage };
   };
-
-  
-
   useEffect(() => {
     const fetchData = async () => {
-      await handleDossiers();  // Charge les dossiers
-  
-      // Seulement si `foldersUpdated` ou `user` change, recalculer les tailles
-      if (foldersUpdated || filesUpdated || user) {
-        const data = await handlerCalculateSizeTypeFile();
-        setSizes({
-          documents: data.totalSizeInBytes,
-          medias: data.totalSizeInBytesMedia,
-          others: data.totalSizeInBytesOther,
-        });
-        setFoldersUpdated(false);  
-        setFilesUpdated(false);
-      }
+      await handleDossiers();
+      const data = await handlerCalculateSizeTypeFile();
+      setSizes({
+        documents: data.totalSizeInBytes,
+        medias: data.totalSizeInBytesMedia,
+        others: data.totalSizeInBytesOther,
+        limitStockage: data.limitStockage,
+        usedCurrentStockage: data.usedCurrentStockage,
+      });
+      setLoading(false); 
     };
   
     fetchData();
-  }, [foldersUpdated, user]);
+  }, [foldersUpdated, filesUpdated]);
 
-
-  
 
 
   const handleOpenFolderDialog = () => {
@@ -169,6 +166,9 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
+  if (loading) {
+    return <Reload message="" timeout={2000} redirectPath="/dashboard" />;
+  }
 
   return (
     <Box>
@@ -268,9 +268,10 @@ const Dashboard = ({rootFolder, user}) => {
             documents={sizes.documents}
             medias={sizes.medias}
             others={sizes.others}
-            total={(user.storageUsed / 1000000000).toFixed(2)}
-            limit={(user.storageLimit / 1000000000).toFixed(2)}
+            limit={(sizes.limitStockage / 1000000000).toFixed(2)}
+            total={(sizes.usedCurrentStockage / 1000000000).toFixed(2)}
             setFilesUpdated={setFilesUpdated}
+
           />
 
           </Grid>
