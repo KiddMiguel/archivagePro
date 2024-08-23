@@ -7,7 +7,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile, createFolder, getUserFolders } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders, getAllFiles } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
 import FolderFilesDialog from '../../components/dashboard-page/FolderFilesDialog';
 
@@ -27,7 +27,8 @@ const Dashboard = ({rootFolder, user}) => {
   const [openFolderFilesDialog, setOpenFolderFilesDialog] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState({});
   const [filesUpdated, setFilesUpdated] = useState(false); 
-
+  const [sizes, setSizes] = useState({ documents: 0, medias: 0, others: 0 });
+  const [stockageChange, setStockageChange] = useState(false);
 
     
   const theme = useTheme();
@@ -85,14 +86,61 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFolder(null);
   };
 
-  useEffect(() => {
-    handleDossiers();
-  }, [foldersUpdated]);
+  const handlerCalculateSizeTypeFile = async () => {
+    let limitStockage = user.storageLimit;
+    let usedCurrentStockage = user.storageUsed; 
+    // type document
+    let type = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf', 'odt', 'ods', 'odp', 'odg', 'odc', 'odf', 'odb', 'odi', 'odm', 'ott', 'ots', 'otp', 'otg', 'otc', 'otf', 'oti', 'oth', 'ots', 'ott', 'otm'];
+    let totalSizeInBytes = 0;
+    const files = await getAllFiles(rootFolder.owner);
+    for (const file of files) {
+      if (type.includes(file.filename.split('.').pop())) {
+        totalSizeInBytes += file.length;
+      }
+    }
+    // type media
+    let typeMedia = ['mp3', 'mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv', 'webm', 'm4a', 'm4v', 'f4v', 'f4a', 'm4b', 'm4r', 'f4b', 'wav', 'flac', 'ogg', 'oga', 'opus', 'amr', 'aiff', 'aif', 'aifc', 'wma', 'aac', '3gp', '3gp2', '3g2', '3gpp', '3gpp2', 'ogg', 'ogv', 'oga', 'ogx', 'ogm', 'spx', 'opus', 'webm', 'flv', 'f4v', 'f4p', 'f4a', 'f4b'];
+    let totalSizeInBytesMedia = 0;
+    for (const file of files) {
+      if (typeMedia.includes(file.filename.split('.').pop())) {
+        totalSizeInBytesMedia += file.length;
+      }
+    }
+    // type other
+    let typeOther = ['js', 'php', 'ts', 'java', 'py']
+    let totalSizeInBytesOther = 0;
+    for (const file of files) {
+      if (typeOther.includes(file.filename.split('.').pop())) {
+        totalSizeInBytesOther += file.length;
+      }
+    }
+    return { totalSizeInBytes, totalSizeInBytesMedia, totalSizeInBytesOther, limitStockage, usedCurrentStockage };
+  };
+
+  
 
   useEffect(() => {
-    setFoldersUpdated(false); 
-  }, [folders]);
+    const fetchData = async () => {
+      await handleDossiers();  // Charge les dossiers
+  
+      // Seulement si `foldersUpdated` ou `user` change, recalculer les tailles
+      if (foldersUpdated || filesUpdated || user) {
+        const data = await handlerCalculateSizeTypeFile();
+        setSizes({
+          documents: data.totalSizeInBytes,
+          medias: data.totalSizeInBytesMedia,
+          others: data.totalSizeInBytesOther,
+        });
+        setFoldersUpdated(false);  
+        setFilesUpdated(false);
+      }
+    };
+  
+    fetchData();
+  }, [foldersUpdated, user]);
 
+
+  
 
 
   const handleOpenFolderDialog = () => {
@@ -105,11 +153,9 @@ const Dashboard = ({rootFolder, user}) => {
   };
 
 
-
   const handleOpenFileDialog = () => {
     setOpenFileDialog(true);
   };
-
 
 
   const handleCloseFileDialog = () => {
@@ -122,8 +168,6 @@ const Dashboard = ({rootFolder, user}) => {
   const handleFileDrop = (acceptedFiles) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
-
-
 
 
   return (
@@ -220,12 +264,15 @@ const Dashboard = ({rootFolder, user}) => {
             <FilesTable  rootFolder={rootFolder} setFoldersUpdated = {setFoldersUpdated}/>
           </Grid>
           <Grid item xs={12} md={4}>
-            <StorageCard
-              documents={2.5}
-              medias={4.2}
-              others={5.3}
-              total={13.1}
-            />
+          <StorageCard
+            documents={sizes.documents}
+            medias={sizes.medias}
+            others={sizes.others}
+            total={(user.storageUsed / 1000000000).toFixed(2)}
+            limit={(user.storageLimit / 1000000000).toFixed(2)}
+            setFilesUpdated={setFilesUpdated}
+          />
+
           </Grid>
         </Grid>
       </Box>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Card, CardContent, Typography, Box, Button, Grid } from '@mui/material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -6,7 +6,7 @@ import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const StorageCard = ({ documents, medias, others, total }) => {
+const StorageCard = ({ documents, medias, others, total, limit, setFilesUpdated }) => {
   const data = {
     labels: ['Documents', 'Médias', 'Autres'],
     datasets: [
@@ -29,6 +29,10 @@ const StorageCard = ({ documents, medias, others, total }) => {
     },
   };
 
+  useEffect(() => {
+    setFilesUpdated(false);
+  }, []);
+
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 'none', border: '1px solid rgba(0, 0, 0, 0.12)' }}>
       <CardContent>
@@ -38,7 +42,7 @@ const StorageCard = ({ documents, medias, others, total }) => {
               Stockage Utilisé
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '10px', md: '12px', lg: '14px' } }}>
-              {total} GB sur 30 GB Utilisés
+              {total} GB sur {limit} GB Utilisés
             </Typography>
           </Grid>
 

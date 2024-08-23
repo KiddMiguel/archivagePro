@@ -2,6 +2,7 @@ const { GridFSBucket, ObjectId } = require('mongodb');
 const { Folder, File } = require('../models/fileModel');
 const { getDB } = require('../config/db');
 const fs = require('fs');
+const { publishEvent } = require('../events/publisher');
 
 // Créer un dossier
 exports.createFolder = async (req, res) => {
@@ -108,9 +109,10 @@ exports.uploadFileToFolder = async (req, res) => {
         });
 
         const uploadedFileIds = await Promise.all(filePromises);
-
+        // Récupérer les fichiers uploadés
         res.status(201).send({ message: 'Files uploaded successfully', fileIds: uploadedFileIds });
-
+        const files = await File.find({ _id: { $in: uploadedFileIds } });
+        await publishEvent('file.stockage.uploaded', 'ExchangeFile', { file: files });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -150,7 +152,9 @@ exports.getFile = async (req, res) => {
 // Supprimer un fichier d'un user
 exports.deleteFile = async (req, res) => {
     try {
+
         const file = await File.findById(req.params.id);
+
         if (!file) {
             return res.status(404).send({ message: 'File not found' });
         }
@@ -162,6 +166,8 @@ exports.deleteFile = async (req, res) => {
         await File.findByIdAndDelete(req.params.id);
 
         res.status(200).send({ message: 'File deleted successfully' });
+
+        await publishEvent('file.stockage.deleted', 'ExchangeFile', { file: file });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -175,6 +181,9 @@ exports.deleteFolder = async (req, res) => {
             return res.status(404).send({ message: 'Folder not found' });
         }
 
+        // Récupérer tous les fichiers du dossier
+        const files = await File.find({ "metadata.parentFolder": req.params.id });
+
         // Supprimer tous les fichiers du dossier
         await File.deleteMany({ "metadata.parentFolder": req.params.id });
 
@@ -185,6 +194,7 @@ exports.deleteFolder = async (req, res) => {
         await Folder.findByIdAndDelete(req.params.id);
 
         res.status(200).send({ message: 'Folder deleted successfully' });
+        await publishEvent('file.stockage.deleted', 'ExchangeFile', { files: files });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }

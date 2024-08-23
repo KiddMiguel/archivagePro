@@ -9,7 +9,18 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const validateApiKey = require('./middlewares/validateApiKey');
 const app = express();
-connectDB();
+connectDB()
+  .then(() => {
+    startConsumer().catch((err) => {
+      console.error('Error starting auth consumer:', err);
+    });
+
+    console.log('Database connected');
+  })
+  .catch((err) => {
+    console.error('Failed to connect to database:', err);
+  });
+  
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(cors()); 

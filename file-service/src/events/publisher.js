@@ -7,7 +7,7 @@ async function publishEvent(eventType, exchangeName, eventData) {
         connection = await amqp.connect(amqpUrl);
         channel = await connection.createChannel();
         
-        await channel.assertExchange(exchangeName, 'direct', { durable: true });
+        await channel.assertExchange(exchangeName, 'topic', { durable: true });
         
         const routingKey = eventType;
         const message = Buffer.from(JSON.stringify(eventData));
