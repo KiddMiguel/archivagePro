@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme,  Avatar, CircularProgress } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FolderCard from '../../components/dashboard-page/FolderCard';
@@ -7,13 +7,9 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile, createFolder, getUserFolders, getAllFiles, validateToken } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders, getAllFiles } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
 import FolderFilesDialog from '../../components/dashboard-page/FolderFilesDialog';
-import Reload from '../reload';
-
-
-
 
 const Dashboard = ({rootFolder, user}) => {
   const [openFolderDialog, setOpenFolderDialog] = useState(false);
@@ -21,7 +17,6 @@ const Dashboard = ({rootFolder, user}) => {
   const [folderName, setFolderName] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [loadingUpload, setLoadingUpload] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [uploadMessage, setUploadMessage] = useState('');
   const [folderMessage, setFolderMessage] = useState('');
   const [folders, setFolders] = useState([]);
@@ -30,8 +25,6 @@ const Dashboard = ({rootFolder, user}) => {
   const [selectedFolder, setSelectedFolder] = useState({});
   const [filesUpdated, setFilesUpdated] = useState(false); 
   const [sizes, setSizes] = useState({ documents: 0, medias: 0, others: 0, limitStockage: 0, usedCurrentStockage: 0 });
-
-    
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -72,12 +65,13 @@ const Dashboard = ({rootFolder, user}) => {
       for (const file of selectedFiles) {
         await uploadFile(file, rootFolder._id);
       }
-      setFilesUpdated(true); // 
+
+      setFilesUpdated(true); // Déclenche la mise à jour des données
     } catch (error) {
-      console.error("Error uploading files: ", error);
       setUploadMessage('Erreur lors du téléchargement des fichiers');
     } finally {
       setLoadingUpload(false);
+      setTimeout(() => setFilesUpdated(false), 1000);
       handleCloseFileDialog();
     }
   };
@@ -121,6 +115,7 @@ const Dashboard = ({rootFolder, user}) => {
     }
     return { totalSizeInBytes, totalSizeInBytesMedia, totalSizeInBytesOther, limitStockage, usedCurrentStockage };
   };
+
   useEffect(() => {
     const fetchData = async () => {
       await handleDossiers();
@@ -132,9 +127,7 @@ const Dashboard = ({rootFolder, user}) => {
         limitStockage: data.limitStockage,
         usedCurrentStockage: data.usedCurrentStockage,
       });
-      setLoading(false); 
     };
-  
     fetchData();
   }, [foldersUpdated, filesUpdated]);
 
@@ -166,9 +159,6 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
-  if (loading) {
-    return <Reload message="" timeout={2000} redirectPath="/dashboard" />;
-  }
 
   return (
     <Box>
@@ -220,7 +210,7 @@ const Dashboard = ({rootFolder, user}) => {
                       icon={<FolderIcon />}
                       onOpen={() => handleOpenFolderFilesDialog(folder)}
                       rootFolder={folder}
-                      setFoldersUpdated={setFoldersUpdated} // Ici, vous passez correctement setFoldersUpdated
+                      setFoldersUpdated={setFilesUpdated} 
                     />
                   </Grid>
                 ))
@@ -261,7 +251,7 @@ const Dashboard = ({rootFolder, user}) => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
-            <FilesTable  rootFolder={rootFolder} setFoldersUpdated = {setFoldersUpdated}/>
+            <FilesTable  rootFolder={rootFolder} filesUpdated = {filesUpdated} setFilesUpdated = {setFilesUpdated} />
           </Grid>
           <Grid item xs={12} md={4}>
           <StorageCard
@@ -269,7 +259,6 @@ const Dashboard = ({rootFolder, user}) => {
             medias={sizes.medias}
             others={sizes.others}
             limit={(sizes.limitStockage / 1000000000).toFixed(2)}
-            total={(sizes.usedCurrentStockage / 1000000000).toFixed(2)}
             setFilesUpdated={setFilesUpdated}
 
           />
@@ -304,7 +293,12 @@ const Dashboard = ({rootFolder, user}) => {
       </Dialog>
 
       {/* Dialogue pour télécharger un fichier */}
-      <Dialog open={openFileDialog} onClose={handleCloseFileDialog} fullScreen={fullScreen} maxWidth="md" fullWidth>
+      <Dialog open={openFileDialog}   onClose={(event, reason) => {
+    if (reason !== "backdropClick") {
+      handleCloseFileDialog();
+    }
+  }}
+   fullScreen={fullScreen} maxWidth="md" fullWidth>
         <DialogTitle>Télécharger des fichiers</DialogTitle>
         <DialogContent>
           <DropzoneArea

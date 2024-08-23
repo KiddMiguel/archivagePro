@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Toolbar, Typography, Box } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import GradeIcon from '@mui/icons-material/Grade';
@@ -9,6 +9,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import DropzoneArea from './DropzoneArea';
 import { uploadFile } from '../../services/serviceFiles';
 import { CircularProgress } from '@mui/material';
+import Reload from '../../pages/reload';
 
 const drawerWidth = 180;
 
@@ -16,7 +17,8 @@ export default function LeftBar({ open, rootFolder }) {
   const location = useLocation();
   const [uploadMessage, setUploadMessage] = useState('');
   const [loadingUpload, setLoadingUpload] = useState(false);
-  
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const determineSelectedIndex = (path) => {
     switch (path) {
@@ -51,9 +53,13 @@ export default function LeftBar({ open, rootFolder }) {
     setLoadingUpload(true);
     await uploadFile(file, rootFolder._id);
     setLoadingUpload(false);
-  
     setUploadMessage('');
+    setLoading(true);
   };
+
+  useEffect(() => {
+    setLoading(false);
+  }, [loading]);
 
 
 
@@ -74,6 +80,10 @@ export default function LeftBar({ open, rootFolder }) {
       backgroundColor: 'inherit',
     },
   });
+
+  if(loading) {
+    navigate('/reload/dashboard');
+  }
 
   return (
     <Drawer

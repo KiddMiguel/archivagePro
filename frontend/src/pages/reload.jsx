@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Reload = ({ message, timeout = 3000, redirectPath = '/' }) => {
+const Reload = ({ message}) => {
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            navigate(redirectPath);  // Navigate to the specified path after timeout
-        }, timeout);
+    // Récupérer l'url de la page actuelle
+    let currentUrl = window.location.href;
+    currentUrl = currentUrl.split('/').pop();
+    console.log(currentUrl);
 
-        return () => clearTimeout(timer);  // Cleanup the timeout on unmount
-    }, [timeout, navigate, redirectPath]);
+    setTimeout(() => {
+        navigate('/dashboard');
+        console.log('reloading page');
+        console.log(currentUrl);
+    }, 1000);
 
     return (
         <Box 
@@ -20,7 +23,7 @@ const Reload = ({ message, timeout = 3000, redirectPath = '/' }) => {
                 justifyContent: 'center', 
                 alignItems: 'center', 
                 height: '100vh', 
-                width: '75vw' 
+                width: '80vw' 
             }}
         >
             <CircularProgress />

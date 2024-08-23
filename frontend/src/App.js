@@ -17,11 +17,8 @@ import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 
 function App() {
-  const { isAuthenticated, loading, user, rootFolder } = useAuth();
+  const { isAuthenticated,  user, rootFolder } = useAuth();
 
-  // if (loading) {
-  //   return <Reload />;
-  // }
 
   return (
     <div className="App">
@@ -39,6 +36,7 @@ function App() {
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
             <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
             <Route path="/favoris" element={<Favoris />} />
+            <Route path= "/reload/:page" element={<Reload  />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/logout" element={<Deconnexion />} />

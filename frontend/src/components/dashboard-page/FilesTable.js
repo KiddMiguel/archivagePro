@@ -12,7 +12,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { CircularProgress } from '@mui/material';
 
-const FilesTable = ({ rootFolder, filesUpdated, folder }) => {
+const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated }) => {
   const [rowData, setRowData] = useState([]);
   const [loadingDonwload, setLoadingDownload] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
@@ -128,12 +128,20 @@ const FilesTable = ({ rootFolder, filesUpdated, folder }) => {
           setLoadingDownload(true);
           await downloadFile(params.data._id);
           setLoadingDownload(false);
+          setFilesUpdated(true);  // Déclenche la mise à jour de la table
+          setTimeout(() => {
+            setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+          }, 500);
         };
               
         const handleDeleteClick = async () => {
           setLoadingDelete(true);
           await deleteFile(params.data._id);
           setLoadingDelete(false);
+          setFilesUpdated(true);  // Déclenche la mise à jour de la table
+          setTimeout(() => {
+            setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+          }, 500);
         };
 
         return (
