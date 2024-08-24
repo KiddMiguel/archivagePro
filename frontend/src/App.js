@@ -18,7 +18,8 @@ import DashTest from './pages/dashboard-page/DashTest';
 
 function App() {
   const { isAuthenticated,  user, rootFolder } = useAuth();
-
+  console.log("user", user);
+  console.log("rootFolder", rootFolder);
 
   return (
     <div className="App">
@@ -38,7 +39,7 @@ function App() {
             <Route path="/favoris" element={<Favoris />} />
             <Route path= "/reload/:page" element={<Reload  />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<Settings user={user} isAuthenticated={isAuthenticated} />} />
             <Route path="/logout" element={<Deconnexion />} />
           </Route>
           

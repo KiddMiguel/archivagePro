@@ -12,13 +12,12 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { CircularProgress } from '@mui/material';
 
-const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated }) => {
+const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated, user }) => {
   const [rowData, setRowData] = useState([]);
-  const [loadingDonwload, setLoadingDownload] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [loadingStates, setLoadingStates] = useState({});
 
   const handleFiles = async () => {
-    const files = rootFolder ? await getAllFiles(rootFolder.owner) : await getFolderFiles(folder._id);
+    const files = rootFolder ? await getAllFiles(rootFolder.owner) : folder ?  await getFolderFiles(folder._id) : user ? await getAllFiles(user.id) : [];
     let totalSizeInBytes = 0;
 
     // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
@@ -39,6 +38,26 @@ const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated }) => {
     });
 
     setRowData(files);
+  };
+
+  const handleDownloadClick = async (fileId) => {
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: 'download' }));
+    await downloadFile(fileId);
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: false }));
+    setFilesUpdated(true);  // Déclenche la mise à jour de la table
+    setTimeout(() => {
+      setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+    }, 500);
+  };
+
+  const handleDeleteClick = async (fileId) => {
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: 'delete' }));
+    await deleteFile(fileId);
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: false }));
+    setFilesUpdated(true);  // Déclenche la mise à jour de la table
+    setTimeout(() => {
+      setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+    }, 500);
   };
 
   const columnDefs = [
@@ -124,45 +143,24 @@ const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated }) => {
       headerName: "",
       field: "options",
       cellRenderer: (params) => {
-        const handleDownloadClick = async () => {
-          setLoadingDownload(true);
-          await downloadFile(params.data._id);
-          setLoadingDownload(false);
-          setFilesUpdated(true);  // Déclenche la mise à jour de la table
-          setTimeout(() => {
-            setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
-          }, 500);
-        };
-              
-        const handleDeleteClick = async () => {
-          setLoadingDelete(true);
-          await deleteFile(params.data._id);
-          setLoadingDelete(false);
-          setFilesUpdated(true);  // Déclenche la mise à jour de la table
-          setTimeout(() => {
-            setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
-          }, 500);
-        };
+        const isDownloading = loadingStates[params.data._id] === 'download';
+        const isDeleting = loadingStates[params.data._id] === 'delete';
 
         return (
-          <Box display="flex" justifyContent="center" alignItems="center"  >
-            <IconButton onClick={handleDownloadClick} aria-label="download">
-              {
-                loadingDonwload ? (
-                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute'}} />
-                ) : (
-                  <DownloadIcon sx={{ color: 'grey', fontSize : "17px" }} />
-                )
-              }
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <IconButton onClick={() => handleDownloadClick(params.data._id)} aria-label="download">
+              {isDownloading ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
+              ) : (
+                <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
+              )}
             </IconButton>
-            <IconButton onClick={handleDeleteClick} aria-label="delete">
-              {
-                loadingDelete ? (
-                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute'}} />
-                ) : (
-                  <DeleteIcon sx={{ color: 'grey', fontSize : "17px" }} />
-                )
-              }
+            <IconButton onClick={() => handleDeleteClick(params.data._id)} aria-label="delete">
+              {isDeleting ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
+              ) : (
+                <DeleteIcon sx={{ color: 'grey', fontSize: "17px" }} />
+              )}
             </IconButton>
           </Box>
         );

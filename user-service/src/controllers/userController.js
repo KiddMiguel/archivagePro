@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      telephone
+      telephone,      
        };
 
     user = await userRepository.createUser(newUser);
@@ -41,10 +41,10 @@ exports.register = async (req, res) => {
       { expiresIn: 360000 },
       (err, token) => {
         if (err) throw err;
-        res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName } });
+        res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName,telephone: user.telephone,  storageLimit : user.storageLimit, address: user.address } });
       }
     );
-    await publishEvent('auth.file.registered', 'ExchangeAuth', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
+    await publishEvent('file.stockage.registered', 'ExchangeFile', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: "Server error", success : false });
@@ -102,6 +102,9 @@ exports.login = async (req, res) => {
             isAdmin: user.isAdmin,
             firstName: user.firstName,
             lastName: user.lastName,
+            telephone: user.telephone,
+            storageLimit: user.storageLimit,
+            address: user.address,
           },
         });
       }
@@ -121,6 +124,7 @@ exports.getUserInfo = async (req, res) => {
     if (!user) {
       return res.status(404).json({ msg: 'Utilisateur non trouvé' });
     }
+
     res.json({ success: true, user: user });
   } catch (err) {
     console.error(err.message);

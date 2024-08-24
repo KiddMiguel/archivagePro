@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const nodemailer = require('nodemailer');
 
 const handleUpadateStockageUser = async (eventData, routingKey) => {
+  
   const fileData = eventData.file[0] || eventData.file; 
   const stockage = fileData.length; 
   const userId = fileData.metadata.owner; 

@@ -10,6 +10,7 @@ import { CreditCard, AccountBalanceWallet} from '@mui/icons-material';
 import { createInvoice } from '../../services/serviceInvoices';
 import { updateUser } from '../../services/serviceUsers';
 import { useNavigate } from 'react-router-dom';
+import Reload from '../reload';
 
 
 const CheckoutForm = ({user}) => {
@@ -48,15 +49,19 @@ const CheckoutForm = ({user}) => {
 
 
     await createInvoice(billingInfo);
-    setLoading(true);
     await updateUser(billingInfo);
-
+    
+    setLoading(true);
     setTimeout(() => {
       setLoading(false);
       navigate('/dashboard');
     }, 10000);
     
   };
+  if(loading){
+    return (<Reload message="Paiement en cours..." redirectURL={"/dashboard"} time ={5000}/>);
+  }
+
 
   return (
     <>

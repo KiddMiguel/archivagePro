@@ -194,7 +194,7 @@ exports.deleteFolder = async (req, res) => {
         await Folder.findByIdAndDelete(req.params.id);
 
         res.status(200).send({ message: 'Folder deleted successfully' });
-        await publishEvent('file.stockage.deleted', 'ExchangeFile', { files: files });
+        await publishEvent('file.stockage.deleted', 'ExchangeFile', { file: files });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }

@@ -135,33 +135,7 @@ export default function LeftBar({ open, rootFolder }) {
             />
           </ListItem>
 
-          <ListItem
-            button
-            key="Favoris"
-            selected={selectedIndex === 1}
-            sx={listItemStyle(1)}
-            component={Link}
-            to="/favoris"
-          >
-            <ListItemIcon>
-              <GradeIcon
-                sx={{
-                  fontSize: 22,
-                  color: selectedIndex === 1 ? '#1976d2' : 'inherit',
-                }}
-                
-              />
-            </ListItemIcon>
-            <ListItemText
-              primary="Favoris"
-              primaryTypographyProps={{
-                fontWeight: selectedIndex === 1 ? '500' : 'regular',
-              }}
-              sx={{
-                marginLeft: '-15px',
-              }}
-            />
-          </ListItem>
+          
 
           <ListItem
             button

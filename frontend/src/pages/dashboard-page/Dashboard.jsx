@@ -93,7 +93,7 @@ const Dashboard = ({rootFolder, user}) => {
     let usedCurrentStockage = user.storageUsed;
     let type = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf', 'odt', 'ods', 'odp', 'odg', 'odc', 'odf', 'odb', 'odi', 'odm', 'ott', 'ots', 'otp', 'otg', 'otc', 'otf', 'oti', 'oth', 'ots', 'ott', 'otm'];
     let totalSizeInBytes = 0;
-    const files = await getAllFiles(rootFolder.owner);
+    const files = await getAllFiles(rootFolder ? rootFolder.owner : user.id);
     for (const file of files) {
       if (type.includes(file.filename.split('.').pop())) {
         totalSizeInBytes += file.length;
@@ -206,11 +206,14 @@ const Dashboard = ({rootFolder, user}) => {
                 folders && folders.map((folder, index) => (
                   <Grid item xs={12} md={3} key={index}>
                     <FolderCard
+                      key={folder._id}
                       title={folder.name}
                       icon={<FolderIcon />}
                       onOpen={() => handleOpenFolderFilesDialog(folder)}
                       rootFolder={folder}
-                      setFoldersUpdated={setFilesUpdated} 
+                      setFoldersUpdated={setFoldersUpdated}
+                      setFilesUpdated={setFilesUpdated}
+                      filesUpdated={filesUpdated}
                     />
                   </Grid>
                 ))
@@ -251,7 +254,7 @@ const Dashboard = ({rootFolder, user}) => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
-            <FilesTable  rootFolder={rootFolder} filesUpdated = {filesUpdated} setFilesUpdated = {setFilesUpdated} />
+            <FilesTable  rootFolder={rootFolder} filesUpdated = {filesUpdated} setFilesUpdated = {setFilesUpdated} user={user} />
           </Grid>
           <Grid item xs={12} md={4}>
           <StorageCard
@@ -309,11 +312,11 @@ const Dashboard = ({rootFolder, user}) => {
             activeBgColor="#e3f2fd"
             textColor="#1976d2"
           />
-          <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", overflowX: "auto", width: "100%" }}>
+          <Box sx={{ mt : 2,  display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", overflowX: "auto", width: "100%" }}>
           {selectedFiles.map((file, index) => (
                 <Box key={index} sx={{display : "flex"}}>
               <Box  display="flex" alignItems="center" sx={{ fontWeight: "600" }}>
-                <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 0 }}>
+                <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 0.5 }}>
                   {<RenderIcon type={file.name.split(".").slice(-1)[0]} />}
                 </Avatar>
                 {file.name}

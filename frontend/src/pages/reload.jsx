@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const Reload = ({ message}) => {
+const Reload = ({ message, redirectURL, time = 1000}) => {
     const navigate = useNavigate();
 
     // Récupérer l'url de la page actuelle
@@ -10,11 +10,12 @@ const Reload = ({ message}) => {
     currentUrl = currentUrl.split('/').pop();
     console.log(currentUrl);
 
+    // Raffraichir la page actuelle
+        window.location.reload();
+
     setTimeout(() => {
-        navigate('/dashboard');
-        console.log('reloading page');
-        console.log(currentUrl);
-    }, 1000);
+        navigate("/dashboard");
+    }, time);
 
     return (
         <Box 
