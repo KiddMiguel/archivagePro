@@ -18,6 +18,8 @@ const FolderCard = ({
   onOpen,
   rootFolder,
   setFoldersUpdated,
+  setFilesUpdated,
+  filUpdated
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -28,15 +30,30 @@ const FolderCard = ({
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const handleDeleteFolder = async () => {
     await deleteFolder(rootFolder._id);
     setFoldersUpdated(true);
+    setFilesUpdated(true); 
+
+    // Réinitialiser l'état après un court délai pour permettre d'autres mises à jour
+    setTimeout(() => {
+      setFoldersUpdated(false);
+      setFilesUpdated(false);
+    }, 1000);
+
+    handleClose(); // Fermer le menu après la suppression
   };
 
+  const handleOpenBtn = () => {
+    onOpen();
+    handleClose();
+  };
+  
   useEffect(() => {
     setFoldersUpdated(false);
   }, []);
+
+
 
   return (
     <Card
@@ -99,7 +116,7 @@ const FolderCard = ({
           aria-controls="folder-menu"
           aria-haspopup="true"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent the onOpen function from being called
+            e.stopPropagation(); 
             handleClick(e);
           }}
           sx={{ ml: "auto" }}
@@ -112,7 +129,7 @@ const FolderCard = ({
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={handleClose}>Ouvrir</MenuItem>
+          <MenuItem onClick={handleOpenBtn}>Ouvrir</MenuItem>
           <MenuItem onClick={handleDeleteFolder}>Supprimer</MenuItem>
         </Menu>
       </CardContent>

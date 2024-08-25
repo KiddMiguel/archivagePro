@@ -1,1 +1,1 @@
-export { updateUser, forgotPassword } from './service';
+export { updateUser, forgotPassword, loginService, deleteUser,changePassword} from './service';

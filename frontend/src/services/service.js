@@ -28,7 +28,13 @@ service.interceptors.request.use(
 export const register = async (user) => {
   try {
     const response = await service.post('/users/register', user);
-    return response.data;
+    const rootFolderResponse = await service.get('/files/root', {
+      headers: {
+        Authorization: `Bearer ${response.data.token}`,
+      },
+    });
+    console.log(rootFolderResponse);
+    return { ...response.data, rootFolder: rootFolderResponse.data };
   } catch (error) {
     return error.response.data;
   }
@@ -63,6 +69,8 @@ export const validateToken = async () => {
   }
 };
 
+
+
 // --------------------------------------------------------- Utilisateurs
 
 export const updateUser = async (user) => {
@@ -86,6 +94,15 @@ export const deleteUser = async () => {
 export const forgotPassword = async (email) => {
   try {
     const response = await service.post('users/forgot-password', email);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await service.put('users/password', { oldPassword, newPassword });
     return response.data;
   } catch (error) {
     return error.response.data;
@@ -198,3 +215,46 @@ export const getAllFiles = async (user) => {
     return error.response.data;
   }
 };
+
+// Supprimer un fichier
+export const deleteFile = async (fileId) => {
+  try {
+    const response = await service.delete(`/files/user/${fileId}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+// Download a file
+export const downloadFile = async (fileId) => {
+  try {
+    const response = await service.get(`/files/download/${fileId}`, {
+      responseType: 'blob',
+    });
+
+    console.log('Headers:', response.headers);
+
+    let fileName = 'downloaded_file';
+    const contentDisposition = response.headers['content-disposition'];
+    
+    if (contentDisposition) {
+      console.log('Content-Disposition:', contentDisposition);
+      const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+      if (fileNameMatch && fileNameMatch.length > 1) {
+          fileName = fileNameMatch[1];
+      }
+  }
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', decodeURIComponent(escape(fileName))); 
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+};
+

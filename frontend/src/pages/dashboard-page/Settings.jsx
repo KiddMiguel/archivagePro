@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Tabs, Tab, TextField, Button, Avatar, Grid, 
   Card, CardContent, IconButton, 
@@ -6,8 +6,11 @@ import {
 } from '@mui/material';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TabPanelProfil from './settings/TabPanelProfil';
+import TabPanelSecurity from './settings/TabPanelSecurity';
 
-const Settings = () => {
+const Settings = ({user, isAuthenticated}) => {
+  console.log(user);
   const [selectedTab, setSelectedTab] = useState(0);
   const [country, setCountry] = useState('Spain');
   const [bio, setBio] = useState('');
@@ -41,6 +44,24 @@ const Settings = () => {
     }));
   };
 
+  useEffect(() => {
+    if(isAuthenticated && !user.address) {
+     window.location.reload(); 
+    }
+    if (isAuthenticated) {
+      setFullName(user.fullName);
+      setEmail(user.email);
+      setPhone(user.phone);
+      setAddress({
+        street: user.address.street,
+        city: user.address.city,
+        postalCode: user.address.postalCode,
+        country: user.address.country
+      });
+      setBio(user.bio);
+    }
+  }, [isAuthenticated, user]);
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
@@ -61,127 +82,14 @@ const Settings = () => {
         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Paramètres Tabs">
           <Tab label="Profil Utilisateur" />
           <Tab label="Sécurité" />
-          <Tab label="Notifications" />
-          <Tab label="Préférences" />
-          <Tab label="Moyens de Paiement" />
+          <Tab label="Facture / Moyens de Paiement" />
           <Tab label="Aide et Support" />
         </Tabs>
       </Box>
 
-      <TabPanel value={selectedTab} index={0} align="center">
-        <Typography variant="h6" sx={{ mb: 2 }} align='center'>Détails de base</Typography>
-        <Grid container spacing={3} sx={{width : "60%"}}>
-          <Grid item xs={12} sm={4}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Avatar
-                sx={{ width: 100, height: 100, mb: 2 }}
-                src="/path/to/profile-picture.jpg"
-              />
-              <Button variant="text" color="error">Supprimer</Button>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={8}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Nom complet"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Adresse e-mail"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  variant="outlined"
-                />
-              </Grid>
-                <Typography variant="h6" sx={{ mb: 1, ml: 2, mt:2 }}>Adresse</Typography>
-
-                <Divider sx={{
-                    mb: 2,
-                    width: '97%',
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                }}/>
-
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Rue"
-                  name="street"
-                  value={address.street}
-                  onChange={handleAddressChange}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Ville"
-                  name="city"
-                  value={address.city}
-                  onChange={handleAddressChange}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Code Postal"
-                  name="postalCode"
-                  value={address.postalCode}
-                  onChange={handleAddressChange}
-                  variant="outlined"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Pays"
-                  name="country"
-                  value={address.country}
-                  onChange={handleAddressChange}
-                  variant="outlined"
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', width:"58.5%" }}>
-          <Button variant="outlined" color="error" sx={{ textTransform: 'none' }}>
-            Supprimer le compte
-          </Button>
-          <Box>
-            <Button variant="outlined" color="inherit" sx={{ textTransform: 'none', mr: 2 }}>
-              Annuler
-            </Button>
-            <Button variant="contained" color="primary" sx={{ textTransform: 'none' }}>
-              Enregistrer les modifications
-            </Button>
-          </Box>
-        </Box>
-      </TabPanel>
-
-      <TabPanel value={selectedTab} index={1}>
-        <Typography variant="h6">Sécurité</Typography>
-        <Typography>Modifier le mot de passe, activer l'authentification à deux facteurs, etc.</Typography>
-      </TabPanel>
-
-      <TabPanel value={selectedTab} index={2}>
-        <Typography variant="h6">Notifications</Typography>
-        <Typography>Paramètres de notification pour les emails, SMS, etc.</Typography>
-      </TabPanel>
-
-      <TabPanel value={selectedTab} index={3}>
-        <Typography variant="h6">Préférences</Typography>
-        <Typography>Langue, thèmes, paramètres de l'application, etc.</Typography>
-      </TabPanel>
+      <TabPanelProfil selectedTab={selectedTab} index={0} user ={user}/>
+      <TabPanelSecurity selectedTab={selectedTab} index={1} user = {user} />
+      
 
       <TabPanel value={selectedTab} index={4}>
         <Typography variant="h6">Moyens de Paiement</Typography>

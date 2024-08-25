@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme, List, ListItem, ListItemText, Avatar, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, Breadcrumbs, Link, Grid, Divider, Dialog, DialogActions, DialogContent, DialogTitle, TextField, useMediaQuery, useTheme,  Avatar, CircularProgress } from '@mui/material';
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import FolderCard from '../../components/dashboard-page/FolderCard';
@@ -7,12 +7,9 @@ import FolderIcon from '@mui/icons-material/Folder';
 import FilesTable from '../../components/dashboard-page/FilesTable';
 import StorageCard from '../../components/dashboard-page/StorageCard';
 import DropzoneArea from '../../components/dashboard-page/DropzoneArea';
-import { uploadFile, createFolder, getUserFolders } from '../../services/serviceFiles';
+import { uploadFile, createFolder, getUserFolders, getAllFiles } from '../../services/serviceFiles';
 import RenderIcon from '../../components/dashboard-page/RenderIcon';
 import FolderFilesDialog from '../../components/dashboard-page/FolderFilesDialog';
-
-
-
 
 const Dashboard = ({rootFolder, user}) => {
   const [openFolderDialog, setOpenFolderDialog] = useState(false);
@@ -27,11 +24,11 @@ const Dashboard = ({rootFolder, user}) => {
   const [openFolderFilesDialog, setOpenFolderFilesDialog] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState({});
   const [filesUpdated, setFilesUpdated] = useState(false); 
-
-
-    
+  const [sizes, setSizes] = useState({ documents: 0, medias: 0, others: 0, limitStockage: 0, usedCurrentStockage: 0 });
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+
+
 
   const handleCreateFolder = async () => {
     if (!folderName) {
@@ -58,22 +55,29 @@ const Dashboard = ({rootFolder, user}) => {
       setUploadMessage('Vous ne pouvez télécharger que 10 fichiers à la fois');
       return;
     }
-
-    if(selectedFiles.some(file => file.size > 10000000)) {
-      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+  
+    if (selectedFiles.some(file => file.size > 50 * 1024 * 1024)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
       return;
     }
+  
+    setLoadingUpload(true);  
+  
+    try {
+      for (const file of selectedFiles) {
+        await uploadFile(file, rootFolder._id);
+      }
 
-    for (const file of selectedFiles) {
-      setLoadingUpload(true);
-      await uploadFile(file, rootFolder._id);
-    }
-    setTimeout(() => {
+      setFilesUpdated(true); // Déclenche la mise à jour des données
+    } catch (error) {
+      setUploadMessage('Erreur lors du téléchargement des fichiers');
+    } finally {
       setLoadingUpload(false);
-      handleCloseFileDialog(); 
-      setFilesUpdated(true);
-    }, 3000);
+      setTimeout(() => setFilesUpdated(false), 1000);
+      handleCloseFileDialog();
+    }
   };
+  
 
   const handleOpenFolderFilesDialog = (folder) => {
     setSelectedFolder(folder);
@@ -86,13 +90,52 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFolder(null);
   };
 
-  useEffect(() => {
-    handleDossiers();
-  }, [foldersUpdated]);
+  const handlerCalculateSizeTypeFile = async () => {
+    let limitStockage = user.storageLimit;
+    let usedCurrentStockage = user.storageUsed;
+    let type = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf', 'odt', 'ods', 'odp', 'odg', 'odc', 'odf', 'odb', 'odi', 'odm', 'ott', 'ots', 'otp', 'otg', 'otc', 'otf', 'oti', 'oth', 'ots', 'ott', 'otm'];
+    let totalSizeInBytes = 0;
+    const files = await getAllFiles(rootFolder ? rootFolder.owner : user.id);
+    for (const file of files) {
+      if (type.includes(file.filename.split('.').pop())) {
+        totalSizeInBytes += file.length;
+      }
+    }
+    let typeMedia = ['mp3', 'mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv', 'webm', 'm4a', 'm4v', 'f4v', 'f4a', 'm4b', 'm4r', 'f4b', 'wav', 'flac', 'ogg', 'oga', 'opus', 'amr', 'aiff', 'aif', 'aifc', 'wma', 'aac', '3gp', '3gp2', '3g2', '3gpp', '3gpp2', 'ogg', 'ogv', 'oga', 'ogx', 'ogm', 'spx', 'opus', 'webm', 'flv', 'f4v', 'f4p', 'f4a', 'f4b'];
+    let totalSizeInBytesMedia = 0;
+    for (const file of files) {
+      if (typeMedia.includes(file.filename.split('.').pop())) {
+        totalSizeInBytesMedia += file.length;
+      }
+    }
+    let typeOther = ['js', 'php', 'ts', 'java', 'py'];
+    let totalSizeInBytesOther = 0;
+    for (const file of files) {
+      if (typeOther.includes(file.filename.split('.').pop())) {
+        totalSizeInBytesOther += file.length;
+      }
+    }
+    return { totalSizeInBytes, totalSizeInBytesMedia, totalSizeInBytesOther, limitStockage, usedCurrentStockage };
+  };
 
   useEffect(() => {
-    setFoldersUpdated(false); 
-  }, [folders]);
+    if(!rootFolder) {
+      window.location.reload();
+      return;
+    }
+    const fetchData = async () => {
+      await handleDossiers();
+      const data = await handlerCalculateSizeTypeFile();
+      setSizes({
+        documents: data.totalSizeInBytes,
+        medias: data.totalSizeInBytesMedia,
+        others: data.totalSizeInBytesOther,
+        limitStockage: data.limitStockage,
+        usedCurrentStockage: data.usedCurrentStockage,
+      });
+    };
+    fetchData();
+  }, [foldersUpdated, filesUpdated]);
 
 
 
@@ -106,11 +149,9 @@ const Dashboard = ({rootFolder, user}) => {
   };
 
 
-
   const handleOpenFileDialog = () => {
     setOpenFileDialog(true);
   };
-
 
 
   const handleCloseFileDialog = () => {
@@ -124,7 +165,6 @@ const Dashboard = ({rootFolder, user}) => {
     setSelectedFiles(prevFiles => [...prevFiles, ...acceptedFiles]); 
   };
 
- 
 
   return (
     <Box>
@@ -172,11 +212,14 @@ const Dashboard = ({rootFolder, user}) => {
                 folders && folders.map((folder, index) => (
                   <Grid item xs={12} md={3} key={index}>
                     <FolderCard
+                      key={folder._id}
                       title={folder.name}
                       icon={<FolderIcon />}
                       onOpen={() => handleOpenFolderFilesDialog(folder)}
                       rootFolder={folder}
-                      setFoldersUpdated={setFoldersUpdated} // Ici, vous passez correctement setFoldersUpdated
+                      setFoldersUpdated={setFoldersUpdated}
+                      setFilesUpdated={setFilesUpdated}
+                      filesUpdated={filesUpdated}
                     />
                   </Grid>
                 ))
@@ -217,15 +260,18 @@ const Dashboard = ({rootFolder, user}) => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
-            <FilesTable  rootFolder={rootFolder} setFoldersUpdated = {setFoldersUpdated}/>
+            <FilesTable  rootFolder={rootFolder} filesUpdated = {filesUpdated} setFilesUpdated = {setFilesUpdated} user={user} />
           </Grid>
           <Grid item xs={12} md={4}>
-            <StorageCard
-              documents={2.5}
-              medias={4.2}
-              others={5.3}
-              total={13.1}
-            />
+          <StorageCard
+            documents={sizes.documents}
+            medias={sizes.medias}
+            others={sizes.others}
+            limit={(sizes.limitStockage / 1000000000).toFixed(2)}
+            setFilesUpdated={setFilesUpdated}
+
+          />
+
           </Grid>
         </Grid>
       </Box>
@@ -256,7 +302,12 @@ const Dashboard = ({rootFolder, user}) => {
       </Dialog>
 
       {/* Dialogue pour télécharger un fichier */}
-      <Dialog open={openFileDialog} onClose={handleCloseFileDialog} fullScreen={fullScreen} maxWidth="md" fullWidth>
+      <Dialog open={openFileDialog}   onClose={(event, reason) => {
+    if (reason !== "backdropClick") {
+      handleCloseFileDialog();
+    }
+  }}
+   fullScreen={fullScreen} maxWidth="md" fullWidth>
         <DialogTitle>Télécharger des fichiers</DialogTitle>
         <DialogContent>
           <DropzoneArea
@@ -267,11 +318,11 @@ const Dashboard = ({rootFolder, user}) => {
             activeBgColor="#e3f2fd"
             textColor="#1976d2"
           />
-          <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", overflowX: "auto", width: "100%" }}>
+          <Box sx={{ mt : 2,  display: "flex", flexDirection: "row", flexWrap: "nowrap", alignItems: "center", overflowX: "auto", width: "100%" }}>
           {selectedFiles.map((file, index) => (
                 <Box key={index} sx={{display : "flex"}}>
               <Box  display="flex" alignItems="center" sx={{ fontWeight: "600" }}>
-                <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 0 }}>
+                <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 0.5 }}>
                   {<RenderIcon type={file.name.split(".").slice(-1)[0]} />}
                 </Avatar>
                 {file.name}

@@ -1,19 +1,19 @@
 require('dotenv').config();
 const amqp = require('amqplib');
-const { handleUserCreated } = require('../handlers/userHandlers');
+const { handleUserCreated, handleUserDelete } = require('../handlers/userHandlers');
 
 async function startAuthConsumer() {
     const amqpUrl = process.env.AMQP_URL || "amqp://guest:guest@localhost:5672//";
     const connection = await amqp.connect(amqpUrl);
     const channel = await connection.createChannel();
 
-    const exchangeName = "ExchangeAuth";
-    const queueName = "queueAuth";
+    const exchangeName = "ExchangeFile";
+    const queueName = "queueFile";
     await channel.assertExchange(exchangeName, "topic", { durable: true });
     await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queueName, exchangeName, "auth.file.#");
+    await channel.bindQueue(queueName, exchangeName, "file.stockage.#");
 
-    console.log("Waiting for auth messages in authQueue...");
+    console.log("Waiting for file messages in queueFile...");
     channel.consume(queueName, async message => {
         if (message !== null) {
             try {
@@ -21,10 +21,12 @@ async function startAuthConsumer() {
                 const eventData = JSON.parse(message.content.toString());
                 console.log(`Received auth event on ${routingKey}:`, eventData);
     
-                // Handle the message based on the routing key
-                if (routingKey === 'auth.file.registered') {
-                    // Call the handler function
+                if (routingKey === 'file.stockage.registered') {
                     await handleUserCreated(eventData);
+                }
+    
+                if (routingKey === 'file.stockage.deleted') {
+                    await handleUserDelete(eventData);
                 }
     
                 channel.ack(message);

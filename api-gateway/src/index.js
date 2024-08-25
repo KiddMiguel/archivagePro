@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -18,6 +17,7 @@ app.use(cors(config.cors));
 
 // Security
 app.use(security);
+
 
 // Routes
 const userRoutes = require('./routes/userRoutes');

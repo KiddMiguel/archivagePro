@@ -1,20 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Card, CardContent, Typography, Box, Button, Grid } from '@mui/material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const StorageCard = ({ documents, medias, others, total }) => {
+const StorageCard = ({ documents, medias, others, limit,  filesUpdated }) => {
+  const navigate = useNavigate();
+  const [totalSizeInBytes, setTotalSizeInBytes] = useState(null);
+
+  const handleCalculateStorageFile = () => {
+    const totalSizeInBytes = documents + medias + others;
+    let i = 0;
+    const byteUnits = ['octets', 'Ko', 'Mo', 'Go', 'To', 'Po', 'Eo', 'Zo', 'Yo'];
+    let fileSize = totalSizeInBytes;
+
+    while (fileSize >= 1024 && i < byteUnits.length - 1) {
+      fileSize /= 1024;
+      i++;
+    }
+    setTotalSizeInBytes(`${fileSize.toFixed(2)} ${byteUnits[i]}`);
+  };
+
   const data = {
     labels: ['Documents', 'Médias', 'Autres'],
     datasets: [
       {
         label: 'GB Utilisés',
         data: [documents, medias, others],
-        backgroundColor: ['#FF6384', '#36A2EB',  '#4BC0C0'],
-        hoverBackgroundColor: ['#FF6384', '#36A2EB',  '#4BC0C0'],
+        backgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
+        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#4BC0C0'],
       },
     ],
   };
@@ -29,6 +46,10 @@ const StorageCard = ({ documents, medias, others, total }) => {
     },
   };
 
+  useEffect(() => {
+    handleCalculateStorageFile();
+  }, [filesUpdated, documents, medias, others]);
+
   return (
     <Card sx={{ borderRadius: 3, boxShadow: 'none', border: '1px solid rgba(0, 0, 0, 0.12)' }}>
       <CardContent>
@@ -38,7 +59,7 @@ const StorageCard = ({ documents, medias, others, total }) => {
               Stockage Utilisé
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '10px', md: '12px', lg: '14px' } }}>
-              {total} GB sur 30 GB Utilisés
+              {totalSizeInBytes} sur {limit} GB Utilisés
             </Typography>
           </Grid>
 
@@ -48,7 +69,7 @@ const StorageCard = ({ documents, medias, others, total }) => {
             </Box>
           </Grid>
 
-          <Grid item xs={12} md ={12}>
+          <Grid item xs={12} md={12}>
             <Card sx={{ borderRadius: 3, boxShadow: 1, backgroundColor: '#1976d2', color: 'white' }}>
               <CardContent>
                 <Grid container alignItems="center" spacing={2}>
@@ -57,18 +78,18 @@ const StorageCard = ({ documents, medias, others, total }) => {
                       Mettez à niveau votre plan pour obtenir plus d'espace de stockage
                     </Typography>
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12} display="flex" justifyContent={{ xs: 'flex-end', sm: 'flex-end', md : "flex-end" }} >
-                    <Button 
-                      variant="contained" 
+                  <Grid item xs={12} sm={12} md={12} display="flex" justifyContent={{ xs: 'flex-end', sm: 'flex-end', md: 'flex-end' }}>
+                    <Button
+                      variant="contained"
                       color="success"
-                      sx={{ 
-                        color: 'white', 
-                        borderRadius: '10px', 
-                        textTransform: 'none', 
+                      sx={{
+                        color: 'white',
+                        borderRadius: '10px',
+                        textTransform: 'none',
                         width: '100%',
                         maxWidth: { xs: '100%', md: '100%' },
                       }}
-                      onClick={() => console.log('Upgrade plan clicked')}
+                      onClick={() => navigate('/checkout')}
                     >
                       Mise à niveau <RocketLaunchIcon sx={{ ml: 1 }} />
                     </Button>

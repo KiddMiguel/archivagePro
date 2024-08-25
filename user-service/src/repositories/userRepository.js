@@ -37,6 +37,10 @@ class UserRepository {
   async updateUserTemporaryPassword (userId, temporaryPassword, temporaryPasswordExpires) {
     return await User.findByIdAndUpdate(userId, { temporaryPassword, temporaryPasswordExpires });
   }
+
+  async getAdmins() {
+    return await User.find({ isAdmin: true });
+  }
   
 }
 

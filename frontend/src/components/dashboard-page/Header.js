@@ -58,7 +58,7 @@ export default function Header({ user }) {
             {user.firstName + " " + user.lastName}
           </Typography>
           <Avatar
-            alt={`${user.firstName} ${user.lastName}`}
+            alt={`${user?.firstName} ${user?.lastName}`}
             src="/path/to/avatar.jpg"
           />
         </Box>

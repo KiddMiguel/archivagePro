@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, useMediaQuery, useTheme, Box, Typography, Avatar } from '@mui/material';
 import FilesTable from './FilesTable';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -7,12 +7,11 @@ import RenderIcon from './RenderIcon';
 import { uploadFile } from '../../services/serviceFiles';
 import { CircularProgress } from '@mui/material';
 
-const FolderFilesDialog = ({ open, onClose, folder }) => {
+const FolderFilesDialog = ({ open, onClose, folder,filesUpdated, setFilesUpdated }) => {
   const [openFileDialog, setOpenFileDialog] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState([]);
   const [loadingUpload, setLoadingUpload] = React.useState(false);
   const [uploadMessage, setUploadMessage] = React.useState('');
-  const [filesUpdated, setFilesUpdated] = React.useState(false);
 
 
   const theme = useTheme();
@@ -44,8 +43,8 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       return;
     }
 
-    if(selectedFiles.some(file => file.size > 10000000)) {
-      setUploadMessage('La taille du fichier ne doit pas dépasser 10 Mo');
+    if(selectedFiles.some(file => file.size > 50000000)) {
+      setUploadMessage('La taille du fichier ne doit pas dépasser 50 Mo');
       return;
     }
 
@@ -53,12 +52,12 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       setLoadingUpload(true);
       await uploadFile(file, folder._id);
     }
-    setTimeout(() => {
       setLoadingUpload(false);
       handleCloseFileDialog(); 
       setFilesUpdated(true);
-    }, 3000);
   };
+
+
 
 
   return (
@@ -80,7 +79,7 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       <DialogContent sx={{height : "500px"}}>
       
         {folder && (
-          <FilesTable  folder ={folder} />
+          <FilesTable  folder ={folder} filesUpdated={filesUpdated} setFilesUpdated={setFilesUpdated} />
         )}
       </DialogContent>
       <DialogActions>
@@ -90,7 +89,12 @@ const FolderFilesDialog = ({ open, onClose, folder }) => {
       </DialogActions>
     </Dialog>
     {/* Dialogue pour télécharger un fichier */}
-    <Dialog open={openFileDialog} onClose={handleCloseFileDialog} fullScreen={fullScreen} maxWidth="md" fullWidth>
+    <Dialog open={openFileDialog}   onClose={(event, reason) => {
+    if (reason !== "backdropClick") {
+      handleCloseFileDialog();
+    }
+  }}
+   fullScreen={fullScreen} maxWidth="md" fullWidth>
     <DialogTitle>Télécharger des fichiers</DialogTitle>
     <DialogContent>
       <DropzoneArea
