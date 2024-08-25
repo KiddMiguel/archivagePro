@@ -14,7 +14,7 @@ const handleUpadateStockageUser = async (eventData, routingKey) => {
     return;
   }
 
-  user.storageUsed = routingKey === "file.stockage.uploaded" ? parseFloat(user.storageUsed) + parseFloat(stockage) : parseFloat(user.storageUsed) - parseFloat(stockage);
+  user.storageUsed = routingKey === "user.stockage.uploaded" ? parseFloat(user.storageUsed) + parseFloat(stockage) : parseFloat(user.storageUsed) - parseFloat(stockage);
 
 
 // Condition pour alerter si le stockage est dépassé

@@ -4,14 +4,17 @@ import { Container, Box, Grid, Typography, TextField, Button, Link, FormControlL
 import { loginService } from '../../services/service';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../services/AuthContext';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Login = () => {
   const [error, setError] = React.useState(null);
+  const [loading , setLoading] = React.useState(false);
   const [message , setMessage] = React.useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleLogin = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const user = {
       email: e.target.email.value,
@@ -26,10 +29,13 @@ const Login = () => {
           navigate('/dashboard');
         }
       } else {
+        setLoading(false);
         setError(true);
         if(response.success === false){
+          setLoading(false);
           setMessage(response.msg);
         }else{
+          setLoading(false);
           setMessage(response.errors[0].message);
         }
       }
@@ -126,7 +132,19 @@ const Login = () => {
               color="primary"
               sx={{ margin: '20px 0', padding: '10px', backgroundColor: '#1a73e8', textTransform: 'none', fontSize: '15px' }}
             >
-              Se connecter
+       {loading ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        Connexion en cours...
+                        <CircularProgress
+                          color="inherit" 
+                          thickness={5} 
+                          size={20} 
+                          sx={{ color: 'white' }} 
+                        />
+                      </div>
+                    ) : (
+                      'Connexion'
+                    )}
             </Button>
             {error && (
               <Alert severity="error" sx={{ background : "white", color : "#dc3545"}}>

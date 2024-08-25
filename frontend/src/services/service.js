@@ -28,7 +28,13 @@ service.interceptors.request.use(
 export const register = async (user) => {
   try {
     const response = await service.post('/users/register', user);
-    return response.data;
+    const rootFolderResponse = await service.get('/files/root', {
+      headers: {
+        Authorization: `Bearer ${response.data.token}`,
+      },
+    });
+    console.log(rootFolderResponse);
+    return { ...response.data, rootFolder: rootFolderResponse.data };
   } catch (error) {
     return error.response.data;
   }

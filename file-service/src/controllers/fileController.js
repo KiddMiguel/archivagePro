@@ -112,7 +112,7 @@ exports.uploadFileToFolder = async (req, res) => {
         // Récupérer les fichiers uploadés
         res.status(201).send({ message: 'Files uploaded successfully', fileIds: uploadedFileIds });
         const files = await File.find({ _id: { $in: uploadedFileIds } });
-        await publishEvent('file.stockage.uploaded', 'ExchangeFile', { file: files });
+        await publishEvent('user.stockage.uploaded', 'ExchangeFile', { file: files });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -167,7 +167,7 @@ exports.deleteFile = async (req, res) => {
 
         res.status(200).send({ message: 'File deleted successfully' });
 
-        await publishEvent('file.stockage.deleted', 'ExchangeFile', { file: file });
+        await publishEvent('user.stockage.deleted', 'ExchangeFile', { file: file });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -194,7 +194,7 @@ exports.deleteFolder = async (req, res) => {
         await Folder.findByIdAndDelete(req.params.id);
 
         res.status(200).send({ message: 'Folder deleted successfully' });
-        await publishEvent('file.stockage.deleted', 'ExchangeFile', { file: files });
+        await publishEvent('user.stockage.deleted', 'ExchangeFile', { file: files });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }

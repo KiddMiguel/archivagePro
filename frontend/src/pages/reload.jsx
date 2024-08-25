@@ -4,14 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 const Reload = ({ message, redirectURL, time = 1000}) => {
     const navigate = useNavigate();
-
+    
     // Récupérer l'url de la page actuelle
     let currentUrl = window.location.href;
     currentUrl = currentUrl.split('/').pop();
     console.log(currentUrl);
 
-    // Raffraichir la page actuelle
-        window.location.reload();
 
     setTimeout(() => {
         navigate("/dashboard");

@@ -39,12 +39,13 @@ exports.register = async (req, res) => {
       payload,
       process.env.JWT_SECRET,
       { expiresIn: 360000 },
-      (err, token) => {
+      async (err, token) => {
         if (err) throw err;
-        res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName,telephone: user.telephone,  storageLimit : user.storageLimit, address: user.address } });
-      }
+        await publishEvent('file.stockage.registered', 'ExchangeFile', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
+        setTimeout(() => {
+          res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName,telephone: user.telephone,  storageLimit : user.storageLimit, address: user.address } });
+        }, 5000);}
     );
-    await publishEvent('file.stockage.registered', 'ExchangeFile', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: "Server error", success : false });

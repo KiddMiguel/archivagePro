@@ -8,10 +8,10 @@ async function startConsumer() {
     const channel = await connection.createChannel();
 
     const exchangeName = "ExchangeFile";
-    const queueName = "queueFile";
+    const queueName = "queueFileUser";
     await channel.assertExchange(exchangeName, "topic", { durable: true });
     await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queueName, exchangeName, "file.stockage.#");
+    await channel.bindQueue(queueName, exchangeName, "user.stockage.#");
 
     console.log("Waiting for file messages in queueFile...");
     channel.consume(queueName, async message => {
@@ -22,7 +22,7 @@ async function startConsumer() {
                 console.log(`Received file event on ${routingKey}:`, eventData);
     
                 // Handle the message based on the routing key
-                if (routingKey === 'file.stockage.uploaded' || routingKey === 'file.stockage.deleted') {
+                if (routingKey === 'user.stockage.uploaded' || routingKey === 'user.stockage.deleted') {
                     // Call the handler function
                     await handleUpadateStockageUser(eventData, routingKey);
                 }

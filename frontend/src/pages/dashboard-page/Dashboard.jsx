@@ -28,6 +28,8 @@ const Dashboard = ({rootFolder, user}) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
+
+
   const handleCreateFolder = async () => {
     if (!folderName) {
       setFolderMessage('Veuillez entrer un nom de dossier');
@@ -117,6 +119,10 @@ const Dashboard = ({rootFolder, user}) => {
   };
 
   useEffect(() => {
+    if(!rootFolder) {
+      window.location.reload();
+      return;
+    }
     const fetchData = async () => {
       await handleDossiers();
       const data = await handlerCalculateSizeTypeFile();
