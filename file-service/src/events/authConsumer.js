@@ -1,6 +1,6 @@
 require('dotenv').config();
 const amqp = require('amqplib');
-const { handleUserCreated } = require('../handlers/userHandlers');
+const { handleUserCreated, handleUserDelete } = require('../handlers/userHandlers');
 
 async function startAuthConsumer() {
     const amqpUrl = process.env.AMQP_URL || "amqp://guest:guest@localhost:5672//";
@@ -21,10 +21,12 @@ async function startAuthConsumer() {
                 const eventData = JSON.parse(message.content.toString());
                 console.log(`Received auth event on ${routingKey}:`, eventData);
     
-                // Handle the message based on the routing key
                 if (routingKey === 'file.stockage.registered') {
-                    // Call the handler function
                     await handleUserCreated(eventData);
+                }
+    
+                if (routingKey === 'file.stockage.deleted') {
+                    await handleUserDelete(eventData);
                 }
     
                 channel.ack(message);

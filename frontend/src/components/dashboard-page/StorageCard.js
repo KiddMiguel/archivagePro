@@ -3,10 +3,12 @@ import { Doughnut } from 'react-chartjs-2';
 import { Card, CardContent, Typography, Box, Button, Grid } from '@mui/material';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import { useNavigate } from 'react-router-dom';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StorageCard = ({ documents, medias, others, limit,  filesUpdated }) => {
+  const navigate = useNavigate();
   const [totalSizeInBytes, setTotalSizeInBytes] = useState(null);
 
   const handleCalculateStorageFile = () => {
@@ -87,7 +89,7 @@ const StorageCard = ({ documents, medias, others, limit,  filesUpdated }) => {
                         width: '100%',
                         maxWidth: { xs: '100%', md: '100%' },
                       }}
-                      onClick={() => console.log('Upgrade plan clicked')}
+                      onClick={() => navigate('/checkout')}
                     >
                       Mise à niveau <RocketLaunchIcon sx={{ ml: 1 }} />
                     </Button>

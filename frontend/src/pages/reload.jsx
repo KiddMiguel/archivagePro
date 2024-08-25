@@ -12,7 +12,7 @@ const Reload = ({ message, redirectURL, time = 1000}) => {
 
 
     setTimeout(() => {
-        navigate("/dashboard");
+        navigate("/"+(redirectURL ? redirectURL : currentUrl));
     }, time);
 
     return (
@@ -22,7 +22,7 @@ const Reload = ({ message, redirectURL, time = 1000}) => {
                 justifyContent: 'center', 
                 alignItems: 'center', 
                 height: '100vh', 
-                width: '80vw' 
+                width: message ? "100vw" :'80vw' 
             }}
         >
             <CircularProgress />

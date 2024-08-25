@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Tabs, Tab, TextField, Button, Avatar, Grid, 
   Card, CardContent, IconButton, 
@@ -42,6 +42,24 @@ const Settings = ({user, isAuthenticated}) => {
       [name]: value
     }));
   };
+
+  useEffect(() => {
+    if(isAuthenticated && !user.address) {
+     window.location.reload(); 
+    }
+    if (isAuthenticated) {
+      setFullName(user.fullName);
+      setEmail(user.email);
+      setPhone(user.phone);
+      setAddress({
+        street: user.address.street,
+        city: user.address.city,
+        postalCode: user.address.postalCode,
+        country: user.address.country
+      });
+      setBio(user.bio);
+    }
+  }, [isAuthenticated, user]);
 
   return (
     <Box>

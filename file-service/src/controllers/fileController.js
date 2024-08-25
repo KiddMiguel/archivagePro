@@ -181,19 +181,29 @@ exports.deleteFolder = async (req, res) => {
             return res.status(404).send({ message: 'Folder not found' });
         }
 
-        // Récupérer tous les fichiers du dossier
+        const db = getDB();
+        const bucket = new GridFSBucket(db);
+
+        // Retrieve all files in the folder
         const files = await File.find({ "metadata.parentFolder": req.params.id });
 
-        // Supprimer tous les fichiers du dossier
+        // Delete each file and its associated chunks
+        for (const file of files) {
+            await bucket.delete(new ObjectId(file._id));  // Delete the file and its chunks
+        }
+
+        // Delete all files in the folder from the File collection
         await File.deleteMany({ "metadata.parentFolder": req.params.id });
 
-        // Supprimer tous les sous-dossiers
+        // Delete all subfolders
         await Folder.deleteMany({ path: { $regex: `^${folder.path}` } });
 
-        // Supprimer le dossier
+        // Delete the folder itself
         await Folder.findByIdAndDelete(req.params.id);
 
         res.status(200).send({ message: 'Folder deleted successfully' });
+
+        // Optionally publish an event after deletion
         await publishEvent('user.stockage.deleted', 'ExchangeFile', { file: files });
     } catch (error) {
         res.status(500).send({ message: error.message });

@@ -69,6 +69,8 @@ export const validateToken = async () => {
   }
 };
 
+
+
 // --------------------------------------------------------- Utilisateurs
 
 export const updateUser = async (user) => {

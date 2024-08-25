@@ -7,6 +7,53 @@ const { publishEvent } = require('../events/publisher');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 
+exports.registerAdmin = async (req, res) => {
+  const { firstName, lastName, email, password, telephone } = req.body;
+
+  try {
+    let user = await userRepository.findUserByEmail(email);
+    if (user) {
+      return res.status(400).json({ msg: 'L\'utilisateur existe déjà' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = {
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      telephone,
+      isAdmin: true,
+    };
+
+    user = await userRepository.createUser(newUser);
+
+    const payload = { user: { id: user.id, isAdmin: user.isAdmin}};
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: 360000 },
+      (err, token) => {
+        if (err) throw err;
+        res.json({
+          token,
+          user: {
+            id: user.id,
+            email: user.email, isAdmin: user.isAdmin, firstName: user.firstName, lastName: user.lastName, telephone: user.telephone , storageLimit: user.storageLimit,  address: user.address,
+          },
+        });
+      }
+    );
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+
 exports.register = async (req, res) => {
   const { firstName, lastName, email, password, telephone } = req.body;
 
@@ -151,7 +198,7 @@ exports.updateProfile = async (req, res) => {
 
     user = await userRepository.updateUser(req.user.id, updateData);
     await publishEvent('auth.updated', 'ExchangeAuth', {  email: user.email, firstName, lastName, address });
-    res.json({ success: true, id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email});
+    res.json({ success: true, user : {id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email, telephone : user.telephone, address : user.address }});
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
@@ -167,9 +214,15 @@ exports.deleteProfile = async (req, res) => {
 
     await userRepository.deleteUser(req.user.id);
 
-    await publishEvent('auth.billing.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
+    // Récupération des mails des administrateurs
+    const admins = await userRepository.getAdmins();
+    const adminEmails = admins.map((admin) => admin.email);
+    console.log(adminEmails);
 
-    res.json({ msg: 'User removed' });
+    await publishEvent('auth.billing.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
+    await publishEvent('file.stockage.deleted', 'ExchangeFile', { userId: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, adminEmails : adminEmails });
+
+    res.json({ msg: 'User removed', success: true });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

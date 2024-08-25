@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box, Typography, TextField, Button, Avatar, Grid, Divider
 } from '@mui/material';
+import { updateUser, deleteUser } from '../../../services/serviceUsers';
+import { useNavigate } from 'react-router-dom';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useAuth } from '../../../services/AuthContext';
+import YesNoToggle from '../../../components/dashboard-page/YesNoToggle';
 
-// Assurez-vous d'avoir un composant TabPanel défini ou importé
 const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
@@ -25,35 +29,66 @@ const TabPanel = (props) => {
 };
 
 const TabPanelProfil = ({ selectedTab, index, user }) => {
-    const [userDetail, setUserDetail] = useState(user);
+    const { updated } = useAuth();
+    const navigate = useNavigate();
+    const [userDetail, setUserDetail] = useState({
+        ...user,
+        address: user.address || { street: '', city: '', postalCode: '', country: '' }
+    });
+    const [error, setError] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
 
-    const handleSubmit = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Logic for submitting form goes here
+        const response = await updateUser(userDetail);
+        console.log(response);
+        if (response.success) {
+            updated(response.user, response.rootFolder);
+            navigate('/reload/dashboard');
+        } else {
+            setError(response.message);
+        }
     };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setUserDetail({
-            ...userDetail,
-            [name]: value,
-        });
+        setUserDetail(prevState => ({
+            ...prevState,
+            // Si le nom du champ appartient à l'adresse, mettez à jour l'adresse
+            address: {
+                ...prevState.address,
+                [name]: value,
+            },
+            // Sinon, mettez à jour directement userDetail
+            ...(name !== 'street' && name !== 'city' && name !== 'postalCode' && name !== 'country' && { [name]: value })
+        }));
     };
+
+    const handleDeleteProfile = async () => {
+        // Supprimer le profil
+       const response =  await deleteUser();
+         if(response.success){
+              navigate('/reload/logout');
+            } else {
+                setError(response.message);
+            }
+    };
+    console.log(userDetail);
+
+    useEffect(() => {
+        // UseEffect pour mettre à jour les détails de l'utilisateur
+        setUserDetail({
+            ...user,
+            address: user.address || { street: '', city: '', postalCode: '', country: ''
+            }
+        });
+    }, []);
 
     return (
         <TabPanel value={selectedTab} index={index} align="left">
             <form onSubmit={handleSubmit}>
                 <Grid container spacing={3} sx={{ width: "70%" }}>
-                    <Grid item xs={12} sm={3}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <Avatar
-                                sx={{ width: 100, height: 100, mb: 2 }}
-                                src="/path/to/profile-picture.jpg"
-                            />
-                            <Button variant="text" color="error">Supprimer</Button>
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={9}>
+                    <Grid item xs={12} sm={9} md={9}>
                         <Grid container spacing={2}>
                             <Typography variant="h6" sx={{ mb: 1, ml: 2, mt: 2 }}>Détails de base</Typography>
 
@@ -85,6 +120,16 @@ const TabPanelProfil = ({ selectedTab, index, user }) => {
                                     name="email"
                                     onChange={handleChange}
                                     value={userDetail?.email || ''}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Téléphone"
+                                    variant="outlined"
+                                    name="telephone"
+                                    onChange={handleChange}
+                                    value={userDetail?.telephone || ''}
                                 />
                             </Grid>
                             <Typography variant="h6" sx={{ mb: 1, ml: 2, mt: 2 }}>Adresse</Typography>
@@ -138,10 +183,13 @@ const TabPanelProfil = ({ selectedTab, index, user }) => {
                             </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
 
-                <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: "58.5%" }}>
-                    <Button variant="outlined" color="error" sx={{ textTransform: 'none', border: "none" }}>
+                    <Grid item xs={12} sm={9} md={9}>
+                    <Box  sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'end', }}>
+                    <Button variant="outlined" color="error" sx={{ textTransform: 'none', border: "none" }} 
+                    onClick={() => {
+                        setOpenDialog(true);
+                    }}>
                         Supprimer le compte
                     </Button>
                     <Box>
@@ -151,9 +199,20 @@ const TabPanelProfil = ({ selectedTab, index, user }) => {
                         <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} type="submit">
                             Enregistrer les modifications
                         </Button>
+                        {error && <Typography variant="body2" sx={{ color: 'error', mt: 0 }}>{error}</Typography>}
                     </Box>
                 </Box>
+                </Grid>
+                </Grid>
             </form>
+
+            <YesNoToggle 
+                title="Supprimer le profil"
+                message="Êtes-vous sûr de vouloir supprimer votre profil? Cette action est irréversible."
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                yesComport={handleDeleteProfile}
+            />
         </TabPanel>
     );
 };
