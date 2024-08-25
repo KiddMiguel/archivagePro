@@ -193,9 +193,6 @@ const TabPanelProfil = ({ selectedTab, index, user }) => {
                         Supprimer le compte
                     </Button>
                     <Box>
-                        <Button variant="outlined" color="inherit" sx={{ textTransform: 'none', mr: 2 }}>
-                            Annuler
-                        </Button>
                         <Button variant="contained" color="primary" sx={{ textTransform: 'none' }} type="submit">
                             Enregistrer les modifications
                         </Button>

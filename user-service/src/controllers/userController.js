@@ -258,7 +258,7 @@ exports.changePassword = async (req, res) => {
 
     await user.save();
 
-    res.json({ msg: 'Password updated' });
+    res.json({ msg: 'Password updated', success: true });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

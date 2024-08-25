@@ -7,6 +7,7 @@ import {
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TabPanelProfil from './settings/TabPanelProfil';
+import TabPanelSecurity from './settings/TabPanelSecurity';
 
 const Settings = ({user, isAuthenticated}) => {
   console.log(user);
@@ -87,13 +88,8 @@ const Settings = ({user, isAuthenticated}) => {
       </Box>
 
       <TabPanelProfil selectedTab={selectedTab} index={0} user ={user}/>
-
+      <TabPanelSecurity selectedTab={selectedTab} index={1} user = {user} />
       
-
-      <TabPanel value={selectedTab} index={1}>
-        <Typography variant="h6">Sécurité</Typography>
-        <Typography>Modifier le mot de passe, activer l'authentification à deux facteurs, etc.</Typography>
-      </TabPanel>
 
       <TabPanel value={selectedTab} index={4}>
         <Typography variant="h6">Moyens de Paiement</Typography>

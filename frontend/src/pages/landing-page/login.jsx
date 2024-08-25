@@ -1,15 +1,16 @@
-// src/pages/Login.js
-import React from 'react';
-import { Container, Box, Grid, Typography, TextField, Button, Link, FormControlLabel, Checkbox, AppBar, Toolbar, Alert } from '@mui/material';
+import React, { useState } from 'react';
+import { Container, Box, Grid, Typography, TextField, Button, Link, FormControlLabel, Checkbox, AppBar, Toolbar, Alert, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { loginService } from '../../services/service';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../services/AuthContext';
 import CircularProgress from '@mui/material/CircularProgress';
 
 const Login = () => {
-  const [error, setError] = React.useState(null);
-  const [loading , setLoading] = React.useState(false);
-  const [message , setMessage] = React.useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);  // Nouvel état pour gérer la visibilité du mot de passe
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -44,12 +45,14 @@ const Login = () => {
     }
   };
 
+  const toggleShowPassword = () => setShowPassword(!showPassword); // Fonction pour basculer la visibilité du mot de passe
+
   return (
     <>
       <AppBar position="static" color="transparent" sx={{ paddingLeft: '10px', paddingRight: '10px' }}>
         <Toolbar>
-        <Typography variant="h6" component="a" href="/" sx={{textDecoration : "none"}}> 
-        ArchiDrive
+          <Typography variant="h6" component="a" href="/" sx={{textDecoration : "none"}}> 
+            ArchiDrive
           </Typography>
         </Toolbar>
       </AppBar>
@@ -85,7 +88,7 @@ const Login = () => {
               </Grid>
               <Grid item>
                 <Link href="/signup" variant="body2" sx={{ textDecoration: 'none', color: '#1a73e8' }}>
-                Vous n'avez pas de compte ?
+                  Vous n'avez pas de compte ?
                 </Link>
               </Grid>
             </Grid>
@@ -108,10 +111,24 @@ const Login = () => {
               fullWidth
               name="password"
               label="Mot de passe"
-              type="password"
+              type={showPassword ? "text" : "password"}  // Changement de type en fonction de la visibilité
               id="password"
               autoComplete="current-password"
               sx={{ marginBottom: '20px' }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={toggleShowPassword}
+                      edge="end"
+                      sx={{ fontSize: 20 }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
             <Grid container justifyContent="space-between" alignItems="center" sx={{ width: '100%', marginBottom: '20px' }}>
               <Grid item>
@@ -122,7 +139,8 @@ const Login = () => {
               </Grid>
               <Grid item>
                 <Link href="/forgotpassword" variant="body2" sx={{ textDecoration: 'none', color: '#1a73e8' }}>
-                Mot de passe oublié ?                </Link>
+                  Mot de passe oublié ?
+                </Link>
               </Grid>
             </Grid>
             <Button
@@ -132,19 +150,19 @@ const Login = () => {
               color="primary"
               sx={{ margin: '20px 0', padding: '10px', backgroundColor: '#1a73e8', textTransform: 'none', fontSize: '15px' }}
             >
-       {loading ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        Connexion en cours...
-                        <CircularProgress
-                          color="inherit" 
-                          thickness={5} 
-                          size={20} 
-                          sx={{ color: 'white' }} 
-                        />
-                      </div>
-                    ) : (
-                      'Connexion'
-                    )}
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  Connexion en cours...
+                  <CircularProgress
+                    color="inherit" 
+                    thickness={5} 
+                    size={20} 
+                    sx={{ color: 'white' }} 
+                  />
+                </div>
+              ) : (
+                'Connexion'
+              )}
             </Button>
             {error && (
               <Alert severity="error" sx={{ background : "white", color : "#dc3545"}}>

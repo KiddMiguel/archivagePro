@@ -100,6 +100,15 @@ export const forgotPassword = async (email) => {
   }
 };
 
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await service.put('users/password', { oldPassword, newPassword });
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 // ---------------------------------------------------------Créer une facture
 export const createInvoice = async (invoice) => {
   try {
