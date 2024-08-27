@@ -58,7 +58,7 @@ export const validateToken = async () => {
     const response = await service.get('/users/profile');
     const rootFolderResponse = await service.get('/files/root');
     return { ...response.data, rootFolder: rootFolderResponse.data };
-  }catch (error) {
+  } catch (error) {
     return error.response.data;
   }
 };
@@ -193,6 +193,15 @@ export const getFolderFiles = async (folderId) => {
 export const getAllFiles = async (user) => {
   try {
     const response = await service.get(`/files/user/${user}`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const response = await service.get('/users');
     return response.data;
   } catch (error) {
     return error.response.data;

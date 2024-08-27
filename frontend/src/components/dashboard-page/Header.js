@@ -7,10 +7,10 @@ import {
   TextField,
   InputAdornment,
   Avatar,
+  Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Link } from "react-router-dom";
 
 export default function Header({ user }) {
@@ -52,17 +52,26 @@ export default function Header({ user }) {
         />
       </Box>
 
-      <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography sx={{ fontSize: "14px" }} variant="h6">
-            {user.firstName + " " + user.lastName}
-          </Typography>
-          <Avatar
-            alt={`${user.firstName} ${user.lastName}`}
-            src="/path/to/avatar.jpg"
-          />
-        </Box>
-      </Link>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {/* Afficher le bouton si l'utilisateur est administrateur */}
+        {user.isAdmin && (
+          <Button component={Link} to="/admin" variant="contained">
+            Administrateur
+          </Button>
+        )}
+
+        <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography sx={{ fontSize: "14px" }} variant="h6">
+              {user.firstName + " " + user.lastName}
+            </Typography>
+            <Avatar
+              alt={`${user.firstName} ${user.lastName}`}
+              src="/path/to/avatar.jpg"
+            />
+          </Box>
+        </Link>
+      </Box>
     </Toolbar>
   );
 }

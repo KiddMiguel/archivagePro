@@ -15,6 +15,7 @@ import Settings from './pages/dashboard-page/Settings';
 import ApiRoutes from './routes/ApiRoutes';  // Assurez-vous que le chemin est correct
 import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   const { isAuthenticated, loading, user, rootFolder } = useAuth();
@@ -37,15 +38,16 @@ function App() {
 
           {/* Routes protégées avec PrivateLayout */}
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
-            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
+            <Route path="/dashboard" element={<Dashboard rootFolder={rootFolder} user={user} />} />
             <Route path="/favoris" element={<Favoris />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/logout" element={<Deconnexion />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
-          
+
         </Routes>
-        <ApiRoutes />  
+        <ApiRoutes />
 
       </Router>
 
