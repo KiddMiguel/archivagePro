@@ -6,6 +6,7 @@ import { AgGridReact } from 'ag-grid-react';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import DownloadIcon from '@mui/icons-material/Download';
 import { CircularProgress } from '@mui/material';
+import { getInvoices } from '../../../services/serviceInvoices';
 
 
 const TabPanel = (props) => {
@@ -31,6 +32,17 @@ const TabPanel = (props) => {
 const TabPanelSecurity = ({ selectedTab, index, user }) => {
   const [rowData, setRowData] = useState([]);
   const [loadingStates, setLoadingStates] = useState({});
+  const [error, setError] = useState(null);
+
+  const handleInvoices = async () => {
+    const response = await getInvoices();
+    if (response.statut) {
+      setRowData(response.invoices);
+    }else{
+      setError(response.message);
+    }
+  };
+
 
   const handleDownloadClick = async (invoiceId) => {
     setLoadingStates(prevState => ({ ...prevState, [invoiceId]: 'download' }));
@@ -42,17 +54,68 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
     };
 
 
-  const columnDefs = [
-    { headerName: 'Titre', field: 'name', sortable: true, filter: true, resizable: true },
-    { headerName: 'Date', field: 'date', sortable: true, filter: true, resizable: true },
-    { headerName: 'Montant', field: 'amount', sortable: true, filter: true, resizable: true },
-    { headerName: 'Statut', field: 'status', sortable: true, filter: true, resizable: true },
-    { 
+    const columnDefs = [
+      { 
+        headerName: 'Titre', 
+        field: '_id', 
+        sortable: true,
+        resizable: true,
+        flex: 2,
+        cellStyle: { textAlign: 'left', fontWeight: 'bold', color: '#4A4A4A' },
+      },
+      { 
+        headerName: 'Date', 
+        field: 'date', 
+        sortable: true,
+        filter: "agDateColumnFilter",
+        resizable: true,
+        flex: 1,
+        cellStyle: { textAlign: 'left', color: '#4A4A4A' },
+        valueFormatter: (params) => {
+          if (params.value) {
+            const date = new Date(params.value);
+            return date.toLocaleDateString('fr-FR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            });
+          } else {
+            return ''; 
+          }
+        },
+        headerClass: 'custom-header'
+      },
+      { 
+        headerName: 'Montant', 
+        field: 'amount', 
+        sortable: true,
+        resizable: true,
+        flex: 1,
+        cellStyle: { textAlign: 'right', color: '#4A4A4A' },
+        headerClass: 'custom-header',
+        valueFormatter: (params) => {
+          return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(params.value);
+        },
+      },
+      { 
+        headerName: 'Statut', 
+        field: 'status', 
+        sortable: true,
+        resizable: true,
+        flex: 1,
+        cellStyle: params => ({
+          textAlign: 'center',
+          color: params.value === 'Actif' ? 'green' : 'red',
+          fontWeight: 'bold',
+        }),
+        headerClass: 'custom-header'
+      },
+      { 
         headerName: "",
         field: "options",
         cellRenderer: (params) => {
           const isDownloading = loadingStates[params.data._id] === 'download';
-  
+    
           return (
             <Box display="flex" justifyContent="center" alignItems="center">
               <IconButton onClick={() => handleDownloadClick(params.data._id)} aria-label="download">
@@ -69,21 +132,18 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
         sortable: false,
         filter: false,
         resizable: false,
-        cellStyle: { textAlign: 'left' },
-    },
-  ];
+        flex: 1,
+        cellStyle: { textAlign: 'center' },
+        headerClass: 'custom-header'
+      },
+    ];
+
+
+    
 
   // Simulate fetching data from a database (MongoDB document in your image)
   useEffect(() => {
-    const fetchedData = [
-      {
-        name: "Facture pour le service de stockage de fichiers, ArchiDrive Premium.",
-        date: "2024-08-25T19:07:38.275+00:00",
-        amount: 20,
-        status: "paid",
-      }
-    ];
-    setRowData(fetchedData);
+    handleInvoices();
   }, []);
 
   const handleDownload = (data) => {
@@ -96,7 +156,7 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
     <TabPanel value={selectedTab} index={index}>
       <Typography variant="h6" align='left'>Factures</Typography>
       <Divider sx={{ my: 2 }} />
-      
+        {error && <Typography variant="body1" color="error">{error}</Typography>}
         <div className="ag-theme-alpine" style={{ height: '30vw', width: '100%', padding: '16px' }}>
           <AgGridReact
             columnDefs={columnDefs}

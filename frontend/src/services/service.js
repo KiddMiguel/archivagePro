@@ -258,3 +258,15 @@ export const downloadFile = async (fileId) => {
   }
 };
 
+
+// --------------------------------------------------------- Factures
+
+// Récupérer les factures d'un utilisateur
+export const getInvoices = async () => {
+  try {
+    const response = await service.get('/billings/invoices');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
