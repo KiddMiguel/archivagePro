@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, Divider, Grid, IconButton
+  Box, Typography, Divider, IconButton,
+  Avatar
 } from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
-import GetAppIcon from '@mui/icons-material/GetApp';
 import DownloadIcon from '@mui/icons-material/Download';
 import { CircularProgress } from '@mui/material';
 import { getInvoices } from '../../../services/serviceInvoices';
+import RenderIcon from '../../../components/dashboard-page/RenderIcon';
+import generateInvoicePDF from '../../../utils/generateInvoicePDF';
 
 
 const TabPanel = (props) => {
@@ -46,12 +48,17 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
 
   const handleDownloadClick = async (invoiceId) => {
     setLoadingStates(prevState => ({ ...prevState, [invoiceId]: 'download' }));
-    setTimeout(() => {
-        handleDownload(invoiceId);
-    }, 1000);
+
+    // Récupérer l'utilisateur et la facture correspondante
+    const invoice = rowData.find(invoice => invoice._id === invoiceId);
+    
+    if (invoice) {
+        generateInvoicePDF(user, invoice);
+    }
 
     setLoadingStates(prevState => ({ ...prevState, [invoiceId]: false }));
-    };
+};
+
 
 
     const columnDefs = [
@@ -62,6 +69,16 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
         resizable: true,
         flex: 2,
         cellStyle: { textAlign: 'left', fontWeight: 'bold', color: '#4A4A4A' },
+      cellRenderer: (params) => {
+        return (
+          <Box display="flex" alignItems="center" sx={{ fontWeight: "600" }}>
+            <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 2 }}>
+              {<RenderIcon type={"pdf"} />}
+            </Avatar>
+            {params.value}
+          </Box>
+        );
+      },
       },
       { 
         headerName: 'Date', 
@@ -118,15 +135,16 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
     
           return (
             <Box display="flex" justifyContent="center" alignItems="center">
-              <IconButton onClick={() => handleDownloadClick(params.data._id)} aria-label="download">
-                {isDownloading ? (
-                  <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
-                ) : (
-                  <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
-                )}
-              </IconButton>
+                <IconButton onClick={() => handleDownloadClick(params.data._id)} aria-label="download">
+                    {isDownloading ? (
+                        <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
+                    ) : (
+                        <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
+                    )}
+                </IconButton>
             </Box>
-          );
+        );
+        
         },
         width: 70,
         sortable: false,
@@ -146,11 +164,6 @@ const TabPanelSecurity = ({ selectedTab, index, user }) => {
     handleInvoices();
   }, []);
 
-  const handleDownload = (data) => {
-    // Logic to handle downloading the invoice
-    // This could be a fetch call to download the PDF or any other action
-    console.log('Downloading invoice for:', data.name);
-  };
 
   return (
     <TabPanel value={selectedTab} index={index}>
