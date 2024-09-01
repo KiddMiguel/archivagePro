@@ -55,6 +55,9 @@ const FolderFilesDialog = ({ open, onClose, folder,filesUpdated, setFilesUpdated
       setLoadingUpload(false);
       handleCloseFileDialog(); 
       setFilesUpdated(true);
+      setTimeout(() => {
+        setFilesUpdated(false);
+      }, 500);
   };
 
 
