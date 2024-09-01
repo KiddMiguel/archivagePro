@@ -42,7 +42,9 @@ const CheckoutForm = ({user}) => {
     billingInfo.user = user.id || user._id;
     billingInfo.facture = user;
     billingInfo.amount = 20;
-    billingInfo.storageLimit = (user.storageLimit + 20) * 1024;
+    billingInfo.subscription = 'premium';
+    billingInfo.storageLimit = parseInt(user.storageLimit) + 21474836480;
+
     billingInfo.address = {
       street: billingInfo.address1,
       city: billingInfo.city,
