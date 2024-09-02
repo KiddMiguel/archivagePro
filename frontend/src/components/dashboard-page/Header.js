@@ -146,13 +146,13 @@ export default function Header({ user, rootFolder }) {
                           <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
                         )}
                       </IconButton>
-                      <IconButton onClick={() => handleDeleteClick(file._id)} aria-label="delete">
+                      {/* <IconButton onClick={() => handleDeleteClick(file._id)} aria-label="delete">
                         {isDeleting ? (
                           <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
                         ) : (
                           <DeleteIcon sx={{ color: 'grey', fontSize: "17px" }} />
                         )}
-                      </IconButton>
+                      </IconButton> */}
                     </Box>
                   </Box>
                 ))}
@@ -161,6 +161,15 @@ export default function Header({ user, rootFolder }) {
           </ClickAwayListener>
         )}
       </Box>
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        {/* Afficher le bouton si l'utilisateur est administrateur */}
+        {user.isAdmin && (
+          <Button component={Link} to="/admin" variant="contained">
+            Administrateur
+          </Button>
+        )}
+
 
       <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -173,6 +182,8 @@ export default function Header({ user, rootFolder }) {
           />
         </Box>
       </Link>
+      </Box>
+
     </Toolbar>
   );
 }
