@@ -3,7 +3,7 @@ import Header from "../../components/landing-page/Header";
 import Footer from "../../components/landing-page/Footer";
 import { Container, Grid, Typography, Button, Box, Card, CardContent, CardActions } from "@mui/material";
 import { Cloud, People, Security, CheckCircle, AddCircle, Euro, Schedule } from '@mui/icons-material'; // Import des icônes Material-UI
-import image1 from "../../assets/images/image1.jpg";
+import image1 from "../../assets/images/image1.png";
 
 const cardStyles = {
   maxWidth: 345,
@@ -32,7 +32,7 @@ const Home = () => {
           </Grid>
           <Grid item xs={12} md={6} style={{ textAlign: 'center' }}>
             <a href="https://www.loom.com/share/27c6a1b00e714ca0aff322b704d8359d?sid=1b16768a-b34c-4d14-b1b9-9d4b52a82245" target="_blank" rel="noopener noreferrer">
-              <img src={image1} alt="Watch the video" style={{ width: '100%', maxWidth: '500px', border: 'none' }} />
+              <img src={image1} alt="Watch the video" style={{ width: '100%',  border: 'none' }} />
             </a>
           </Grid>
         </Grid>

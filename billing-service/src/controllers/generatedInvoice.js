@@ -12,6 +12,7 @@ const generateInvoiceWord = async (invoice) => {
   const data = {
     firstName: invoice.facture.firstName,
     lastName: invoice.facture.lastName,
+    storageLimit : (invoice.storageLimit / (1024**3)).toFixed(2),
     address: invoice.address,
     date: new Date(invoice.date).toLocaleDateString(),
     date_echeance: new Date(invoice.date_echeance).toLocaleDateString(),
@@ -85,36 +86,40 @@ const sendInvoice = async (invoice, pdfPath) => {
       to: invoice.facture.email,
       subject: `Votre facture #${invoice.id}`,
         html: `
-        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
-          <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <div style="text-align: center; padding-bottom: 20px;">
-              <h1 style="margin: 0; font-size: 24px;">Merci pour votre commande</h1>
-              <p style="margin: 0; color: #888;">Nous avons bien reçu votre paiement. Voici un récapitulatif de votre commande.</p>
-            </div>
-            <hr style="border: none; border-top: 1px solid #e0e0e0;">
-            <div style="padding: 20px 0;">
-              <p style="margin: 0;"><strong>Facture #${invoice.id}</strong></p>
-              <p style="margin: 0;">Client : <strong>${invoice.facture.firstName} ${invoice.facture.lastName}</strong> (${invoice.facture.email})</p>
-              <p style="margin: 0;">Méthode de paiement : <strong>Carte de crédit</strong></p>
-              <p style="margin: 0;">Date de paiement : <strong>${new Date(invoice.date).toLocaleDateString()}</strong></p>
-            </div>
-            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-              <p style="margin: 0;"><strong>${invoice.description}</strong></p>
-              <p style="margin: 0; text-align: right; font-size: 20px;"><strong>${invoice.amount.toFixed(2)} €</strong></p>
-            </div>
-            <div style="padding: 20px 0; font-size: 18px;">
-              <p style="margin: 0;">Montant total payé : <strong style="color: #4CAF50;">${invoice.amount.toFixed(2)} €</strong></p>
-            </div>
-            <hr style="border: none; border-top: 1px solid #e0e0e0;">
-            <div style="padding-top: 20px;">
-              <p style="margin: 0; color: #888; font-size: 12px;">Disclaimer: La facture est jointe à cet email. Si vous avez des questions, veuillez nous contacter directement.</p>
-              <p style="margin: 0; font-size: 14px; text-align: center;">Nous apprécions votre confiance.</p>
-              <p style="margin: 0; font-size: 14px; text-align: center;"><strong>ARCHIDRIVE</strong></p>
-              <p style="margin: 0; font-size: 12px; text-align: center;">16192 Coastal Highway, Lewes, Delaware 19958, USA</p>
-              <p style="margin: 0; font-size: 12px; text-align: center;">+1 262 600 2002</p>
-            </div>
-          </div>
-        </div>
+       <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+  <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <div style="text-align: center; padding-bottom: 20px;">
+      <h1 style="margin: 0; font-size: 24px;">Merci pour votre commande</h1>
+      <p style="margin: 0; color: #888;">Nous avons bien reçu votre paiement. Voici un récapitulatif de votre commande.</p>
+    </div>
+    <hr style="border: none; border-top: 1px solid #e0e0e0;">
+    <div style="padding: 20px 0;">
+      <p style="margin: 0;"><strong>Facture #${invoice.id}</strong></p>
+      <p style="margin: 0;">Client : <strong>${invoice.facture.firstName} ${invoice.facture.lastName}</strong> (${invoice.facture.email})</p>
+      <p style="margin: 0;">Méthode de paiement : <strong>Carte de crédit</strong></p>
+      <p style="margin: 0;">Date de paiement : <strong>${new Date(invoice.date).toLocaleDateString()}</strong></p>
+    </div>
+    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+      <p style="margin: 0;"><strong>${invoice.description}</strong></p>
+      <p style="margin: 0; text-align: right; font-size: 20px;"><strong>${invoice.amount.toFixed(2)} €</strong></p>
+    </div>
+    <div style="padding: 20px 0; font-size: 18px;">
+      <p style="margin: 0;">Montant total payé : <strong style="color: #4CAF50;">${invoice.amount.toFixed(2)} €</strong></p>
+    </div>
+    <div style="padding: 20px 0; font-size: 18px;">
+      <p style="margin: 0;">Confirmation de l'espace acheté : <strong style="color: #4CAF50;">${(invoice.facture.storageLimit / (1024**3)).toFixed(2)} GB</strong></p>
+    </div>
+    <hr style="border: none; border-top: 1px solid #e0e0e0;">
+    <div style="padding-top: 20px;">
+      <p style="margin: 0; color: #888; font-size: 12px;">Disclaimer: La facture est jointe à cet email. Si vous avez des questions, veuillez nous contacter directement.</p>
+      <p style="margin: 0; font-size: 14px; text-align: center;">Nous apprécions votre confiance.</p>
+      <p style="margin: 0; font-size: 14px; text-align: center;"><strong>ARCHIDRIVE</strong></p>
+      <p style="margin: 0; font-size: 12px; text-align: center;">16192 Coastal Highway, Lewes, Delaware 19958, USA</p>
+      <p style="margin: 0; font-size: 12px; text-align: center;">+1 262 600 2002</p>
+    </div>
+  </div>
+</div>
+
       `
       // attachments: [
       //   {

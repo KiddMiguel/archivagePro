@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+
 const API_BASE_URL = 'http://localhost:4000';
 
 const service = axios.create({
@@ -255,6 +256,19 @@ export const downloadFile = async (fileId) => {
     document.body.removeChild(link);
   } catch (error) {
     console.error('Error downloading file:', error);
+  }
+};
+
+
+// --------------------------------------------------------- Factures
+
+// Récupérer les factures d'un utilisateur
+export const getInvoices = async () => {
+  try {
+    const response = await service.get('/billings/invoices');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
   }
 };
 

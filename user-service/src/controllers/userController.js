@@ -181,7 +181,7 @@ exports.getUserInfo = async (req, res) => {
 };
 
 exports.updateProfile = async (req, res) => {
-  const { firstName, lastName, address, telephone } = req.body;
+  const { firstName, lastName, address, telephone, subscription, storageLimit } = req.body;
 
   try {
     let user = await userRepository.findUserById(req.user.id);
@@ -194,6 +194,8 @@ exports.updateProfile = async (req, res) => {
       lastName: lastName || user.lastName,
       address: address || user.address,
       telephone: telephone || user.telephone,
+      subscription : user.subscription || subscription,
+      storageLimit : user.storageLimit || storageLimit,
     };
 
     user = await userRepository.updateUser(req.user.id, updateData);

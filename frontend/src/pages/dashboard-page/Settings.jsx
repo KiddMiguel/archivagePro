@@ -8,6 +8,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import DeleteIcon from '@mui/icons-material/Delete';
 import TabPanelProfil from './settings/TabPanelProfil';
 import TabPanelSecurity from './settings/TabPanelSecurity';
+import TabPanelFactures from './settings/TabPanelFactures';
 
 const Settings = ({user, isAuthenticated}) => {
   console.log(user);
@@ -89,6 +90,7 @@ const Settings = ({user, isAuthenticated}) => {
 
       <TabPanelProfil selectedTab={selectedTab} index={0} user ={user}/>
       <TabPanelSecurity selectedTab={selectedTab} index={1} user = {user} />
+      <TabPanelFactures selectedTab={selectedTab} index={2} user = {user} />
       
 
       <TabPanel value={selectedTab} index={4}>
