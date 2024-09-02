@@ -1,5 +1,5 @@
 // src/pages/Signup.js
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Box,
@@ -15,8 +15,10 @@ import {
 import { register } from "../../services/service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext";
+import CircularProgress from '@mui/material/CircularProgress';
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading , setLoading] = useState(false);
   const { login } = useAuth();
 
   const [error, setError] = React.useState(false);
@@ -24,6 +26,7 @@ const Signup = () => {
 
   // Register
   const handleRegister = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const user = {
       firstName: e.target.firstName.value,
@@ -34,15 +37,17 @@ const Signup = () => {
     };
     // Call the register function from the service
     const response = await register(user);
-    console.log(response);
     if (response.success) {
-      login(response.user, response.token);
+      login(response.user, response.token, response.rootFolder);
       navigate('/checkout');
     } else {
+      setLoading(false);
       setError(true);
       if(response.success === false){
+        setLoading(false);
         setMessage(response.msg);
       }else{
+        setLoading(false);
         setMessage(response.errors[0].message);
       }
     }
@@ -191,7 +196,19 @@ const Signup = () => {
                 fontSize: "15px",
               }}
             >
-              Créer un compte
+        {loading ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                       Inscription en cours...
+                        <CircularProgress
+                          color="inherit" 
+                          thickness={5} 
+                          size={20} 
+                          sx={{ color: 'white' }} 
+                        />
+                      </div>
+                    ) : (
+                      'S\'inscrire'
+                    )}
             </Button>
             {error && (
               <Alert severity="error" sx={{ background : "white", color : "#dc3545"}}>

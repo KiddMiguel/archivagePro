@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+
 const API_BASE_URL = 'http://localhost:4000';
 
 const service = axios.create({
@@ -28,7 +29,13 @@ service.interceptors.request.use(
 export const register = async (user) => {
   try {
     const response = await service.post('/users/register', user);
-    return response.data;
+    const rootFolderResponse = await service.get('/files/root', {
+      headers: {
+        Authorization: `Bearer ${response.data.token}`,
+      },
+    });
+    console.log(rootFolderResponse);
+    return { ...response.data, rootFolder: rootFolderResponse.data };
   } catch (error) {
     return error.response.data;
   }
@@ -58,10 +65,12 @@ export const validateToken = async () => {
     const response = await service.get('/users/profile');
     const rootFolderResponse = await service.get('/files/root');
     return { ...response.data, rootFolder: rootFolderResponse.data };
-  } catch (error) {
+  }catch (error) {
     return error.response.data;
   }
 };
+
+
 
 // --------------------------------------------------------- Utilisateurs
 
@@ -86,6 +95,15 @@ export const deleteUser = async () => {
 export const forgotPassword = async (email) => {
   try {
     const response = await service.post('users/forgot-password', email);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const response = await service.put('users/password', { oldPassword, newPassword });
     return response.data;
   } catch (error) {
     return error.response.data;
@@ -129,12 +147,12 @@ export const getRootFolder = async (userId) => {
 
 
 // Téléverser un fichier
-export const uploadFile = async (file) => {
+export const uploadFile = async (file, folderId) => {
   try {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await service.post('/files/upload', formData, {
+    const response = await service.post(`/files/upload/${folderId}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -199,11 +217,67 @@ export const getAllFiles = async (user) => {
   }
 };
 
-export const getAllUsers = async () => {
+// Supprimer un fichier
+export const deleteFile = async (fileId) => {
   try {
-    const response = await service.get('/users/usersS');
+    const response = await service.delete(`/files/user/${fileId}`);
     return response.data;
   } catch (error) {
     return error.response.data;
   }
 };
+
+export const getAllUsers = async () => {
+  try {
+    const response = await service.get('/users/users');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
+// Download a file
+export const downloadFile = async (fileId) => {
+  try {
+    const response = await service.get(`/files/download/${fileId}`, {
+      responseType: 'blob',
+    });
+
+    console.log('Headers:', response.headers);
+
+    let fileName = 'downloaded_file';
+    const contentDisposition = response.headers['content-disposition'];
+    
+    if (contentDisposition) {
+      console.log('Content-Disposition:', contentDisposition);
+      const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+      if (fileNameMatch && fileNameMatch.length > 1) {
+          fileName = fileNameMatch[1];
+      }
+  }
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', decodeURIComponent(escape(fileName))); 
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+};
+
+
+// --------------------------------------------------------- Factures
+
+// Récupérer les factures d'un utilisateur
+export const getInvoices = async () => {
+  try {
+    const response = await service.get('/billings/invoices');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+

@@ -1,66 +1,44 @@
-import React, { useState } from 'react';
-import { ToggleButtonGroup, ToggleButton, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import React from 'react';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button
+} from '@mui/material';
 
-const YesNoToggle = ({ title, value, onChange, disabled = false, openDialog = false, onDialogClose }) => {
-  const [open, setOpen] = useState(openDialog);
-
-  const handleChange = (event, newValue) => {
-    if (newValue !== null) {
-      onChange(newValue);
-      if (onDialogClose) {
-        onDialogClose();
-      }
-      setOpen(false);
-    }
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    if (onDialogClose) {
-      onDialogClose();
-    }
-  };
-
+const YesNoDialog = ({ title, message, open, yesComport, onClose }) => {
   return (
-    <div>
-      {title && (
-        <Typography variant="h6" gutterBottom>
-          {title}
-        </Typography>
-      )}
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open Yes/No Toggle
-      </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{title || 'Choose an option'}</DialogTitle>
-        <DialogContent>
-          <ToggleButtonGroup
-            value={value}
-            exclusive
-            onChange={handleChange}
-            aria-label="yes no toggle"
-            disabled={disabled}
-          >
-            <ToggleButton value="yes" aria-label="yes">
-              Yes
-            </ToggleButton>
-            <ToggleButton value="no" aria-label="no">
-              No
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      aria-labelledby="yes-no-dialog-title"
+      aria-describedby="yes-no-dialog-description"
+    >
+      <DialogTitle id="yes-no-dialog-title">{title}</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="yes-no-dialog-description">
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="primary">
+          No
+        </Button>
+        <Button
+          onClick={() => {
+            yesComport();
+            onClose();
+          }}
+          color="primary"
+          autoFocus
+        >
+          Yes
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
-export default YesNoToggle;
+export default YesNoDialog;

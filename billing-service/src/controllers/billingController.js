@@ -36,7 +36,7 @@ exports.createInvoice = async (req, res) => {
 exports.getInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.find({ user: req.user.id });
-    res.json(invoices);
+    res.json({invoices : invoices, statut : true});
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

@@ -1,1 +1,1 @@
-export {createInvoice} from './service';
+export {createInvoice, getInvoices} from './service';

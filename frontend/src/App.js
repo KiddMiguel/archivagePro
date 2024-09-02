@@ -17,12 +17,11 @@ import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 import AdminPage from './pages/AdminPage';
 
-function App() {
-  const { isAuthenticated, loading, user, rootFolder } = useAuth();
 
-  if (loading) {
-    return <Reload />;
-  }
+function App() {
+  const { isAuthenticated,  user, rootFolder } = useAuth();
+  console.log("user", user);
+  console.log("rootFolder", rootFolder);
 
   return (
     <div className="App">
@@ -37,17 +36,25 @@ function App() {
           <Route path="/checkout/" element={<CheckoutForm user={user} />} />
 
           {/* Routes protégées avec PrivateLayout */}
-          <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} />}>
-            <Route path="/dashboard" element={<Dashboard rootFolder={rootFolder} user={user} />} />
+          {
+            user && user.subscription !== "basic" ? (
+              <Route path="/dashboard" element={<Navigate to="/checkout" />} />
+            ) : (
+            <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
+            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
             <Route path="/favoris" element={<Favoris />} />
+            <Route path= "/reload/:page" element={<Reload  />} />
             <Route path="/corbeille" element={<h1>Corbeille</h1>} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/logout" element={<Deconnexion />} />
+            <Route path="/settings" element={<Settings user={user} isAuthenticated={isAuthenticated} />} />
             <Route path="/admin" element={<AdminPage />} />
-          </Route>
-
+            <Route path="/logout" element={<Deconnexion />} />
+          </Route>              
+            )
+          }
+          
+          
         </Routes>
-        <ApiRoutes />
+        <ApiRoutes />  
 
       </Router>
 

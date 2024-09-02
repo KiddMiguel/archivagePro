@@ -2,22 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { Box, Avatar, IconButton } from '@mui/material';
+import { Box, Avatar, IconButton, Menu, MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import FolderIcon from '@mui/icons-material/Folder';
 import "../../assets/styles/stylesAgDataGrid.css";
-import { getAllFiles } from '../../services/serviceFiles';
+import { deleteFile, downloadFile, getAllFiles, getFolderFiles } from '../../services/serviceFiles';
 import RenderIcon from './RenderIcon';
+import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { CircularProgress } from '@mui/material';
 
-const FilesTable = ({ rootFolder, filesUpdated  }) => {
+const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated, user }) => {
   const [rowData, setRowData] = useState([]);
+  const [loadingStates, setLoadingStates] = useState({});
 
   const handleFiles = async () => {
-    const files = await getAllFiles(rootFolder.owner);
-
+    const files = rootFolder ? await getAllFiles(rootFolder.owner) : folder ?  await getFolderFiles(folder._id) : user ? await getAllFiles(user.id) : [];
     let totalSizeInBytes = 0;
 
     // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
-    files.forEach((file) => {
+    files && files.forEach((file) => {
       totalSizeInBytes += file.length; // Ajouter la taille de chaque fichier en octets
 
       // Formater la taille de chaque fichier individuellement
@@ -36,6 +40,25 @@ const FilesTable = ({ rootFolder, filesUpdated  }) => {
     setRowData(files);
   };
 
+  const handleDownloadClick = async (fileId) => {
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: 'download' }));
+    await downloadFile(fileId);
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: false }));
+    setFilesUpdated(true);  // Déclenche la mise à jour de la table
+    setTimeout(() => {
+      setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+    }, 500);
+  };
+
+  const handleDeleteClick = async (fileId) => {
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: 'delete' }));
+    await deleteFile(fileId);
+    setLoadingStates(prevState => ({ ...prevState, [fileId]: false }));
+    setFilesUpdated(true);  // Déclenche la mise à jour de la table
+    setTimeout(() => {
+      setFilesUpdated(false);  // Réinitialise la prop pour permettre de futures mises à jour
+    }, 500);
+  };
 
   const columnDefs = [
     {
@@ -46,14 +69,17 @@ const FilesTable = ({ rootFolder, filesUpdated  }) => {
       resizable: true,
       flex: 2,
       cellStyle: { textAlign: 'left' },
-      cellRenderer: (params) => (
-        <Box display="flex" alignItems="center" sx={{fontWeight : "600"}}>
-          <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 2}}>
-            {<RenderIcon type={params.data.filename.split(".").slice(-1)[0]} />}
-          </Avatar>
-          {params.value}
-        </Box>
-      ),
+      cellRenderer: (params) => {
+        const fixedText = decodeURIComponent(escape(params.value));
+        return (
+          <Box display="flex" alignItems="center" sx={{ fontWeight: "600" }}>
+            <Avatar sx={{ bgcolor: "#f5f5f5", color: "#000", mr: 2 }}>
+              {<RenderIcon type={params.data.filename.split(".").slice(-1)[0]} />}
+            </Avatar>
+            {fixedText}
+          </Box>
+        );
+      },
     },
     {
       headerName: "Date de création",
@@ -63,18 +89,18 @@ const FilesTable = ({ rootFolder, filesUpdated  }) => {
       resizable: true,
       flex: 1,
       cellStyle: { textAlign: 'left' },
-      filterParams: {
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-          const cellDate = new Date(cellValue);
-          if (cellDate < filterLocalDateAtMidnight) {
-            return -1;
-          } else if (cellDate > filterLocalDateAtMidnight) {
-            return 1;
-          } else {
-            return 0;
-          }
+      valueFormatter: (params) => {
+        if (params.value) {
+          const date = new Date(params.value);
+          return date.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+        } else {
+          return ''; 
         }
-      }
+      },
     },
     {
       headerName: "Taille du fichier",
@@ -87,22 +113,59 @@ const FilesTable = ({ rootFolder, filesUpdated  }) => {
     },
     {
       headerName: "Dossier",
-      field: "parentFolderName",
+      field: "metadata.parentFolderName",
       sortable: true,
       filter: true,
       resizable: true,
       flex: 2,
-      cellStyle: { textAlign: 'left' }
+      cellStyle: { textAlign: 'left' },
+      valueGetter: (params) => {
+        if (params.data.metadata) {
+          const folderName = params.data.metadata.parentFolderName;
+          // Check if the folder name starts with "root_"
+          if (folderName.startsWith("root_")) {
+            return "root";
+          }
+          return folderName; 
+        }
+        return '';
+      },
+      cellRenderer: (params) => {
+        return (
+          <Box display="flex" alignItems="center">
+            <FolderIcon sx={{ color: '#1976d2', marginRight: 1 }} />
+            {params.value}
+          </Box>
+        );
+      }
     },
     {
       headerName: "",
       field: "options",
-      cellRenderer: () => (
-        <IconButton>
-          <MoreVertIcon />
-        </IconButton>
-      ),
-      width: 50,
+      cellRenderer: (params) => {
+        const isDownloading = loadingStates[params.data._id] === 'download';
+        const isDeleting = loadingStates[params.data._id] === 'delete';
+
+        return (
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <IconButton onClick={() => handleDownloadClick(params.data._id)} aria-label="download">
+              {isDownloading ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
+              ) : (
+                <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
+              )}
+            </IconButton>
+            <IconButton onClick={() => handleDeleteClick(params.data._id)} aria-label="delete">
+              {isDeleting ? (
+                <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
+              ) : (
+                <DeleteIcon sx={{ color: 'grey', fontSize: "17px" }} />
+              )}
+            </IconButton>
+          </Box>
+        );
+      },
+      width: 70,
       sortable: false,
       filter: false,
       resizable: false,

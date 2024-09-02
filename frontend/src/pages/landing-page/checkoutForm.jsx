@@ -10,9 +10,12 @@ import { CreditCard, AccountBalanceWallet} from '@mui/icons-material';
 import { createInvoice } from '../../services/serviceInvoices';
 import { updateUser } from '../../services/serviceUsers';
 import { useNavigate } from 'react-router-dom';
+import Reload from '../reload';
+import { useAuth } from '../../services/AuthContext';
 
 
 const CheckoutForm = ({user}) => {
+  const { updated } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -35,10 +38,12 @@ const CheckoutForm = ({user}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    user.storageLimit = user.storageLimit + 20 * 1024 * 1024 * 1024;
     billingInfo.user = user.id || user._id;
     billingInfo.facture = user;
     billingInfo.amount = 20;
+    billingInfo.subscription = 'premium';
+
     billingInfo.address = {
       street: billingInfo.address1,
       city: billingInfo.city,
@@ -48,15 +53,15 @@ const CheckoutForm = ({user}) => {
 
 
     await createInvoice(billingInfo);
-    setLoading(true);
     await updateUser(billingInfo);
-
-    setTimeout(() => {
-      setLoading(false);
-      navigate('/dashboard');
-    }, 10000);
-    
+    const updatedUser = { ...user, address: billingInfo.address };
+    await updated(updatedUser);
+    setLoading(true);    
   };
+  if(loading){
+    return (<Reload message="Paiement en cours..." redirectURL={"dashboard"} time ={5000}/>);
+  }
+
 
   return (
     <>
@@ -109,6 +114,7 @@ const CheckoutForm = ({user}) => {
                         fullWidth
                         autoComplete="shipping address-line1"
                         onChange={handleChange}
+                        value={user && user.address && user.address.street}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -119,6 +125,7 @@ const CheckoutForm = ({user}) => {
                         fullWidth
                         autoComplete="shipping address-line2"
                         onChange={handleChange}
+                        value={user && user.address && user.address.street2}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -130,6 +137,7 @@ const CheckoutForm = ({user}) => {
                         fullWidth
                         autoComplete="shipping country"
                         onChange={handleChange}
+                        value={user && user.address && user.address.country}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -141,6 +149,7 @@ const CheckoutForm = ({user}) => {
                         fullWidth
                         autoComplete="shipping address-level1"
                         onChange={handleChange}
+                        value={user && user.address && user.address.city}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -152,6 +161,7 @@ const CheckoutForm = ({user}) => {
                         fullWidth
                         autoComplete="shipping postal-code"
                         onChange={handleChange}
+                        value={user && user.address && user.address.postalCode}
                       />
                     </Grid>
                     <Grid item xs={12} >

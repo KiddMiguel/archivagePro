@@ -23,13 +23,13 @@ router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
 router.get('/folder/user/:userId', authMiddleware, fileController.getUserFolders);
 
 // Télécharger un fichier
-router.post('/upload', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
+router.post('/upload/:folderId', authMiddleware, upload.array('file', 10), fileController.uploadFileToFolder);
 
 // Récupérer un fichier par ID
 router.get('/:id', authMiddleware, fileController.getFile);
 
-// Supprimer un fichier par ID
-router.delete('/:id', authMiddleware, isAdmin, fileController.deleteFile);
+// Supprimer un fichier d'un user 
+router.delete('/user/:id', authMiddleware, fileController.deleteFile);
 
 // Récupérer les fichiers d'un utilisateur
 router.get('/user/:userId', authMiddleware, fileController.getUserFiles);
@@ -40,4 +40,6 @@ router.get('/', authMiddleware, isAdmin, fileController.getAllFiles);
 // Récupérer les fichiers d'un dossier
 router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
 
+// Télécharger un fichier 
+router.get('/download/:id', authMiddleware, fileController.downloadFile);
 module.exports = router;

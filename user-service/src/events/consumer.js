@@ -1,19 +1,41 @@
+require('dotenv').config();
 const amqp = require('amqplib');
+const { handleUpadateStockageUser } = require('../handlers/filesHandlers');
 
 async function startConsumer() {
-    // const amqpUrl = process.env.AMQP_URL  || 'amqp://guest:guest@localhost:5672//';
-    // const connection = await amqp.connect(amqpUrl);
-    // const channel = await connection.createChannel();
+    const amqpUrl = process.env.AMQP_URL || "amqp://guest:guest@localhost:5672//";
+    const connection = await amqp.connect(amqpUrl);
+    const channel = await connection.createChannel();
 
-    // const queueName = 'event_bus_queue';
+    const exchangeName = "ExchangeFile";
+    const queueName = "queueFileUser";
+    await channel.assertExchange(exchangeName, "topic", { durable: true });
+    await channel.assertQueue(queueName, { durable: true });
+    await channel.bindQueue(queueName, exchangeName, "user.stockage.#");
 
-    // console.log("Waiting for messages in event_bus_queue...");
-    // channel.consume(queueName, async message => {
-    //     const eventData = JSON.parse(message.content.toString());
-    //     console.log(`Received event:`, eventData);
-
-    //     channel.ack(message);
-    // });
+    console.log("Waiting for file messages in queueFile...");
+    channel.consume(queueName, async message => {
+        if (message !== null) {
+            try {
+                const routingKey = message.fields.routingKey;
+                const eventData = JSON.parse(message.content.toString());
+                console.log(`Received file event on ${routingKey}:`, eventData);
+    
+                // Handle the message based on the routing key
+                if (routingKey === 'user.stockage.uploaded' || routingKey === 'user.stockage.deleted') {
+                    // Call the handler function
+                    await handleUpadateStockageUser(eventData, routingKey);
+                }
+    
+                channel.ack(message);
+            } catch (error) {
+                console.error("Failed to process message:", error);
+                channel.nack(message, false, false); 
+            }
+        } else {
+            console.error("Received null message");
+        }
+    }, { noAck: false });
 }
 
 module.exports = { startConsumer };

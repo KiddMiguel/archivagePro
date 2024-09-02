@@ -17,6 +17,8 @@ const router = express.Router();
 
 // Route pour l'inscription
 router.post('/register', registerValidationRules, validate, userController.register);
+// Route pour l'incription d'un admin
+router.post('/register/admin', registerValidationRules, validate, userController.registerAdmin);
 // Route pour la connexion
 router.post('/login', loginValidationRules, validate, userController.login);
 // Route pour la récupération du profil

@@ -19,6 +19,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profilePicture: {
+    type: String,
+  },
+  telephone: {
+    type: String,
+    required: true,
+  },
   temporaryPassword: {
     type: String,
   },
