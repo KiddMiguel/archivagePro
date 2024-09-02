@@ -201,7 +201,7 @@ export const getAllFiles = async (user) => {
 
 export const getAllUsers = async () => {
   try {
-    const response = await service.get('/users');
+    const response = await service.get('/users/usersS');
     return response.data;
   } catch (error) {
     return error.response.data;
