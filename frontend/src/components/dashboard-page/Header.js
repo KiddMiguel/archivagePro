@@ -146,13 +146,13 @@ export default function Header({ user, rootFolder }) {
                           <DownloadIcon sx={{ color: 'grey', fontSize: "17px" }} />
                         )}
                       </IconButton>
-                      <IconButton onClick={() => handleDeleteClick(file._id)} aria-label="delete">
+                      {/* <IconButton onClick={() => handleDeleteClick(file._id)} aria-label="delete">
                         {isDeleting ? (
                           <CircularProgress size={19} sx={{ color: 'grey', position: 'absolute' }} />
                         ) : (
                           <DeleteIcon sx={{ color: 'grey', fontSize: "17px" }} />
                         )}
-                      </IconButton>
+                      </IconButton> */}
                     </Box>
                   </Box>
                 ))}

@@ -227,6 +227,15 @@ export const deleteFile = async (fileId) => {
   }
 };
 
+export const getAllUsers = async () => {
+  try {
+    const response = await service.get('/users/users');
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 // Download a file
 export const downloadFile = async (fileId) => {
   try {

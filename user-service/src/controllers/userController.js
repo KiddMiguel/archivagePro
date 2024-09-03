@@ -90,7 +90,7 @@ exports.register = async (req, res) => {
         if (err) throw err;
         await publishEvent('file.stockage.registered', 'ExchangeFile', { userId : user.id, email :user.email , firstName : user.firstName, lastName : user.lastName });
         setTimeout(() => {
-          res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName,telephone: user.telephone,  storageLimit : user.storageLimit, address: user.address } });
+          res.status(200).json({ msg: "User created", success : true , token, user: { id: user.id, email: user.email, isAdmin: user.isAdmin, firstName : user.firstName, lastName : user.lastName,telephone: user.telephone,  storageLimit : user.storageLimit, address: user.address, subscription: user.subscription } });
         }, 5000);}
     );
   } catch (err) {
@@ -153,6 +153,7 @@ exports.login = async (req, res) => {
             telephone: user.telephone,
             storageLimit: user.storageLimit,
             address: user.address,
+            subscription: user.subscription,
           },
         });
       }
