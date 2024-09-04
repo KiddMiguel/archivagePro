@@ -16,10 +16,10 @@ import ApiRoutes from './routes/ApiRoutes';  // Assurez-vous que le chemin est c
 import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 import AdminPage from './pages/AdminPage';
-
+import Statistics from './pages/Statistics';
 
 function App() {
-  const { isAuthenticated,  user, rootFolder } = useAuth();
+  const { isAuthenticated, user, rootFolder } = useAuth();
   console.log("user", user);
   console.log("rootFolder", rootFolder);
 
@@ -40,21 +40,22 @@ function App() {
             user && user.subscription !== "basic" ? (
               <Route path="/dashboard" element={<Navigate to="/checkout" />} />
             ) : (
-            <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
-            <Route path="/dashboard" element={<Dashboard rootFolder = {rootFolder} user = {user}/>} />
-            <Route path="/favoris" element={<Favoris />} />
-            <Route path= "/reload/:page" element={<Reload  />} />
-            <Route path="/corbeille" element={<h1>Corbeille</h1>} />
-            <Route path="/settings" element={<Settings user={user} isAuthenticated={isAuthenticated} />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/logout" element={<Deconnexion />} />
-          </Route>              
+              <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
+                <Route path="/dashboard" element={<Dashboard rootFolder={rootFolder} user={user} />} />
+                <Route path="/favoris" element={<Favoris />} />
+                <Route path="/reload/:page" element={<Reload />} />
+                <Route path="/corbeille" element={<h1>Corbeille</h1>} />
+                <Route path="/settings" element={<Settings user={user} isAuthenticated={isAuthenticated} />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path='Statistics/' element={<Statistics />} />
+                <Route path="/logout" element={<Deconnexion />} />
+              </Route>
             )
           }
-          
-          
+
+
         </Routes>
-        <ApiRoutes />  
+        <ApiRoutes />
 
       </Router>
 

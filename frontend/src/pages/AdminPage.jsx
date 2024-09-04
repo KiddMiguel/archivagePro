@@ -18,7 +18,7 @@ const AdminPage = () => {
         },
         {
             headerName: "Stockage (%)", field: "storageUsedPercentage", sortable: true, filter: true, flex: 1,
-            cellRendererFramework: (params) => (
+            cellRenderer: (params) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography variant="body2" sx={{ minWidth: '80px' }}>
                         {`${params.value}%`}
@@ -28,7 +28,7 @@ const AdminPage = () => {
             )
         },
         {
-            headerName: "Actions", field: "actions", cellRendererFramework: (params) => (
+            headerName: "Actions", field: "actions", cellRenderer: (params) => (
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                     <IconButton color="primary" onClick={() => editUser(params.data)}>
                         <EditIcon />

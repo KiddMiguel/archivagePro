@@ -53,11 +53,16 @@ export default function Header({ user }) {
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        {/* Afficher le bouton si l'utilisateur est administrateur */}
+        {/* Afficher les boutons si l'utilisateur est administrateur */}
         {user.isAdmin && (
-          <Button component={Link} to="/admin" variant="contained">
-            Administrateur
-          </Button>
+          <>
+            <Button component={Link} to="/admin" variant="contained">
+              Administrateur
+            </Button>
+            <Button component={Link} to="/statistics" variant="contained">
+              Statistiques
+            </Button>
+          </>
         )}
 
         <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>

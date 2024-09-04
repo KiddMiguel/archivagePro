@@ -65,7 +65,7 @@ export const validateToken = async () => {
     const response = await service.get('/users/profile');
     const rootFolderResponse = await service.get('/files/root');
     return { ...response.data, rootFolder: rootFolderResponse.data };
-  }catch (error) {
+  } catch (error) {
     return error.response.data;
   }
 };
@@ -217,6 +217,15 @@ export const getAllFiles = async (user) => {
   }
 };
 
+export const getAllFilesBase = async (user) => {
+  try {
+    const response = await service.get(`/files/`);
+    return response.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
+
 // Supprimer un fichier
 export const deleteFile = async (fileId) => {
   try {
@@ -247,19 +256,19 @@ export const downloadFile = async (fileId) => {
 
     let fileName = 'downloaded_file';
     const contentDisposition = response.headers['content-disposition'];
-    
+
     if (contentDisposition) {
       console.log('Content-Disposition:', contentDisposition);
       const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
       if (fileNameMatch && fileNameMatch.length > 1) {
-          fileName = fileNameMatch[1];
+        fileName = fileNameMatch[1];
       }
-  }
+    }
 
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', decodeURIComponent(escape(fileName))); 
+    link.setAttribute('download', decodeURIComponent(escape(fileName)));
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
