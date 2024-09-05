@@ -19,6 +19,7 @@ const Statistics = () => {
             const todayDateString = today.toISOString().split('T')[0];
 
             // Filtrer les fichiers uploadés aujourd'hui
+            console.log(files)
             const filesUploadedToday = files.filter(file =>
                 file.uploadDate.split('T')[0] === todayDateString
             );
