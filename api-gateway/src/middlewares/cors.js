@@ -1,12 +1,13 @@
 const cors = require('cors');
 const config = require('../config');
+const { origin, methods, allowedHeaders, exposedHeaders, credentials, maxAge } = config.cors;
 
 const corsOptions = {
-    origin: config.cors.origin,
-    methods: config.cors.methods,
-    allowedHeaders: config.cors.allowedHeaders,
-    exposedHeaders: config.cors.exposedHeaders,
-    credentials: config.cors.credentials,
-    maxAge: config.cors.maxAge
+    origin,
+    methods,
+    allowedHeaders,
+    exposedHeaders,
+    credentials,
+    maxAge
 };
 module.exports = cors(corsOptions);

@@ -290,3 +290,22 @@ export const getInvoices = async () => {
   }
 };
 
+
+export const updateUserid = async (id, updatedUserData) => {
+  try {
+    const response = await axios.put(`/api/users/profile/${id}`, updatedUserData); // API PUT pour mettre à jour un utilisateur par ID
+    return response.data;
+  } catch (error) {
+    return error.response ? error.response.data : { message: "Une erreur est survenue" };
+  }
+};
+
+
+export const deleteUserid = async (id) => {
+  try {
+    const response = await axios.delete(`/api/users/profile/${id}`);  // Remplacez '/api' par le bon chemin si nécessaire
+    return response.data;
+  } catch (error) {
+    return error.response ? error.response.data : { message: "Une erreur est survenue" };
+  }
+};
