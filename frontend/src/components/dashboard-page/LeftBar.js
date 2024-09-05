@@ -137,32 +137,7 @@ export default function LeftBar({ open, rootFolder }) {
 
           
 
-          <ListItem
-            button
-            key="Corbeille"
-            selected={selectedIndex === 2}
-            sx={listItemStyle(2)}
-            component={Link}
-            to="/corbeille"
-          >
-            <ListItemIcon>
-              <DeleteSweepIcon
-                sx={{
-                  fontSize: 22,
-                  color: selectedIndex === 2 ? '#1976d2' : 'inherit',
-                }}
-              />
-            </ListItemIcon>
-            <ListItemText
-              primary="Corbeille"
-              primaryTypographyProps={{
-                fontWeight: selectedIndex === 2 ? '500' : 'regular',
-              }}
-              sx={{
-                marginLeft: '-15px',
-              }}
-            />
-          </ListItem>
+          
         </List>
       </Box>
 
