@@ -23,14 +23,18 @@ function ProtectedRoute({ element, isAuthenticated }) {
   return isAuthenticated ? element : <Navigate to="/login" />;
 }
 
-// Composant pour vérifier si l'utilisateur a une souscription "premium"
-function PremiumRoute({ element, isAuthenticated, user }) {
+// Composant pour gérer la redirection selon le rôle après le login
+function RoleBasedRedirect({ isAuthenticated, user }) {
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
-  } else if (user.subscription !== 'premium') {
-    return <Navigate to="/checkout" />; 
   }
-  return element;
+
+  // Redirection selon le rôle
+  if (user.isAdmin === true) {
+    return <Navigate to="/admin" />;
+  } else {
+    return <Navigate to="/dashboard" />;
+  }
 }
 
 function App() {
@@ -45,18 +49,30 @@ function App() {
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<DashTest />} />
-          <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
-          <Route path="/forgotpassword" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
+          <Route 
+            path="/login" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <Login />} 
+          />
+          <Route 
+            path="/signup" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <Signup />} 
+          />
+          <Route 
+            path="/forgotpassword" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <ForgotPassword />} 
+          />
 
           {/* Routes protégées */}
           <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
+            {/* Route dashboard uniquement accessible aux clients (non admin) */}
             <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard rootFolder={rootFolder} user={user} />} isAuthenticated={isAuthenticated} />} />
-            <Route path="/favoris" element={<PremiumRoute element={<Favoris />} isAuthenticated={isAuthenticated} user={user} />} />
-            <Route path="/reload/:page" element={<PremiumRoute element={<Reload />} isAuthenticated={isAuthenticated} user={user} />} />
-            <Route path="/corbeille" element={<PremiumRoute element={<h1>Corbeille</h1>} isAuthenticated={isAuthenticated} user={user} />} />
-            <Route path="/settings" element={<ProtectedRoute element={<Settings user={user} isAuthenticated={isAuthenticated} />} isAuthenticated={isAuthenticated} />} />
-            <Route path="/admin" element={<PremiumRoute element={<AdminPage />} isAuthenticated={isAuthenticated} user={user} />} />
+            <Route path="/favoris" element={<ProtectedRoute element={<Favoris />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/reload/:page" element={<ProtectedRoute element={<Reload />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/corbeille" element={<ProtectedRoute element={<h1>Corbeille</h1>} isAuthenticated={isAuthenticated} />} />
+            <Route path="/settings" element={<ProtectedRoute element={<Settings user={user} />} isAuthenticated={isAuthenticated} />} />
+            {/* Route admin protégée */}
+            <Route path="/admin" element={<ProtectedRoute element={<AdminPage user= {user} />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/statistics" element={<ProtectedRoute element={<Statistics />} isAuthenticated={isAuthenticated} />} />
             <Route path="/logout" element={<Deconnexion />} />
           </Route>
 

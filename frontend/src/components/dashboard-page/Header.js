@@ -24,47 +24,38 @@ export default function Header({ user }) {
         borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
-        <TextField
-          variant="outlined"
-          placeholder="Recherche de fichiers..."
-          size="small"
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton>
-                  <FilterListIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-            sx: {
-              borderRadius: "10px",
-              height: "35px",
-              fontSize: "14px",
-            },
-          }}
-        />
-      </Box>
+              <Box sx={{ display: "flex", alignItems: "center", width: "30%" }}>
+
+      {user.isAdmin === false && (
+          <TextField
+            variant="outlined"
+            placeholder="Recherche de fichiers..."
+            size="small"
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton>
+                    <FilterListIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+              sx: {
+                borderRadius: "10px",
+                height: "35px",
+                fontSize: "14px",
+              },
+            }}
+          />
+      )}
+        </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        {/* Afficher les boutons si l'utilisateur est administrateur */}
-        {user.isAdmin && (
-          <>
-            <Button component={Link} to="/admin" variant="contained">
-              Administrateur
-            </Button>
-            <Button component={Link} to="/statistics" variant="contained">
-              Statistiques
-            </Button>
-          </>
-        )}
-
         <Link to="/settings" style={{ textDecoration: "none", color: "inherit" }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography sx={{ fontSize: "14px" }} variant="h6">

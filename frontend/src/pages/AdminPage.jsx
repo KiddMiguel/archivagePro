@@ -1,26 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, IconButton, LinearProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Box,Link, Typography, Button, IconButton, LinearProgress, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Breadcrumbs } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AgGridReact } from 'ag-grid-react'; // Importer ag-Grid
 import 'ag-grid-community/styles/ag-grid.css'; // Styles ag-Grid de base
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Styles du thème
 import { getAllUsers, getAllFiles, deleteUserid, updateUserid } from '../services/service'; // Importer updateUserid
+import FolderCopyIcon from '@mui/icons-material/FolderCopy';
+import FolderFilesDialog from '../components/dashboard-page/FolderFilesDialog';
 
-const AdminPage = () => {
+const AdminPage = ({user}) => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null); // Stocker l'utilisateur à modifier ou supprimer
     const [openDialog, setOpenDialog] = useState(false); // Gérer l'état du dialog de confirmation ou modification
     const [isEditing, setIsEditing] = useState(false); // Gérer l'état de l'édition d'un utilisateur
+    const [openFolderDialog, setOpenFolderDialog] = useState(false); // État pour ouvrir le dialogue des fichiers
+    const [filesUpdated, setFilesUpdated] = useState(false); 
     const [editForm, setEditForm] = useState({
         fullName: '',
         email: '',
         role: ''
     });
 
+    // Afficher le dialog pour les fichiers de l'utilisateur
+
+    const handleOpenFolderDialog = (user) => {
+        setSelectedUser(user); // Stocke l'utilisateur ou le dossier pour le dialogue
+        setOpenFolderDialog(true); // Ouvre le dialogue des fichiers
+    };
+
+    const handleCloseFolderDialog = () => {
+        setOpenFolderDialog(false); // Ferme le dialogue des fichiers
+    };
+
     const [columnDefs] = useState([
-        { headerName: "Nom", field: "fullName", sortable: true, filter: true, flex: 1 },
-        { headerName: "Email", field: "email", sortable: true, filter: true, flex: 1 },
+        { headerName: "Nom", field: "fullName", sortable: true, filter: true, flex: 1,cellStyle: { textAlign: 'left' }},
+        { headerName: "Email", field: "email", sortable: true, filter: true, flex: 1, cellStyle: { textAlign: 'left' } },
         { headerName: "Rôle", field: "role", sortable: true, filter: true, flex: 1 },
         {
             headerName: "Stockage Utilisé", field: "storageFormatted", sortable: true, filter: true, flex: 2,
@@ -29,25 +44,51 @@ const AdminPage = () => {
             headerName: "Stockage (%)", field: "storageUsedPercentage", sortable: true, filter: true, flex: 1,
             cellRenderer: (params) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Typography variant="body2" sx={{ minWidth: '80px' }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            minWidth: '80px',
+                            fontWeight: 'bold',
+                            color: params.value >= 80 ? 'red' : params.value >= 50 ? 'orange' : 'green',
+                        }}
+                    >
                         {`${params.value}%`}
                     </Typography>
-                    <LinearProgress variant="determinate" value={params.value} sx={{ flexGrow: 1 }} />
+                    <LinearProgress
+                        variant="determinate"
+                        value={params.value}
+                        sx={{
+                            flexGrow: 1,
+                            height: '8px',
+                            borderRadius: '4px',
+                            '& .MuiLinearProgress-bar': {
+                                backgroundColor:
+                                    params.value >= 80 ? 'red' :
+                                    params.value >= 50 ? 'orange' :
+                                    'green',
+                            },
+                        }}
+                    />
                 </Box>
             )
-        },
+        }
+        ,
         {
             headerName: "Actions", field: "actions", cellRenderer: (params) => (
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
                     <IconButton color="primary" onClick={() => handleEditUser(params.data)}>
-                        <EditIcon />
+                        <EditIcon sx={{fontSize : "15px"}}/>
                     </IconButton>
                     <IconButton color="error" onClick={() => handleOpenDialog(params.data)}>
-                        <DeleteIcon />
+                        <DeleteIcon sx={{fontSize : "15px"}} />
+                    </IconButton>
+                    {/* Icône pour ouvrir le dialogue de fichiers */}
+                    <IconButton color="info" onClick={() => handleOpenFolderDialog(params.data)}>
+                        <FolderCopyIcon sx={{fontSize : "15px"}}/>
                     </IconButton>
                 </Box>
             ), flex: 1, sortable: false, filter: false
-        }
+        }      
     ]);
 
     useEffect(() => {
@@ -141,19 +182,24 @@ const AdminPage = () => {
     };
 
     return (
-        <Box sx={{ padding: 3 }}>
-            <Box sx={{ marginBottom: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4" component="h1" gutterBottom>
-                    Gestion des Utilisateurs
-                </Typography>
-                <Button variant="contained" color="primary">
-                    Ajouter un Utilisateur
-                </Button>
-            </Box>
+        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
+          <Box>
+            <Breadcrumbs aria-label="breadcrumb">
+              <Link underline="hover" color="inherit" href="/" fontSize="12px">
+                Accueil
+              </Link>
+              <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Utilisateurs</Typography>
+            </Breadcrumbs>
+            <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
+            Gestion des Utilisateurs
+            </Typography>
+          </Box>
+        </Box>
             <Box
                 className="ag-theme-alpine"
                 sx={{
-                    height: 500,
+                    height: '75vh',
                     width: '100%',
                     '& .ag-header': {
                         backgroundColor: '#f5f5f5',
@@ -173,6 +219,15 @@ const AdminPage = () => {
                     paginationPageSize={10}
                     animateRows={true}
                 />
+
+            <FolderFilesDialog
+                open={openFolderDialog}
+                onClose={handleCloseFolderDialog}
+                folder={selectedUser} // Passe l'utilisateur ou le dossier au dialogue
+                filesUpdated={filesUpdated}
+                setFilesUpdated={setFilesUpdated}
+                user={user}
+            />
             </Box>
 
             {/* Dialog de confirmation de suppression ou modification */}

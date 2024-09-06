@@ -27,7 +27,7 @@ const Login = () => {
       if (response.success) {
         if (response.token) {
           login(response.user, response.token, response.rootFolder);
-          navigate('/dashboard');
+          navigate(response.user && response.user.isAdmin === true ? '/admin' : '/dashboard');
         }
       } else {
         setLoading(false);

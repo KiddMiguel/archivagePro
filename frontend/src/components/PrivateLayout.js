@@ -33,7 +33,7 @@ const PrivateLayout = ({user , isAuthenticated, rootFolder}) => {
 
   return (
     <div style={{ display: 'flex'}}>
-      <LeftBar rootFolder ={rootFolder}/>
+      <LeftBar rootFolder ={rootFolder} user={user}/>
       <div style={{ flexGrow: 1 }}>
         <Header user={user} rootFolder={rootFolder} />
         <div style={{ padding: '20px', background: "#f8f9fa" }}>
