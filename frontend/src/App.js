@@ -16,6 +16,7 @@ import ApiRoutes from './routes/ApiRoutes';
 import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 import AdminPage from './pages/AdminPage';
+import Statistics from './pages/Statistics';
 
 // Composant pour vérifier l'authentification
 function ProtectedRoute({ element, isAuthenticated }) {

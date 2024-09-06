@@ -35,7 +35,7 @@ router.delete('/user/:id', authMiddleware, fileController.deleteFile);
 router.get('/user/:userId', authMiddleware, fileController.getUserFiles);
 
 // Récupérer tous les fichiers
-router.get('/', authMiddleware, isAdmin, fileController.getAllFiles);
+router.get('/', authMiddleware,/* isAdmin,*/ fileController.getAllFiles);
 
 // Récupérer les fichiers d'un dossier
 router.get('/folder/:folderId', authMiddleware, fileController.getFolderFiles);
