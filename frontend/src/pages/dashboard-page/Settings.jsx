@@ -83,14 +83,19 @@ const Settings = ({user, isAuthenticated}) => {
         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Paramètres Tabs">
           <Tab label="Profil Utilisateur" />
           <Tab label="Sécurité" />
-          <Tab label="Facture / Moyens de Paiement" />
+          {(user.isAdmin === false) && (
+ <Tab label="Facture / Moyens de Paiement" />
+          )}
           <Tab label="Aide et Support" />
         </Tabs>
       </Box>
 
       <TabPanelProfil selectedTab={selectedTab} index={0} user ={user}/>
       <TabPanelSecurity selectedTab={selectedTab} index={1} user = {user} />
-      <TabPanelFactures selectedTab={selectedTab} index={2} user = {user} />
+
+      {(user.isAdmin === false) && (
+            <TabPanelFactures selectedTab={selectedTab} index={2} user = {user} />
+      )}
       
 
       <TabPanel value={selectedTab} index={4}>

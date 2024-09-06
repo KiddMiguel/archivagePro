@@ -7,7 +7,7 @@ import RenderIcon from './RenderIcon';
 import { uploadFile } from '../../services/serviceFiles';
 import { CircularProgress } from '@mui/material';
 
-const FolderFilesDialog = ({ open, onClose, folder,filesUpdated, setFilesUpdated }) => {
+const FolderFilesDialog = ({ open, onClose, folder,filesUpdated, setFilesUpdated, user }) => {
   const [openFileDialog, setOpenFileDialog] = React.useState(false);
   const [selectedFiles, setSelectedFiles] = React.useState([]);
   const [loadingUpload, setLoadingUpload] = React.useState(false);
@@ -71,11 +71,14 @@ const FolderFilesDialog = ({ open, onClose, folder,filesUpdated, setFilesUpdated
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Fichiers dans le dossier {folder?.name}
           </Typography>
-            <Box sx={{ml : "left"}} >
+          {user.isAdmin === false && (
+          <Box sx={{ml : "left"}} >
           <Button variant="contained" startIcon={<NoteAddIcon />} sx={{ borderRadius: 9, textTransform: "none" }} onClick={handleOpenFileDialog}>
             Fichier
           </Button>
-        </Box>
+          </Box>
+          )}
+     
             </DialogTitle>
   
 
