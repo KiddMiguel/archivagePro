@@ -12,11 +12,30 @@ import Favoris from './pages/dashboard-page/Favoris';
 import PrivateLayout from './components/PrivateLayout';
 import Deconnexion from './components/dashboard-page/Deconnexion';
 import Settings from './pages/dashboard-page/Settings';
-import ApiRoutes from './routes/ApiRoutes';  // Assurez-vous que le chemin est correct
+import ApiRoutes from './routes/ApiRoutes'; 
 import ForgotPassword from './pages/landing-page/forgotPassword';
 import DashTest from './pages/dashboard-page/DashTest';
 import AdminPage from './pages/AdminPage';
 import Statistics from './pages/Statistics';
+
+// Composant pour vérifier l'authentification
+function ProtectedRoute({ element, isAuthenticated }) {
+  return isAuthenticated ? element : <Navigate to="/login" />;
+}
+
+// Composant pour gérer la redirection selon le rôle après le login
+function RoleBasedRedirect({ isAuthenticated, user }) {
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  // Redirection selon le rôle
+  if (user.isAdmin === true) {
+    return <Navigate to="/admin" />;
+  } else {
+    return <Navigate to="/dashboard" />;
+  }
+}
 
 function App() {
   const { isAuthenticated, user, rootFolder } = useAuth();
@@ -30,35 +49,38 @@ function App() {
           {/* Routes publiques */}
           <Route path="/" element={<Home />} />
           <Route path="/test" element={<DashTest />} />
-          <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Signup />} />
-          <Route path="/forgotpassword" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
-          <Route path="/checkout/" element={<CheckoutForm user={user} />} />
+          <Route 
+            path="/login" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <Login />} 
+          />
+          <Route 
+            path="/signup" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <Signup />} 
+          />
+          <Route 
+            path="/forgotpassword" 
+            element={isAuthenticated ? <RoleBasedRedirect isAuthenticated={isAuthenticated} user={user} /> : <ForgotPassword />} 
+          />
 
-          {/* Routes protégées avec PrivateLayout */}
-          {
-            user && user.subscription !== "basic" ? (
-              <Route path="/dashboard" element={<Navigate to="/checkout" />} />
-            ) : (
-              <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
-                <Route path="/dashboard" element={<Dashboard rootFolder={rootFolder} user={user} />} />
-                <Route path="/favoris" element={<Favoris />} />
-                <Route path="/reload/:page" element={<Reload />} />
-                <Route path="/corbeille" element={<h1>Corbeille</h1>} />
-                <Route path="/settings" element={<Settings user={user} isAuthenticated={isAuthenticated} />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path='Statistics/' element={<Statistics />} />
-                <Route path="/logout" element={<Deconnexion />} />
-              </Route>
-            )
-          }
+          {/* Routes protégées */}
+          <Route path="/" element={<PrivateLayout user={user} isAuthenticated={isAuthenticated} rootFolder={rootFolder} />}>
+            {/* Route dashboard uniquement accessible aux clients (non admin) */}
+            <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard rootFolder={rootFolder} user={user} />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/favoris" element={<ProtectedRoute element={<Favoris />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/reload/:page" element={<ProtectedRoute element={<Reload />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/corbeille" element={<ProtectedRoute element={<h1>Corbeille</h1>} isAuthenticated={isAuthenticated} />} />
+            <Route path="/settings" element={<ProtectedRoute element={<Settings user={user} />} isAuthenticated={isAuthenticated} />} />
+            {/* Route admin protégée */}
+            <Route path="/admin" element={<ProtectedRoute element={<AdminPage user= {user} />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/statistics" element={<ProtectedRoute element={<Statistics />} isAuthenticated={isAuthenticated} />} />
+            <Route path="/logout" element={<Deconnexion />} />
+          </Route>
 
-
+          {/* Route checkout en dehors de PrivateLayout */}
+          <Route path="/checkout/" element={<ProtectedRoute element={<CheckoutForm user={user} />} isAuthenticated={isAuthenticated} />} />
         </Routes>
-        <ApiRoutes />
-
+        <ApiRoutes />  
       </Router>
-
     </div>
   );
 }

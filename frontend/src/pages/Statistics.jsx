@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Breadcrumbs, Link } from '@mui/material';
 import { Bar, Line } from 'react-chartjs-2';
 import { getAllFilesBase, getAllUsers } from '../services/service'; // Assurez-vous que le chemin est correct
 import 'chart.js/auto';  // Chart.js V3 ne nécessite pas d'importer des composants individuellement
@@ -46,7 +46,9 @@ const Statistics = () => {
 
         const fetchUsers = async () => {
             const allUsers = await getAllUsers();
-            setUsers(allUsers);  // Stocker les utilisateurs récupérés
+            
+            const filteredUsers = allUsers.filter(user => !user.isAdmin); // Filtre pour prendre tous les utilisateurs dont isAdmin est false
+            setUsers(filteredUsers);  // Stocker les utilisateurs filtrés
         };
 
         fetchStatistics();
@@ -85,10 +87,20 @@ const Statistics = () => {
     };
 
     return (
-        <Box sx={{ padding: 3 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Statistiques
+        <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
+          <Box>
+            <Breadcrumbs aria-label="breadcrumb">
+              <Link underline="hover" color="inherit" href="/" fontSize="12px">
+                Accueil
+              </Link>
+              <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Statistiques</Typography>
+            </Breadcrumbs>
+            <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
+            Statistiques
             </Typography>
+          </Box>
+        </Box>
 
             <Grid container spacing={3}>
                 {/* Total des fichiers uploadés */}

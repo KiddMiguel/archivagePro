@@ -2,18 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Divider, Toolbar, Typography, Box } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import GradeIcon from '@mui/icons-material/Grade';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DropzoneArea from './DropzoneArea';
 import { uploadFile } from '../../services/serviceFiles';
 import { CircularProgress } from '@mui/material';
-import Reload from '../../pages/reload';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
 
 const drawerWidth = 180;
 
-export default function LeftBar({ open, rootFolder }) {
+export default function LeftBar({ open, rootFolder, user }) {
   const location = useLocation();
   const [uploadMessage, setUploadMessage] = useState('');
   const [loadingUpload, setLoadingUpload] = useState(false);
@@ -22,7 +20,7 @@ export default function LeftBar({ open, rootFolder }) {
 
   const determineSelectedIndex = (path) => {
     switch (path) {
-      case '/dashboard':
+      case user &&  user.isAdmin === true ? '/admin' : '/dashboard':
         return 0;
       case '/favoris':
         return 1;
@@ -30,6 +28,8 @@ export default function LeftBar({ open, rootFolder }) {
         return 2;
       case '/settings':
         return 3;
+      case user && user.isAdmin === true ? '/statistics' : '/':
+        return 4;
       default:
         return null;
     }
@@ -114,7 +114,7 @@ export default function LeftBar({ open, rootFolder }) {
             selected={selectedIndex === 0}
             sx={listItemStyle(0)}
             component={Link}
-            to="/dashboard"
+            to= {user && user.isAdmin=== true ? "/admin" : "/dashboard"}
           >
             <ListItemIcon>
               <DashboardIcon
@@ -135,39 +135,41 @@ export default function LeftBar({ open, rootFolder }) {
             />
           </ListItem>
 
-          
-
           <ListItem
             button
-            key="Corbeille"
-            selected={selectedIndex === 2}
-            sx={listItemStyle(2)}
+            key="Statistiques"
+            selected={selectedIndex === 4}
+            sx={listItemStyle(4)}
             component={Link}
-            to="/corbeille"
+            to= {user && user.isAdmin=== true ? "/statistics" : "/"}
           >
             <ListItemIcon>
-              <DeleteSweepIcon
+              <EqualizerIcon
                 sx={{
                   fontSize: 22,
-                  color: selectedIndex === 2 ? '#1976d2' : 'inherit',
+                  color: selectedIndex === 4 ? '#1976d2' : 'inherit',
                 }}
               />
             </ListItemIcon>
             <ListItemText
-              primary="Corbeille"
+              primary="Statistiques"
               primaryTypographyProps={{
-                fontWeight: selectedIndex === 2 ? '500' : 'regular',
+                fontWeight: selectedIndex === 4 ? '500' : 'regular',
               }}
               sx={{
                 marginLeft: '-15px',
               }}
             />
           </ListItem>
+          
+
+          
         </List>
       </Box>
 
       <Box sx={{ mb: 2 }}>
         <List>
+        {user.isAdmin === false && (
           <Box
             sx={{
               padding: '10px',
@@ -200,6 +202,7 @@ export default function LeftBar({ open, rootFolder }) {
             '')
           }
           </Box>
+          )}
           <Divider
             sx={{
               mb: 2,

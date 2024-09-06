@@ -39,6 +39,7 @@ const CheckoutForm = ({user}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     user.storageLimit = user.storageLimit + 20 * 1024 * 1024 * 1024;
+    user.subscription = 'premium';
     billingInfo.user = user.id || user._id;
     billingInfo.facture = user;
     billingInfo.amount = 20;
@@ -50,6 +51,7 @@ const CheckoutForm = ({user}) => {
       postalCode: billingInfo.postalCode,
       country: billingInfo.country
     }
+    console.log(billingInfo);
 
 
     await createInvoice(billingInfo);
