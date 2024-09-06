@@ -195,8 +195,8 @@ exports.updateProfile = async (req, res) => {
       lastName: lastName || user.lastName,
       address: address || user.address,
       telephone: telephone || user.telephone,
-      subscription : user.subscription || subscription,
-      storageLimit : user.storageLimit || storageLimit,
+      subscription : subscription || user.subscription,
+      storageLimit : storageLimit || user.storageLimit,
     };
 
     user = await userRepository.updateUser(req.user.id, updateData);
