@@ -17,9 +17,17 @@ const AdminPage = ({user}) => {
     const [openFolderDialog, setOpenFolderDialog] = useState(false); // État pour ouvrir le dialogue des fichiers
     const [filesUpdated, setFilesUpdated] = useState(false); 
     const [editForm, setEditForm] = useState({
-        fullName: '',
+        firstName : '',
+        lastName: '',
         email: '',
-        role: ''
+        telephone: '',
+        storageLimit : '',
+        address : {
+            street: '',
+            city: '',
+            postalCode: '',
+            country: ''
+        }
     });
 
     // Afficher le dialog pour les fichiers de l'utilisateur
@@ -34,9 +42,10 @@ const AdminPage = ({user}) => {
     };
 
     const [columnDefs] = useState([
-        { headerName: "Nom", field: "fullName", sortable: true, filter: true, flex: 1,cellStyle: { textAlign: 'left' }},
+        { headerName: "Nom", field: "firstName", sortable: true, filter: true, flex: 1,cellStyle: { textAlign: 'left' }},
+        { headerName: "Prénom", field: "lastName", sortable: true, filter: true, flex: 1, cellStyle: { textAlign: 'left' } },
+        { headerName: "Téléphone", field: "telephone", sortable: true, filter: true, flex: 1, cellStyle: { textAlign: 'left' } },
         { headerName: "Email", field: "email", sortable: true, filter: true, flex: 1, cellStyle: { textAlign: 'left' } },
-        { headerName: "Rôle", field: "role", sortable: true, filter: true, flex: 1 },
         {
             headerName: "Stockage Utilisé", field: "storageFormatted", sortable: true, filter: true, flex: 2,
         },
@@ -141,9 +150,17 @@ const AdminPage = ({user}) => {
     const handleEditUser = (user) => {
         setSelectedUser(user);  // Stocker l'utilisateur à modifier
         setEditForm({
-            fullName: user.fullName,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
-            role: user.role
+            telephone: user.telephone,
+            storageLimit : user.storageLimit,
+            address: {
+                street: user.address?.street || '',
+                city: user.address?.city || '',
+                postalCode: user.address?.postalCode || '',
+                country: user.address?.country || ''
+            }
         });
         setIsEditing(true);  // Activer le mode édition
         setOpenDialog(true);  // Ouvrir le dialog d'édition
@@ -151,33 +168,37 @@ const AdminPage = ({user}) => {
 
     const updateUser = async () => {
         try {
-            const [firstName, lastName] = editForm.fullName.split(' ');
             const updatedUserData = {
-                firstName,
-                lastName,
+                firstName: editForm.firstName,
+                lastName: editForm.lastName,
                 email: editForm.email,
-                role: editForm.role
+                telephone: editForm.telephone,
+                address: {
+                    street: editForm.address.street,
+                    city: editForm.address.city,
+                    postalCode: editForm.address.postalCode,
+                    country: editForm.address.country
+                }
             };
+            
+
             await updateUserid(selectedUser._id, updatedUserData);  // Appel à l'API pour mettre à jour l'utilisateur
             setUsers(users.map(user => (user._id === selectedUser._id ? { ...user, ...updatedUserData } : user)));  // Mettre à jour l'état local
             handleCloseDialog();
-            alert("Utilisateur mis à jour avec succès.");
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);
-            alert("Erreur lors de la mise à jour de l'utilisateur.");
         }
     };
 
     const deleteUser = async () => {
         if (!selectedUser) return;
         try {
-            await deleteUserid(selectedUser._id);  // Appel à l'API pour supprimer l'utilisateur
+            const reponse = await deleteUserid(selectedUser._id);
+            console.log(reponse);  
             setUsers(users.filter(user => user._id !== selectedUser._id));  // Mettre à jour la liste des utilisateurs
             handleCloseDialog();
-            alert("Utilisateur supprimé avec succès.");
         } catch (error) {
             console.error("Erreur lors de la suppression :", error);
-            alert("Erreur lors de la suppression de l'utilisateur.");
         }
     };
 
@@ -227,6 +248,7 @@ const AdminPage = ({user}) => {
                 filesUpdated={filesUpdated}
                 setFilesUpdated={setFilesUpdated}
                 user={user}
+                selectedUser={selectedUser}
             />
             </Box>
 
@@ -242,26 +264,84 @@ const AdminPage = ({user}) => {
                         <DialogTitle id="alert-dialog-title">{"Modifier cet utilisateur"}</DialogTitle>
                         <DialogContent>
                             <TextField
-                                label="Nom Complet"
-                                value={editForm.fullName}
-                                onChange={(e) => setEditForm({ ...editForm, fullName: e.target.value })}
+                                label="Nom"
+                                name = "firstName"
+                                value={editForm.firstName}
+                                onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
                                 fullWidth
                                 margin="normal"
                             />
                             <TextField
+                                label="Prenom"
+                                name = "lastName"
+                                value={editForm.lastName}
+                                onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                                fullWidth
+                                margin="normal"
+                            />
+                            
+                            <Box sx={{display : "flex"}}>
+
+                                <Box>
+                            <TextField
                                 label="Email"
+                                name='email'
                                 value={editForm.email}
                                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                                 fullWidth
                                 margin="normal"
                             />
+                            </Box>
+                            <Box sx={{paddingLeft : "15px"}}>
                             <TextField
-                                label="Rôle"
-                                value={editForm.role}
-                                onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                                label="Telephone"
+                                name='telephone'
+                                value={editForm.telephone}
+                                onChange={(e) => setEditForm({ ...editForm, telephone: e.target.value })}
                                 fullWidth
                                 margin="normal"
                             />
+                            </Box>
+                            </Box>
+                            <TextField
+                                label="Adresse"
+                                name='address'
+                                value={editForm.address?.street || ''} 
+                                onChange={(e) => setEditForm({...editForm, address: {...editForm.address, street: e.target.value}})}
+                                  fullWidth
+                                margin="normal"
+                            />
+                            <Box sx={{display : "flex"}}>
+
+                            <TextField
+                                label="Ville"
+                                name='city'
+                                value={editForm.address?.city || ''} 
+                                onChange={(e) => setEditForm({...editForm, address: {...editForm.address, city: e.target.value}})}
+                                fullWidth
+                                margin="normal"
+                            />
+                            <Box sx={{paddingLeft : "15px"}}>
+
+                            <TextField
+                                label="Code Postal"
+                                name='postalCode'
+                                value={editForm.address?.postalCode || ''} 
+                                onChange={(e) => setEditForm({...editForm, address: {...editForm.address, postalCode: e.target.value}})}
+                                fullWidth
+                                margin="normal"
+                            />
+                            </Box>
+                            </Box>
+                            <TextField
+                                label="Pays"
+                                name='country'
+                                value={editForm.address?.country || ''} 
+                                onChange={(e) => setEditForm({...editForm, address: {...editForm.address, country: e.target.value}})}
+                                fullWidth
+                                margin="normal"
+                            />
+
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleCloseDialog} color="primary">

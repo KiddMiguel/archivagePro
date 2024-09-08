@@ -25,12 +25,16 @@ router.post('/login', loginValidationRules, validate, userController.login);
 router.get('/profile', verifyToken, userController.getUserInfo);
 // Route pour la mise à jour du profil
 router.put('/profile', verifyToken, updateProfileValidationRules, validate, userController.updateProfile);
+
+
 // Route pour la mise à jour du profil par l'admin
-router.put('/profile/:id', verifyToken, updateProfileValidationRules, validate, userController.updateProfile);
+router.put('/profile/:id', verifyToken, isAdmin, updateProfileValidationRules, validate, userController.updateProfileAdmin);
+
 // Route pour la suppression du profil
 router.delete('/profile', verifyToken, userController.deleteProfile);
+
 // Route pour la suppression du profil parl'admin
-router.delete('/profile/:id', verifyToken, userController.deleteProfile);
+router.delete('/profile/delete/:id',  verifyToken, isAdmin, userController.deleteProfileAdmin);
 // Route pour la récupération de tous les utilisateurs avec vérification admin
 router.get('/users', verifyToken, isAdmin, userController.getAllUsers);
 // Route pour la modification d'un mot de passe

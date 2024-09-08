@@ -240,8 +240,9 @@ const Dashboard = ({rootFolder, user}) => {
                folder={selectedFolder}
                filesUpdated={filesUpdated}
                setFilesUpdated={setFilesUpdated}
+               user = {user}
               />
-      </Box>
+            </Box>
 
       <Divider
         sx={{
