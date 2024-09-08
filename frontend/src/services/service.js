@@ -293,7 +293,7 @@ export const getInvoices = async () => {
 
 export const updateUserid = async (id, updatedUserData) => {
   try {
-    const response = await axios.put(`/api/users/profile/${id}`, updatedUserData); // API PUT pour mettre à jour un utilisateur par ID
+    const response = await service.put(`users/profile/${id}`, updatedUserData); 
     return response.data;
   } catch (error) {
     return error.response ? error.response.data : { message: "Une erreur est survenue" };
@@ -303,7 +303,7 @@ export const updateUserid = async (id, updatedUserData) => {
 
 export const deleteUserid = async (id) => {
   try {
-    const response = await axios.delete(`/api/users/profile/${id}`);  // Remplacez '/api' par le bon chemin si nécessaire
+    const response = await service.delete(`users/profile/delete/${id}`);  
     return response.data;
   } catch (error) {
     return error.response ? error.response.data : { message: "Une erreur est survenue" };
