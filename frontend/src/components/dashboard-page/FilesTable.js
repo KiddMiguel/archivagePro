@@ -12,16 +12,25 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { CircularProgress } from '@mui/material';
 
-const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated, user }) => {
+const FilesTable = ({ rootFolder, filesUpdated, folder, setFilesUpdated, user , selectedUser }) => {
   const [rowData, setRowData] = useState([]);
   const [loadingStates, setLoadingStates] = useState({});
-
   const handleFiles = async () => {
-    const files = rootFolder ? await getAllFiles(rootFolder.owner) : folder ?  await getFolderFiles(folder._id) : user ? await getAllFiles(user.id) : [];
+    const files = user.isAdmin 
+    ? await getAllFiles(selectedUser._id)
+    : rootFolder 
+        ? await getAllFiles(rootFolder.owner) 
+        : folder 
+            ? await getFolderFiles(folder._id) 
+            : user 
+                ? await getAllFiles(user.id) 
+                : [];
+
+
     let totalSizeInBytes = 0;
 
     // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
-    files && files.forEach((file) => {
+    files &&  files.forEach((file) => {
       totalSizeInBytes += file.length; // Ajouter la taille de chaque fichier en octets
 
       // Formater la taille de chaque fichier individuellement

@@ -208,6 +208,35 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+exports.updateProfileAdmin = async (req, res) => {
+  const { id } = req.params;
+  const { firstName, lastName, address, telephone, subscription, storageLimit } = req.body;
+
+  try {
+    let user = await userRepository.findUserById(id);
+    if (!user) {
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
+    }
+
+    const updateData = {
+      firstName: firstName || user.firstName,
+      lastName: lastName || user.lastName,
+      address: address || user.address,
+      telephone: telephone || user.telephone,
+      subscription : subscription || user.subscription,
+      storageLimit : storageLimit || user.storageLimit,
+    };
+
+    user = await userRepository.updateUser(id, updateData);
+
+    await publishEvent('auth.updated', 'ExchangeAuth', { email: user.email, firstName, lastName, address });
+    res.json({ success: true, user : {id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email, telephone : user.telephone, address : user.address }});
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
 exports.deleteProfile = async (req, res) => {
   try {
     const user = await userRepository.findUserById(req.user.id);
@@ -231,6 +260,33 @@ exports.deleteProfile = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+exports.deleteProfileAdmin = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await userRepository.findUserById(id);
+    if (!user) {
+      return res.status(404).json({ msg: 'Utilisateur non trouvé' });
+    }
+
+    await userRepository.deleteUser(id);
+
+    // Récupération des mails des administrateurs
+    const admins = await userRepository.getAdmins();
+    const adminEmails = admins.map((admin) => admin.email);
+    console.log(adminEmails);
+
+    await publishEvent('auth.billing.deleted', 'ExchangeAuth', { email: user.email, userId: user.id });
+    await publishEvent('file.stockage.deleted', 'ExchangeFile', { userId: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, adminEmails : adminEmails });
+
+    res.json({ msg: 'User removed', success: true });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
 
 exports.getAllUsers = async (req, res) => {
   try {
