@@ -84,9 +84,8 @@ const Settings = ({user, isAuthenticated}) => {
           <Tab label="Profil Utilisateur" />
           <Tab label="Sécurité" />
           {(user.isAdmin === false) && (
- <Tab label="Facture / Moyens de Paiement" />
+ <Tab label="Factures" />
           )}
-          <Tab label="Aide et Support" />
         </Tabs>
       </Box>
 
