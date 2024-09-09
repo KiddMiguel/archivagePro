@@ -146,7 +146,7 @@ const Statistics = () => {
                 </Grid>
 
                 {/* Répartition par client (graphique à barres) */}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <Card>
                         <CardContent>
                             <Typography variant="h5" component="h2" gutterBottom>
@@ -158,7 +158,7 @@ const Statistics = () => {
                 </Grid>
 
                 {/* Graphique des fichiers uploadés par jour (graphique en courbes) */}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <Card>
                         <CardContent>
                             <Typography variant="h5" component="h2" gutterBottom>

@@ -1,93 +1,86 @@
-# Documentation de Test
+# ArchiDrive API - Getting Started
 
-Ce document est utilisé pour tester le rendu Markdown avec des blocs de code de différents langages, ainsi que la fonctionnalité du bouton "Copier le code".
+Bienvenue dans la documentation de l'API ArchiDrive! Ce guide vous aidera à démarrer avec l'intégration de notre API dans vos applications pour la gestion et la facturation de documents.
 
 ## Introduction
 
-Bienvenue dans ce document de test. Vous trouverez ci-dessous des exemples de code en plusieurs langages, ainsi que du texte standard pour voir comment tout est rendu ensemble.
+L'API ArchiDrive vous permet d'interagir avec notre système pour gérer les utilisateurs, les documents et les factures. Grâce à une architecture RESTful, vous pouvez facilement accéder à nos services à partir de n'importe quelle application.
 
-## Exemple de code JavaScript
+### Base URL
 
-Voici un exemple simple de fonction JavaScript :
+Toutes les requêtes vers l'API doivent être faites à l'URL de base suivante:
 
-```javascript
-function greet(name) {
-    console.log(`Hello, ${name}!`);
-}
-
-greet("World");
+```
+https://api.archidrive.com/v1/
 ```
 
-## Exemple de code Python
+## Authentification
 
-Maintenant, un exemple en Python :
+L'API utilise un système d'authentification basé sur des jetons. Chaque demande doit inclure un jeton API valide dans les en-têtes pour être authentifiée. Vous pouvez obtenir un jeton en créant un compte et en récupérant les informations depuis votre tableau de bord.
 
-```python
-def greet(name):
-    print(f"Hello, {name}!")
+### Exemple d'en-tête d'authentification
 
-greet("World")
+```http
+GET /users/me HTTP/1.1
+Host: api.archidrive.com
+Authorization: Bearer <your-api-token>
 ```
 
-## Exemple de code HTML
+## Endpoints Principaux
 
-Voici un exemple de structure HTML de base :
+Voici un aperçu des principaux endpoints de l'API que vous utiliserez:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-</body>
-</html>
-```
+### Utilisateur API
 
-## Exemple de code Bash
+- **Création**: Créer un nouvel utilisateur dans ArchiDrive.
+  - `POST /users`
+  
+- **Récupérer des informations d'utilisateur**: Obtenez les détails d'un utilisateur spécifique.
+  - `GET /users/{id}`
+  
+- **Mise à jour**: Modifier les informations d'un utilisateur existant.
+  - `PUT /users/{id}`
+  
+- **Suppression**: Supprimer un utilisateur du système.
+  - `DELETE /users/{id}`
 
-Et enfin, un exemple de script Bash :
+### Facturation API
 
-```bash
-#!/bin/bash
-echo "Hello, World!"
-```
+- **Création de facture**: Créez une nouvelle facture pour un utilisateur.
+  - `POST /invoices`
+  
+- **Lister les factures**: Obtenez une liste de toutes les factures pour un utilisateur.
+  - `GET /invoices?user_id={id}`
+  
+- **Mettre à jour une facture**: Modifiez une facture existante.
+  - `PUT /invoices/{id}`
+  
+- **Supprimer une facture**: Supprimez une facture du système.
+  - `DELETE /invoices/{id}`
+  
+- **Toutes les factures**: Obtenez un aperçu de toutes les factures du système.
+  - `GET /invoices`
 
-## Texte simple
+## Gestion des Erreurs
 
-Ce document contient également du texte simple, comme celui-ci, pour s'assurer que tout fonctionne correctement en dehors des blocs de code.
+Lorsque vous utilisez l'API, certaines erreurs peuvent survenir. Voici un aperçu des codes d'erreur que vous pouvez rencontrer:
 
-Merci d'avoir testé ce document Markdown. Assurez-vous que chaque bloc de code est correctement rendu avec la coloration syntaxique et que le bouton "Copier le code" fonctionne comme prévu.
-```
+- **200 OK**: La requête a été effectuée avec succès.
+- **400 Bad Request**: Il y a une erreur dans la syntaxe de la requête.
+- **401 Unauthorized**: Le jeton d'authentification est manquant ou invalide.
+- **404 Not Found**: La ressource demandée n'existe pas.
+- **500 Internal Server Error**: Une erreur s'est produite sur le serveur.
 
-### Comment utiliser ce fichier
+## Limites de l'API
 
-1. **Créer le fichier** : Créez un fichier nommé `test.md` dans le dossier où vous stockez vos fichiers Markdown (par exemple, `/public/markdown-doc/test.md` si vous servez les fichiers depuis le dossier `public`).
+Chaque compte utilisateur est soumis à des limites de taux d'utilisation pour éviter les abus. Ces limites sont définies à:
 
-2. **Charger le fichier dans votre composant** : Utilisez votre composant `MarkdownPage` pour afficher ce fichier :
+- 100 requêtes par minute.
+- 10 000 requêtes par jour.
 
-   ```javascript
-   import React from 'react';
-   import MarkdownPage from './MarkdownPage';
+## FAQ
 
-   const App = () => {
-     return (
-       <div>
-         <h1>Test du rendu Markdown</h1>
-         <MarkdownPage markdownText="test.md" />
-       </div>
-     );
-   };
+Consultez notre section FAQ pour répondre aux questions les plus fréquentes sur l'API.
 
-   export default App;
-   ```
 
-3. **Tester dans votre application** : Lancez votre application, et assurez-vous que :
-   - Les blocs de code JavaScript, Python, HTML et Bash sont correctement colorés.
-   - Chaque bloc de code a un bouton "Copier le code" en haut à droite.
-   - Le bouton fonctionne et copie correctement le contenu du code dans le presse-papiers.
-   - Le texte simple est correctement rendu.
-
+Merci d'utiliser l'API ArchiDrive! Nous espérons que ce guide vous a aidé à démarrer rapidement avec votre intégration.

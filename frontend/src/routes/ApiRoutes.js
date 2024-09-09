@@ -26,6 +26,20 @@ const ApiRoutes = () => (
       <Route path="billing-api/delete" element={<MarkdownPage markdownText="delete-invoice.md" />} />
       <Route path="billing-api/getAll" element={<MarkdownPage markdownText="get-all-invoices.md" />} />
 
+      {/* Routes pour l'API de fichiers */}
+      <Route path="files-api/create" element={<MarkdownPage markdownText="create-folder.md" />} />
+      <Route path="files-api/delete" element={<MarkdownPage markdownText="delete-folder.md" />} />
+      <Route path="files-api/update" element={<MarkdownPage markdownText="update-folder.md" />} />
+      <Route path="files-api/getAll" element={<MarkdownPage markdownText="get-all-folders.md" />} />
+
+      {/* Routes pour l'API de dossiers */}
+      <Route path="folder-api/create" element={<MarkdownPage markdownText="create-folder.md" />} />
+      <Route path="folder-api/delete" element={<MarkdownPage markdownText="delete-folder.md" />} />
+      <Route path="folder-api/getAll" element={<MarkdownPage markdownText="get-all-folders.md" />} />
+
+      {/* Route pour la FAQ */}
+      
+
       <Route path="faq" element={<MarkdownPage markdownText="faq.md" />} />
     </Route>
   </Routes>
