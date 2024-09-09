@@ -72,8 +72,11 @@ dist/
 
 # Gatsby files
 .cache/
-public/
 
+# Ignore everything in the public folder except markdown-doc
+public/*
+!public/markdown-doc/
+!public/markdown-doc/**
 # vuepress build output
 .vuepress/dist
 
