@@ -201,7 +201,7 @@ exports.updateProfile = async (req, res) => {
 
     user = await userRepository.updateUser(req.user.id, updateData);
     await publishEvent('auth.updated', 'ExchangeAuth', {  email: user.email, firstName, lastName, address });
-    res.json({ success: true, user : {id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email, telephone : user.telephone, address : user.address }});
+    res.json({ success: true, user : {id : user._id,  address : user.address, firstName : user.firstName, lastName : user.lastName, email : user.email, telephone : user.telephone, address : user.address, isAdmin : user.isAdmin, storageLimit : user.storageLimit, subscription : user.subscription }});
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');

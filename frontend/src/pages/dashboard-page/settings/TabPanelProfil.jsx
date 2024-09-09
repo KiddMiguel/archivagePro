@@ -45,7 +45,7 @@ const TabPanelProfil = ({ selectedTab, index, user }) => {
         console.log(response);
         if (response.success) {
             updated(response.user, response.rootFolder);
-            navigate('/reload/dashboard');
+            navigate(user && user.isAdmin  ? '/reload/admin' :   '/reload/dashboard');
         } else {
             setError(response.message);
         }
