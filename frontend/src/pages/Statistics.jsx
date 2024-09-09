@@ -46,7 +46,7 @@ const Statistics = () => {
 
         const fetchUsers = async () => {
             const allUsers = await getAllUsers();
-            
+
             const filteredUsers = allUsers.filter(user => !user.isAdmin); // Filtre pour prendre tous les utilisateurs dont isAdmin est false
             setUsers(filteredUsers);  // Stocker les utilisateurs filtrés
         };
@@ -58,8 +58,9 @@ const Statistics = () => {
     // Préparation des données pour le graphique à barres (répartition par client)
     const clientData = {
         labels: filesByClient.map(([clientId]) => {
-            const user = users.find(user => user._id === clientId); // Trouver le nom de l'utilisateur
-            return user ? `${user.firstName} ${user.lastName}` : clientId; // Si l'utilisateur est trouvé, afficher son nom
+            //const user = users.find(user => user._id === clientId); // Trouver le nom de l'utilisateur
+            const user = users.length
+            return user ? `${user}` : "Aucun User trouvé"; // Si l'utilisateur est trouvé, afficher son nom
         }),
         datasets: [
             {
@@ -88,19 +89,19 @@ const Statistics = () => {
 
     return (
         <Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
-          <Box>
-            <Breadcrumbs aria-label="breadcrumb">
-              <Link underline="hover" color="inherit" href="/" fontSize="12px">
-                Accueil
-              </Link>
-              <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Statistiques</Typography>
-            </Breadcrumbs>
-            <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
-            Statistiques
-            </Typography>
-          </Box>
-        </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
+                <Box>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/" fontSize="12px">
+                            Accueil
+                        </Link>
+                        <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Statistiques</Typography>
+                    </Breadcrumbs>
+                    <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
+                        Statistiques
+                    </Typography>
+                </Box>
+            </Box>
 
             <Grid container spacing={3}>
                 {/* Total des fichiers uploadés */}
