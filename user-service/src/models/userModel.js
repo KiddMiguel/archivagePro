@@ -52,7 +52,7 @@ const UserSchema = new mongoose.Schema({
   },
   storageLimit: {
     type: Number,
-    default: 20 * 1024 * 1024 * 1024, // 20GB in bytes
+    default: 0, // 20GB in bytes
   },
   subscription: {
     type: String,
