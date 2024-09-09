@@ -57,9 +57,9 @@ const Statistics = () => {
 
     // Préparation des données pour le graphique à barres (répartition par client)
     const clientData = {
-        labels: filesByClient.map(([clientId]) => {
-            const user = users.find(user => user._id === clientId); // Trouver le nom de l'utilisateur
-            return user ? `${user.firstName} ${user.lastName}` : clientId; // Si l'utilisateur est trouvé, afficher son nom
+        labels: filesByClient.map(() => {
+            const user = users.length ; 
+            return user ? `${user}` : "Aucun User trouvé";        
         }),
         datasets: [
             {

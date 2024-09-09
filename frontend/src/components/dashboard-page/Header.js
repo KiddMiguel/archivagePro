@@ -26,26 +26,33 @@ export default function Header({ user, rootFolder }) {
   const [files, setFiles] = useState([]);
 
   const handleFiles = async () => {
-    const files = await getAllFiles(rootFolder.owner);
+    let files;
+  
+    if (rootFolder) {
+      files = await getAllFiles(rootFolder.owner);
+    } else {
+      files = await getAllFiles(user._id);
+    }
+  
     let totalSizeInBytes = 0;
-
+  
     // Convertir la taille des fichiers en Ko, Mo, Go et calculer la taille totale
     files && files.forEach((file) => {
       totalSizeInBytes += file.length; // Ajouter la taille de chaque fichier en octets
-
+  
       // Formater la taille de chaque fichier individuellement
       let fileSize = file.length;
       let i = 0;
       const byteUnits = ['octets', 'Ko', 'Mo', 'Go', 'To', 'Po', 'Eo', 'Zo', 'Yo'];
-
+  
       while (fileSize >= 1024 && i < byteUnits.length - 1) {
         fileSize /= 1024;
         i++;
       }
-
+  
       file.fileSize = `${fileSize.toFixed(2)} ${byteUnits[i]}`;
     });
-
+  
     setFiles(files);
   };
 
@@ -57,9 +64,9 @@ export default function Header({ user, rootFolder }) {
 
 
   useEffect(() => {
-    handleFiles();
 
     if (searchTerm) {
+      handleFiles();
       const results = files.filter((file) =>
         file.filename.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -68,7 +75,7 @@ export default function Header({ user, rootFolder }) {
     } else {
       setShowDropdown(false);
     }
-  }, [searchTerm, files]);
+  }, [searchTerm]);
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);

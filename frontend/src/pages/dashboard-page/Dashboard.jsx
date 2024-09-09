@@ -268,7 +268,7 @@ const Dashboard = ({rootFolder, user}) => {
             documents={sizes.documents}
             medias={sizes.medias}
             others={sizes.others}
-            limit={(sizes.limitStockage / 1000000000).toFixed(2)}
+            limit={(sizes.limitStockage / 1073741824).toFixed(2)}
             setFilesUpdated={setFilesUpdated}
 
           />

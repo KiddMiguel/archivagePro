@@ -1,4 +1,3 @@
-// src/pages/Signup.js
 import React, { useState } from "react";
 import {
   Container,
@@ -11,45 +10,64 @@ import {
   AppBar,
   Toolbar,
   Alert,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { register } from "../../services/service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../services/AuthContext";
 import CircularProgress from '@mui/material/CircularProgress';
+
 const Signup = () => {
   const navigate = useNavigate();
-  const [loading , setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const [error, setError] = React.useState(false);
-  const [message , setMessage] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = React.useState(false);
 
-  // Register
+  // Add state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Add state for password and confirm password
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Toggle password visibility
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
   const handleRegister = async (e) => {
     setLoading(true);
     e.preventDefault();
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      setConfirmPasswordError(true);
+      setLoading(false);
+      setMessage("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
     const user = {
       firstName: e.target.firstName.value,
       lastName: e.target.lastName.value,
       telephone: e.target.telephone.value,
       email: e.target.email.value,
-      password: e.target.password.value,
+      password: password,
     };
-    // Call the register function from the service
+
     const response = await register(user);
     if (response.success) {
       login(response.user, response.token, response.rootFolder);
-      navigate('/checkout');
+      navigate("/checkout");
     } else {
       setLoading(false);
       setError(true);
-      if(response.success === false){
-        setLoading(false);
-        setMessage(response.msg);
-      }else{
-        setLoading(false);
-        setMessage(response.errors[0].message);
-      }
+      setMessage(response.success === false ? response.msg : response.errors[0].message);
     }
   };
 
@@ -91,7 +109,7 @@ const Signup = () => {
         >
           <Box
             component="form"
-            onSubmit={(e) => handleRegister(e)}
+            onSubmit={handleRegister}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -178,10 +196,50 @@ const Signup = () => {
               fullWidth
               name="password"
               label="Mot de passe"
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
-              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               sx={{ marginBottom: "20px" }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="confirmPassword"
+              label="Confirmer le mot de passe"
+              type={showConfirmPassword ? "text" : "password"}
+              id="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              sx={{ marginBottom: "20px" }}
+              error={confirmPasswordError}
+              helperText={confirmPasswordError && "Les mots de passe ne correspondent pas"}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleClickShowConfirmPassword}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"
@@ -196,26 +254,25 @@ const Signup = () => {
                 fontSize: "15px",
               }}
             >
-        {loading ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                       Inscription en cours...
-                        <CircularProgress
-                          color="inherit" 
-                          thickness={5} 
-                          size={20} 
-                          sx={{ color: 'white' }} 
-                        />
-                      </div>
-                    ) : (
-                      'S\'inscrire'
-                    )}
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  Inscription en cours...
+                  <CircularProgress
+                    color="inherit"
+                    thickness={5}
+                    size={20}
+                    sx={{ color: 'white' }}
+                  />
+                </div>
+              ) : (
+                "S'inscrire"
+              )}
             </Button>
             {error && (
-              <Alert severity="error" sx={{ background : "white", color : "#dc3545"}}>
+              <Alert severity="error" sx={{ background: "white", color: "#dc3545" }}>
                 {message}
               </Alert>
             )}
-           
           </Box>
         </Container>
       </Box>
