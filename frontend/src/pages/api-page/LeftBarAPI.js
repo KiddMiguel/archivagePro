@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer, List, Divider, Toolbar, Typography, Box } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CodeIcon from '@mui/icons-material/Code';
 import SidebarItem from '../../components/dashboard-page/SidebarItem'; // Importez le composant SidebarItem
 
@@ -39,8 +39,22 @@ export default function LeftBarAPI({ open }) {
         return 12; // Index pour la suppression des factures
       case '/api/billing-api/getAll':
         return 13; // Index pour la récupération de toutes les factures (admin)
+      case '/api/files-api/create':
+        return 14; // Index pour la création de dossier
+      case '/api/files-api/delete':
+        return 15; // Index pour la suppression de dossier
+      case '/api/files-api/update':
+        return 16; // Index pour la mise à jour de dossier
+      case '/api/files-api/getAll':
+        return 17; // Index pour la récupération de tous les dossiers
+      case '/api/folder-api/create':
+        return 18; // Index pour la création de dossier
+      case '/api/folder-api/delete':
+        return 19; // Index pour la suppression de dossier
+      case '/api/folder-api/getAll':
+        return 21; // Index pour la récupération de tous les dossiers
       case '/api/faq':
-        return 14;
+        return 20;
       // Ajoutez d'autres cas pour chaque route
       default:
         return 0;
@@ -68,7 +82,11 @@ export default function LeftBarAPI({ open }) {
     >
       <Box>
         <Toolbar>
-          <Typography variant="h6">ArchiDrive API</Typography>
+          <Typography variant="h6">
+            <Link to="/" style={{ textDecoration: 'none', color : "#1976d2" }}>
+              ArchiDrive API
+            </Link>
+          </Typography>
         </Toolbar>
         <Divider />
         <List>
@@ -105,6 +123,18 @@ export default function LeftBarAPI({ open }) {
             subItems={[
               { text: 'Création', icon: <CodeIcon />, to: '/api/billing-api/create', index: 9 },
               { text: 'Factures', icon: <CodeIcon />, to: '/api/billing-api/invoices', index: 10 },
+              { text: 'Mise à jour', icon: <CodeIcon />, to: '/api/billing-api/update', index: 11 },
+              { text: 'Suppression', icon: <CodeIcon />, to: '/api/billing-api/delete', index: 12 },
+              { text: 'Toutes les factures', icon: <CodeIcon />, to: '/api/billing-api/getAll', index: 13 },
+            ]}
+          />
+          <SidebarItem
+            text="Fichiers API"
+            selectedIndex={selectedIndex}
+            currentIndex={9} // Index du parent Billing API
+            subItems={[
+              { text: 'Création dossier', icon: <CodeIcon />, to: '/api/folder-api/create', index: 9 },
+              { text: 'Dossiers', icon: <CodeIcon />, to: '/api/folder-api/getAll', index: 10 },
               { text: 'Mise à jour', icon: <CodeIcon />, to: '/api/billing-api/update', index: 11 },
               { text: 'Suppression', icon: <CodeIcon />, to: '/api/billing-api/delete', index: 12 },
               { text: 'Toutes les factures', icon: <CodeIcon />, to: '/api/billing-api/getAll', index: 13 },

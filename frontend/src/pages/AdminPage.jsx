@@ -206,10 +206,10 @@ const AdminPage = ({user}) => {
         <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
           <Box>
-            <Breadcrumbs aria-label="breadcrumb">
-              <Link underline="hover" color="inherit" href="/" fontSize="12px">
-                Accueil
-              </Link>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Typography  sx={{ fontWeight: "500", fontSize: "12px" }}>
+              Accueil
+            </Typography>
               <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Utilisateurs</Typography>
             </Breadcrumbs>
             <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>

@@ -57,9 +57,9 @@ const Statistics = () => {
 
     // Préparation des données pour le graphique à barres (répartition par client)
     const clientData = {
-        labels: filesByClient.map(([clientId]) => {
-            const user = users.find(user => user._id === clientId); // Trouver le nom de l'utilisateur
-            return user ? `${user.firstName} ${user.lastName}` : clientId; // Si l'utilisateur est trouvé, afficher son nom
+        labels: filesByClient.map(() => {
+            const user = users.length ; 
+            return user ? `${user}` : "Aucun User trouvé";        
         }),
         datasets: [
             {
@@ -90,10 +90,10 @@ const Statistics = () => {
         <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
           <Box>
-            <Breadcrumbs aria-label="breadcrumb">
-              <Link underline="hover" color="inherit" href="/" fontSize="12px">
-                Accueil
-              </Link>
+          <Breadcrumbs aria-label="breadcrumb">
+            <Typography  sx={{ fontWeight: "500", fontSize: "12px" }}>
+              Accueil
+            </Typography>
               <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Statistiques</Typography>
             </Breadcrumbs>
             <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
@@ -146,7 +146,7 @@ const Statistics = () => {
                 </Grid>
 
                 {/* Répartition par client (graphique à barres) */}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <Card>
                         <CardContent>
                             <Typography variant="h5" component="h2" gutterBottom>
@@ -158,7 +158,7 @@ const Statistics = () => {
                 </Grid>
 
                 {/* Graphique des fichiers uploadés par jour (graphique en courbes) */}
-                <Grid item xs={12}>
+                <Grid item xs={6}>
                     <Card>
                         <CardContent>
                             <Typography variant="h5" component="h2" gutterBottom>

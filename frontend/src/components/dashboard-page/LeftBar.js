@@ -104,7 +104,9 @@ export default function LeftBar({ open, rootFolder, user }) {
     >
       <Box>
         <Toolbar>
-          <Typography variant="h3">ArchiDrive</Typography>
+          <Typography variant="h3">           <Link to="/" style={{ textDecoration: 'none', color : "#1976d2" }}>
+              ArchiDrive
+            </Link></Typography>
         </Toolbar>
         <Divider />
         <List>

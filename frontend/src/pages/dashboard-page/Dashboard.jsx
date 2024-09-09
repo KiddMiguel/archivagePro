@@ -171,9 +171,9 @@ const Dashboard = ({rootFolder, user}) => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, borderBottom: "1px solid rgba(0, 0, 0, 0.12)", pb: 2 }}>
         <Box>
           <Breadcrumbs aria-label="breadcrumb">
-            <Link underline="hover" color="inherit" href="/" fontSize="12px">
+            <Typography  sx={{ fontWeight: "500", fontSize: "12px" }}>
               Accueil
-            </Link>
+            </Typography>
             <Typography color="text.primary" sx={{ fontWeight: "500", fontSize: "12px" }}>Dashboard</Typography>
           </Breadcrumbs>
           <Typography variant="h4" align="left" sx={{ fontWeight: 'bold', mt: 1 }}>
@@ -268,7 +268,7 @@ const Dashboard = ({rootFolder, user}) => {
             documents={sizes.documents}
             medias={sizes.medias}
             others={sizes.others}
-            limit={(sizes.limitStockage / 1000000000).toFixed(2)}
+            limit={(sizes.limitStockage / 1073741824).toFixed(2)}
             setFilesUpdated={setFilesUpdated}
 
           />
