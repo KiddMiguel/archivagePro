@@ -135,6 +135,8 @@ export default function LeftBar({ open, rootFolder, user }) {
             />
           </ListItem>
 
+          {user.isAdmin === true && (
+
           <ListItem
             button
             key="Statistiques"
@@ -161,7 +163,7 @@ export default function LeftBar({ open, rootFolder, user }) {
               }}
             />
           </ListItem>
-          
+          )}
 
           
         </List>
